@@ -21,7 +21,7 @@ namespace BRIM
         public int BottleSize;
         public string Brand;
         public int UnitsPerCase;
-        public string Vintage;
+        public int Vintage;
 
         public void CalculateStatus()
         {

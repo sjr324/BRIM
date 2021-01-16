@@ -1,13 +1,17 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace React.Sample.Webpack.CoreMvc
+//namespace React.Sample.Webpack.CoreMvc
+namespace BRIM
 {
 	public class Program
 	{
 		public static void Main(string[] args)
 		{
-			BuildWebHost(args).Run();
+			Inventory test = new Inventory();
+			test.GetItemList();
+
+			//BuildWebHost(args).Run();
 		}
 
 		public static IWebHost BuildWebHost(string[] args) =>
