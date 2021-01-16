@@ -100,34 +100,91 @@ namespace BRIM
         /// <summary>
         /// This method gets all of the recipes that have been registered in the dratabase and adds them to the 
         /// global recipeList variable. It overwrites the current global variable when it reads from the database.
+        /// initial call to get all the stored recipes, then must call the drinkrecipe table to get the list of all
+        /// registered ingredients, then must find the drink values from the drink table and make those values into a
+        /// tuple list for each recipe entry
         /// </summary>
         /// <returns>It returns an int representing the status of the request</returns>
         public int GetRecipeList()
         {
-            List<Recipe> newList = new List<Recipe>();
-            DataTable dt = new DataTable();
+            List<Recipe> newList = new List<Recipe>(); //return list
+            DataTable recipeNameTable = new DataTable(); //list of all recipe names
+            DataTable recipeIngredients = new DataTable(); //used to store the recipe ingredients
+
             int rowsReturned;
             string connString = @"SERVER=68.84.78.85;PORT=3306;DATABASE=brim;UID=dev;PASSWORD=devpassword;";
             //read from drink table and add to item list, can do food later down the line
             string query = @"select * from recipes";
 
-            MySqlConnection conn = new MySqlConnection(connString);
-            MySqlCommand cmd = new MySqlCommand(query, conn);
-            MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
-            conn.Open();
-            rowsReturned = adapter.Fill(dt);
-            conn.Close();
+            using (MySqlConnection conn = new MySqlConnection(connString))
+            {
+                conn.Open();
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                //initial call for list of all recipes
+                MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+                rowsReturned = adapter.Fill(recipeNameTable);
 
-            if (dt.Rows.Count == 0)
-            {
-                Console.WriteLine("The database query returned no data");
-            }
-            else
-            {
-                foreach (DataRow dr in dt.Rows)
+                if (recipeNameTable.Rows.Count == 0)
                 {
-                    //TODO: Build out recipe grabbing fucntionality. takes a lot more calls to do
+                    Console.WriteLine("The database query returned no data");
                 }
+                else
+                {
+                    foreach (DataRow dr in recipeNameTable.Rows)
+                    {
+                        Recipe tempRecipe = new Recipe();
+                        tempRecipe.Name = dr.Field<string>("name");
+                        int recipeID = dr.Field<int>("ID");
+                        List<(Item, double)> ingredientList = new List<(Item, double)>(); //stores the list of ingredients for each recipe
+
+                        //call the database to get the items that correspond to that recipe ID
+                        cmd.CommandText = "select * from drinkrecipes where recipeID = " + recipeID;
+                        adapter = new MySqlDataAdapter(cmd);
+                        rowsReturned = adapter.Fill(recipeIngredients);
+
+                        if (rowsReturned == 0)
+                        {
+                            //print an error somewhere
+                            Console.WriteLine("There are no ingredients for this recipe");
+                        } else
+                        {
+                            //use that list of ingredients to find their names and store their values into a tuple to add to the recipe list
+                            foreach (DataRow ingredientRow in recipeIngredients.Rows)
+                            {
+                                double quantity = ingredientRow.Field<double>("itemQuantity");
+                                int itemID = ingredientRow.Field<int>("drinkID");
+
+                                cmd.CommandText = "select name from drinks where drinkID = " + itemID;
+                                string itemName = (string)cmd.ExecuteScalar();
+
+                                //need to search the itemList for the item with the same name, then add both.
+                                int i = 0;
+                                while (i < ItemList.Count)
+                                {
+                                    if (ItemList[i].Name == itemName)
+                                    {
+                                        break;
+                                    }
+                                    i++;
+                                }
+
+                                if (i >= ItemList.Count)
+                                {
+                                    //item was not found, error
+                                    Console.WriteLine("Ingredient could not be found in item list");
+                                }
+
+                                //add the tuple for the ingredient to the tuple list
+                                ingredientList.Add((ItemList[i], quantity));
+                            }
+                        }
+
+                        //set the ingredient list for the tempRecipe and then add that recipe to the new recipeList
+                        tempRecipe.ItemList = ingredientList;
+                        newList.Add(tempRecipe);
+                    }
+                }
+
             }
 
             RecipeList = newList;
