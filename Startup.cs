@@ -7,7 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using React.AspNet;
 
-namespace React.Sample.Webpack.CoreMvc
+//namespace React.Sample.Webpack.CoreMvc
+namespace BRIM
 {
 	public class Startup
 	{
