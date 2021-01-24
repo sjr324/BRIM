@@ -14,7 +14,7 @@ namespace BRIM
         public List<Item> ItemList = new List<Item>(); //holds all items registered to this BRIM instance
         public List<Recipe> RecipeList = new List<Recipe>(); //holds all of the recipes for this BRIM instance
         public string Country;
-        public DatabaseManager databaseManager;
+        public DatabaseManager databaseManager = new DatabaseManager();
 
         public int UpdateItem(Item info)
         {

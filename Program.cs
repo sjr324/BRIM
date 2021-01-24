@@ -11,6 +11,7 @@ namespace BRIM
 		{
 			Inventory test = new Inventory();
 			test.GetItemList();
+			test.GetRecipeList();
 			Console.WriteLine(test.ItemList);
 
 			//BuildWebHost(args).Run();
