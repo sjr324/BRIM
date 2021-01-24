@@ -10,6 +10,7 @@ namespace BRIM
 
     public interface Item
     {
+        int ID { get; set; }
         string Name { get; set; }
         double Price { get; set; }
         double LowerEstimate { get; set; }
