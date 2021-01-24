@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 
 namespace BRIM
 {
-    public enum unit { oz, ml } //standard measurement units
+    public enum unit { milliliters, ounces } //standard measurement units
     public enum status { empty, belowPar, belowIdeal, aboveIdeal } //the status of an inventory item
 
     public interface Item
     {
+        int ID { get; set; }
         string Name { get; set; }
         double Price { get; set; }
         double LowerEstimate { get; set; }
