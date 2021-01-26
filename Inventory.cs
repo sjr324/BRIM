@@ -28,7 +28,7 @@ namespace BRIM
                 + "', measurmentUnit = '" + updateItem.Measurement + "', parLevel = '" + updateItem.ParLevel + "', idealLevel = '" + updateItem.IdealLevel + "', bottleSize = '" 
                 + updateItem.BottleSize + "', brand = '" + updateItem.Brand + "', bottlesPerCase = '" + updateItem.UnitsPerCase + "', vintage = '" + updateItem.Vintage + "' where "
                 + "drinkID = '" + updateItem.ID + "'";
-            bool result = this.databaseManager.runUpdateQuery(query);
+            bool result = this.databaseManager.runSqlQuery(query);
 
             if (!result)
             {
@@ -50,7 +50,7 @@ namespace BRIM
             string query = @"insert into brim.drinks (name, lowerEstimate, upperEstimate, measurmentUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
                 + newItem.Name + "', '" + newItem.LowerEstimate + "', '" + newItem.UpperEstimate + "', '" + newItem.Measurement + "', '" + newItem.ParLevel + "', '" + newItem.IdealLevel
                 + "', '" + newItem.BottleSize + "', '" + newItem.Brand + "', '" + newItem.UnitsPerCase + "', '" + newItem.Vintage + "')";
-            bool result = this.databaseManager.runInsertQuery(query);
+            bool result = this.databaseManager.runSqlQuery(query);
             
             if (!result)
             {
@@ -62,6 +62,15 @@ namespace BRIM
 
         public int RemoveItem(Item i)
         {
+            Drink removeItem = i as Drink;
+            string query = @"delete from brim.drinks where drinkID = '" + removeItem.ID + "'";
+            bool result = this.databaseManager.runSqlQuery(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Item removal failed");
+            }
+
             return 0;
         }
 

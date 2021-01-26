@@ -33,36 +33,18 @@ namespace BRIM
             return dt;
         }
 
-        //Runs the given insert statement to add an item to the database
-        public bool runInsertQuery(string query)
+        //Runs the given insert, update, or delete statement to add affect the database, returns the amount of rows affected
+        public bool runSqlQuery(string query)
         {
             MySqlCommand cmd = new MySqlCommand(query, conn);
             conn.Open();
-            int rowsInserted = cmd.ExecuteNonQuery();
+            int rowsAffected = cmd.ExecuteNonQuery();
             conn.Close();
 
-            if(rowsInserted <= 0)
+            if(rowsAffected <= 0)
             {
                 Console.WriteLine("The database query could not insert the information");
                 
-                return false;
-            }
-
-            return true;
-        }
-
-        //Runs the given update statement to update an item in the database
-        public bool runUpdateQuery(string query)
-        {
-            MySqlCommand cmd = new MySqlCommand(query, conn);
-            conn.Open();
-            int rowsUpdated = cmd.ExecuteNonQuery();
-            conn.Close();
-
-            if(rowsUpdated <= 0)
-            {
-                Console.WriteLine("The database query could not update the information");
-
                 return false;
             }
 
