@@ -16,13 +16,47 @@ namespace BRIM
         public string Country;
         public DatabaseManager databaseManager = new DatabaseManager();
 
+        /// <summary>
+        /// Runs anh update command on the item based off the item that is sent in from the frontend
+        /// </summary>
+        /// <param name="info">An item that is created from the frontend</param>
+        /// <returns>an integer return based on the exit status of the function</returns>
         public int UpdateItem(Item info)
         {
+            Drink updateItem = info as Drink;
+            string query = @"update brim.drinks set name = '" + updateItem.Name + "', lowerEstimate = '" + updateItem.LowerEstimate + "', upperEstimate = '" + updateItem.UpperEstimate 
+                + "', measurmentUnit = '" + updateItem.Measurement + "', parLevel = '" + updateItem.ParLevel + "', idealLevel = '" + updateItem.IdealLevel + "', bottleSize = '" 
+                + updateItem.BottleSize + "', brand = '" + updateItem.Brand + "', bottlesPerCase = '" + updateItem.UnitsPerCase + "', vintage = '" + updateItem.Vintage + "' where "
+                + "drinkID = '" + updateItem.ID + "'";
+            bool result = this.databaseManager.runUpdateQuery(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Item Update Failed");
+            }
+
             return 0;
         }
 
+        /// <summary>
+        /// Takes the item information sent to it from the frontend and makes an Insert call to the database to add an item.
+        /// The database call returns true if the item is added and false otherwise.
+        /// </summary>
+        /// <param name="i">Item that the frontend sends to the backend</param>
+        /// <returns>An integer is returned that corresponds to the exit status of the method</returns>
         public int AddItem(Item i)
         {
+            Drink newItem = i as Drink;
+            string query = @"insert into brim.drinks (name, lowerEstimate, upperEstimate, measurmentUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
+                + newItem.Name + "', '" + newItem.LowerEstimate + "', '" + newItem.UpperEstimate + "', '" + newItem.Measurement + "', '" + newItem.ParLevel + "', '" + newItem.IdealLevel
+                + "', '" + newItem.BottleSize + "', '" + newItem.Brand + "', '" + newItem.UnitsPerCase + "', '" + newItem.Vintage + "')";
+            bool result = this.databaseManager.runInsertQuery(query);
+            
+            if (!result)
+            {
+                Console.WriteLine("Error: Item Addition Failed");
+            }
+
             return 0;
         }
 
@@ -49,6 +83,7 @@ namespace BRIM
             List<Item> drinksList = new List<Item>();
             drinksList = this.databaseManager.getDrinks();
             ItemList = drinksList;
+
             return 0;
         }
 
@@ -75,11 +110,14 @@ namespace BRIM
             List<Recipe> recipeList = new List<Recipe>();
             recipeList = this.databaseManager.getRecipes();
             RecipeList = recipeList;
+
             return 0;
         }
 
         public int AddRecipe()
         {
+
+
             return 0;
         }
 
