@@ -16,18 +16,59 @@ namespace BRIM
         public string Country;
         public DatabaseManager databaseManager = new DatabaseManager();
 
+        /// <summary>
+        /// Runs anh update command on the item based off the item that is sent in from the frontend
+        /// </summary>
+        /// <param name="info">An item that is created from the frontend</param>
+        /// <returns>an integer return based on the exit status of the function</returns>
         public int UpdateItem(Item info)
         {
+            Drink updateItem = info as Drink;
+            bool result = this.databaseManager.updateDrink(updateItem);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Item Update Failed");
+            }
+
             return 0;
         }
 
+        /// <summary>
+        /// Takes the item information sent to it from the frontend and calls database to add an item.
+        /// The database call returns true if the item is added and false otherwise.
+        /// </summary>
+        /// <param name="i">Item that the frontend sends to the backend</param>
+        /// <returns>An integer is returned that corresponds to the exit status of the method</returns>
         public int AddItem(Item i)
         {
+            Drink newItem = i as Drink;
+            bool result = this.databaseManager.addDrink(newItem);
+            
+            if (!result)
+            {
+                Console.WriteLine("Error: Item Addition Failed");
+            }
+
             return 0;
         }
 
+        /// <summary>
+        /// This item takes in an item to be removed and then makes a call to the database to delete that item
+        /// The database call returns true if the item is removed and false otherwise.
+        /// </summary>
+        /// <param name="i">The item to be deleted</param>
+        /// <returns>an integer value representing the exit status of the method</returns>
         public int RemoveItem(Item i)
         {
+            Drink removeItem = i as Drink;
+            bool result = this.databaseManager.deleteDrink(removeItem);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Item removal failed");
+            }
+
             return 0;
         }
 
@@ -49,6 +90,7 @@ namespace BRIM
             List<Item> drinksList = new List<Item>();
             drinksList = this.databaseManager.getDrinks();
             ItemList = drinksList;
+
             return 0;
         }
 
@@ -75,11 +117,14 @@ namespace BRIM
             List<Recipe> recipeList = new List<Recipe>();
             recipeList = this.databaseManager.getRecipes();
             RecipeList = recipeList;
+
             return 0;
         }
 
         public int AddRecipe()
         {
+
+
             return 0;
         }
 
