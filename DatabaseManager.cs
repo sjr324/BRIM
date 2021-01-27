@@ -33,8 +33,8 @@ namespace BRIM
             return dt;
         }
 
-        //Runs the given insert, update, or delete statement to add affect the database, returns the amount of rows affected
-        public bool runSqlQuery(string query)
+        //Runs the given insert, update, or delete statement to add affect the database, returns true if it succeeds, false otherwise
+        private bool runSqlQuery(string query)
         {
             MySqlCommand cmd = new MySqlCommand(query, conn);
             conn.Open();
@@ -43,8 +43,61 @@ namespace BRIM
 
             if(rowsAffected <= 0)
             {
-                Console.WriteLine("The database query could not insert the information");
+                Console.WriteLine("The database query could not run the query");
                 
+                return false;
+            }
+
+            return true;
+        }
+
+        //Creates then runs a delete query
+        public bool deleteDrink(Drink drink)
+        {
+            string query = @"delete from brim.drinks where drinkID = '" + drink.ID + "'";
+            bool result = this.runSqlQuery(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Drink could not be deleted");
+
+                return false;
+            }
+
+            return true;
+        }
+
+        //Creates then runs an insert query
+        public bool addDrink(Drink drink)
+        {
+            string query = @"insert into brim.drinks (name, lowerEstimate, upperEstimate, measurmentUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
+                + drink.Name + "', '" + drink.LowerEstimate + "', '" + drink.UpperEstimate + "', '" + drink.Measurement + "', '" + drink.ParLevel + "', '" + drink.IdealLevel
+                + "', '" + drink.BottleSize + "', '" + drink.Brand + "', '" + drink.UnitsPerCase + "', '" + drink.Vintage + "')";
+            bool result = this.runSqlQuery(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Drink could not be added");
+
+                return false;
+            }
+
+            return true;
+        }
+
+        //Creates then runs an update query
+        public bool updateDrink(Drink drink)
+        {
+            string query = @"update brim.drinks set name = '" + drink.Name + "', lowerEstimate = '" + drink.LowerEstimate + "', upperEstimate = '" + drink.UpperEstimate
+                + "', measurmentUnit = '" + drink.Measurement + "', parLevel = '" + drink.ParLevel + "', idealLevel = '" + drink.IdealLevel + "', bottleSize = '"
+                + drink.BottleSize + "', brand = '" + drink.Brand + "', bottlesPerCase = '" + drink.UnitsPerCase + "', vintage = '" + drink.Vintage + "' where "
+                + "drinkID = '" + drink.ID + "'";
+            bool result = this.runSqlQuery(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Drink could not be updated");
+
                 return false;
             }
 

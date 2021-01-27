@@ -24,11 +24,7 @@ namespace BRIM
         public int UpdateItem(Item info)
         {
             Drink updateItem = info as Drink;
-            string query = @"update brim.drinks set name = '" + updateItem.Name + "', lowerEstimate = '" + updateItem.LowerEstimate + "', upperEstimate = '" + updateItem.UpperEstimate 
-                + "', measurmentUnit = '" + updateItem.Measurement + "', parLevel = '" + updateItem.ParLevel + "', idealLevel = '" + updateItem.IdealLevel + "', bottleSize = '" 
-                + updateItem.BottleSize + "', brand = '" + updateItem.Brand + "', bottlesPerCase = '" + updateItem.UnitsPerCase + "', vintage = '" + updateItem.Vintage + "' where "
-                + "drinkID = '" + updateItem.ID + "'";
-            bool result = this.databaseManager.runSqlQuery(query);
+            bool result = this.databaseManager.updateDrink(updateItem);
 
             if (!result)
             {
@@ -39,7 +35,7 @@ namespace BRIM
         }
 
         /// <summary>
-        /// Takes the item information sent to it from the frontend and makes an Insert call to the database to add an item.
+        /// Takes the item information sent to it from the frontend and calls database to add an item.
         /// The database call returns true if the item is added and false otherwise.
         /// </summary>
         /// <param name="i">Item that the frontend sends to the backend</param>
@@ -47,10 +43,7 @@ namespace BRIM
         public int AddItem(Item i)
         {
             Drink newItem = i as Drink;
-            string query = @"insert into brim.drinks (name, lowerEstimate, upperEstimate, measurmentUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
-                + newItem.Name + "', '" + newItem.LowerEstimate + "', '" + newItem.UpperEstimate + "', '" + newItem.Measurement + "', '" + newItem.ParLevel + "', '" + newItem.IdealLevel
-                + "', '" + newItem.BottleSize + "', '" + newItem.Brand + "', '" + newItem.UnitsPerCase + "', '" + newItem.Vintage + "')";
-            bool result = this.databaseManager.runSqlQuery(query);
+            bool result = this.databaseManager.addDrink(newItem);
             
             if (!result)
             {
@@ -60,11 +53,16 @@ namespace BRIM
             return 0;
         }
 
+        /// <summary>
+        /// This item takes in an item to be removed and then makes a call to the database to delete that item
+        /// The database call returns true if the item is removed and false otherwise.
+        /// </summary>
+        /// <param name="i">The item to be deleted</param>
+        /// <returns>an integer value representing the exit status of the method</returns>
         public int RemoveItem(Item i)
         {
             Drink removeItem = i as Drink;
-            string query = @"delete from brim.drinks where drinkID = '" + removeItem.ID + "'";
-            bool result = this.databaseManager.runSqlQuery(query);
+            bool result = this.databaseManager.deleteDrink(removeItem);
 
             if (!result)
             {
