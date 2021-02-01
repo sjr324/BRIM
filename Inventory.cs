@@ -14,7 +14,17 @@ namespace BRIM
         public List<Item> ItemList = new List<Item>(); //holds all items registered to this BRIM instance
         public List<Recipe> RecipeList = new List<Recipe>(); //holds all of the recipes for this BRIM instance
         public string Country;
-        public DatabaseManager databaseManager = new DatabaseManager();
+        public DatabaseManager databaseManager;
+
+        /// <summary>
+        /// Constructor, makes initial database calls to populate lists
+        /// </summary>
+        public Inventory(){
+
+            databaseManager = new DatabaseManager();
+            this.GetItemList();
+            this.GetRecipeList();
+        }
 
         /// <summary>
         /// Runs anh update command on the item based off the item that is sent in from the frontend
