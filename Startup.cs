@@ -64,8 +64,9 @@ namespace BRIM
 				// your components as well as all of their dependencies.
 				// See http://reactjs.net/ for more information. Example:
 				config
-				  .AddScript("~/js/remarkable.min.js")
-				  .AddScript("~/js/tutorial.jsx")
+				  //.AddScript("~/js/remarkable.min.js")
+				  //.AddScript("~/js/tutorial.jsx")
+				  .AddScript("~/js/wrapper.jsx")
 				  .SetJsonSerializerSettings(new JsonSerializerSettings
 					{
 						StringEscapeHandling = StringEscapeHandling.EscapeHtml,
@@ -87,7 +88,7 @@ namespace BRIM
 
 			app.UseEndpoints(endpoints =>
 			{
-				endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+				endpoints.MapControllerRoute("default", "{controller=Item}/{action=Index}/{id?}");
 			});
 		}
 	}
