@@ -1,91 +1,58 @@
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using ReactDemo.Models;
 
-namespace React.Sample.Webpack.CoreMvc.Controllers
+namespace ReactDemo.Controllers
 {
 	public class HomeController : Controller
 	{
-		private const int COMMENTS_PER_PAGE = 3;
+		private static readonly IList<CommentModel> _comments;
 
-		private readonly IDictionary<string, AuthorModel> _authors;
-		private readonly IList<CommentModel> _comments;
-
-		public HomeController()
+		static HomeController()
 		{
-			// In reality, you would use a repository or something for fetching data
-			// For clarity, we'll just use a hard-coded list.
-			_authors = new Dictionary<string, AuthorModel>
-			{
-				{"daniel", new AuthorModel { Name = "Daniel Lo Nigro", GithubUsername = "Daniel15" }},
-				{"vjeux", new AuthorModel { Name = "Christopher Chedeau", GithubUsername = "vjeux" }},
-				{"cpojer", new AuthorModel { Name = "Christoph Pojer", GithubUsername = "cpojer" }},
-				{"jordwalke", new AuthorModel { Name = "Jordan Walke", GithubUsername = "jordwalke" }},
-				{"zpao", new AuthorModel { Name = "Paul O'Shannessy", GithubUsername = "zpao" }},
-			};
 			_comments = new List<CommentModel>
 			{
-				new CommentModel { Author = _authors["daniel"], Text = "First!!!!111!" },
-				new CommentModel { Author = _authors["zpao"], Text = "React is awesome!" },
-				new CommentModel { Author = _authors["cpojer"], Text = "Awesome!" },
-				new CommentModel { Author = _authors["vjeux"], Text = "Hello World" },
-				new CommentModel { Author = _authors["daniel"], Text = "Foo" },
-				new CommentModel { Author = _authors["daniel"], Text = "Bar" },
-				new CommentModel { Author = _authors["daniel"], Text = "FooBarBaz" },
+				new CommentModel
+				{
+					Id = 1,
+					Author = "Daniel Lo Nigro",
+					Text = "Hello ReactJS.NET World!"
+				},
+				new CommentModel
+				{
+					Id = 2,
+					Author = "Pete Hunt",
+					Text = "This is one comment"
+				},
+				new CommentModel
+				{
+					Id = 3,
+					Author = "Jordan Walke",
+					Text = "This is *another* comment"
+				},
 			};
 		}
 
 		public ActionResult Index()
 		{
-			return View(new IndexViewModel
-			{
-				Comments = _comments.Take(COMMENTS_PER_PAGE).ToList().AsReadOnly(),
-				CommentsPerPage = COMMENTS_PER_PAGE,
-				Page = 1
-			});
+			return View(_comments);
 		}
 
-		public ActionResult Comments(int page)
+		[Route("comments")]
+		[ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+		public ActionResult Comments()
 		{
-			var comments = _comments.Skip((page - 1) * COMMENTS_PER_PAGE).Take(COMMENTS_PER_PAGE);
-			var hasMore = page * COMMENTS_PER_PAGE < _comments.Count;
-
-			if (ControllerContext.HttpContext.Request.ContentType == "application/json")
-			{
-				return new JsonResult(new
-				{
-					comments = comments,
-					hasMore = hasMore
-				});
-			}
-			else
-			{
-				return View("~/Views/Home/Index.cshtml", new IndexViewModel
-				{
-					Comments = _comments.Take(COMMENTS_PER_PAGE * page).ToList().AsReadOnly(),
-					CommentsPerPage = COMMENTS_PER_PAGE,
-					Page = page
-				});
-			}
+			return Json(_comments);
 		}
 
-		public class AuthorModel
+		[Route("comments/new")]
+		[HttpPost]
+		public ActionResult AddComment(CommentModel comment)
 		{
-			public string Name { get; set; }
-			public string GithubUsername { get; set; }
-		}
-
-		public class CommentModel
-		{
-			public AuthorModel Author { get; set; }
-			public string Text { get; set; }
-		}
-
-		public class IndexViewModel
-		{
-			public IReadOnlyList<CommentModel> Comments { get; set; }
-			public int CommentsPerPage { get; set; }
-			public int Page { get; set; }
+			// Create a fake ID for this comment
+			comment.Id = _comments.Count + 1;
+			_comments.Add(comment);
+			return Content("Success :)");
 		}
 	}
 }

@@ -1,19 +1,24 @@
-@using React.AspNet
-@using React.RenderFunctions
-@using React.Router
-@model React.Sample.Webpack.CoreMvc.Controllers.HomeController.IndexViewModel
-
+@model IEnumerable<ReactDemo.Models.CommentModel>
 @{
-	Layout = "_Layout";
-	var emotionFunctions = new EmotionFunctions();
-	var styledComponentsFunctions = new StyledComponentsFunctions();
-	var reactJssFunctions = new ReactJssFunctions();
-	var helmetFunctions = new ReactHelmetFunctions();
-
-	var chainedFunctions = new ChainedRenderFunctions(emotionFunctions, styledComponentsFunctions, reactJssFunctions, helmetFunctions);
+	Layout = null;
 }
-@Html.ReactRouter("Components.RootComponent", new { initialComments = Model.Comments, page = Model.Page }, renderFunctions: chainedFunctions)
-@{
-	ViewBag.ServerStyles = styledComponentsFunctions.RenderedStyles + reactJssFunctions.RenderedStyles;
-	ViewBag.HelmetTitle = helmetFunctions.RenderedHelmet?.GetValueOrDefault("title");
-}
+<html>
+<head>
+	<title>Hello React</title>
+</head>
+<body>
+	@Html.React("CommentBox", new
+	{
+		initialData = Model,
+		url = Url.Action("Comments"),
+		submitUrl = Url.Action("AddComment"),
+		pollInterval = 2000,
+	})
+	<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/16.13.0/umd/react.development.js"></script>
+	<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/16.13.0/umd/react-dom.development.js"></script>
+	<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.6.0/prop-types.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/remarkable/1.7.1/remarkable.min.js"></script>
+	<script src="@Url.Content("~/js/tutorial.jsx")"></script>
+	@Html.ReactInitJavaScript()
+</body>
+</html>

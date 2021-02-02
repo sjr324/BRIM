@@ -1,25 +1,30 @@
 using System;
-using Microsoft.AspNetCore;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 
-//namespace React.Sample.Webpack.CoreMvc
-namespace BRIM
+namespace BRIM 
 {
-	public class Program
-	{
-		public static void Main(string[] args)
-		{
-			Inventory test = new Inventory();
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            Inventory test = new Inventory();
 			test.GetItemList();
 			test.GetRecipeList();
 			Console.WriteLine(test.ItemList);
 
-			//BuildWebHost(args).Run();
-		}
+            var host = new WebHostBuilder()
+                .UseKestrel()
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseIISIntegration()
+                .UseStartup<Startup>()
+                .Build();
 
-		public static IWebHost BuildWebHost(string[] args) =>
-			WebHost.CreateDefaultBuilder(args)
-				.UseStartup<Startup>()
-				.Build();
-	}
+
+            host.Run();
+        }
+    }
 }
