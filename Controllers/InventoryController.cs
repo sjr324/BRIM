@@ -7,7 +7,6 @@ namespace React.Sample.Webpack.CoreMvc.Controllers
 {
 	public class InventoryController: Controller
 	{
-		private const int ITEMS_PER_PAGE = 15;
 
 		private Inventory inventory;
 		private const int COMMENTS_PER_PAGE = 3;
@@ -17,11 +16,12 @@ namespace React.Sample.Webpack.CoreMvc.Controllers
 		{
 			//initialize the inventory
 			inventory = new Inventory();
-			
+			inventory.GetItemList();
+			inventory.GetRecipeList();	
 		}
-		public ActionResult Items(){
+		public ActionResult Index(){
 			return View(new ItemViewModel{
-				Items = this.inventory.ItemList.Take(ITEMS_PER_PAGE).ToList().AsReadOnly()
+				Items = this.inventory.ItemList.AsReadOnly()
 			});
 		}
 /*

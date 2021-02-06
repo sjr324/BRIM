@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactDOMServer from 'react-dom/server';
 
-import RootComponent from './home.jsx';
+import RootComponent from './items.jsx';
 import { ServerStyleSheet } from 'styled-components';
 import { JssProvider, SheetsRegistry } from 'react-jss';
 import { renderStylesToString } from 'emotion-server';

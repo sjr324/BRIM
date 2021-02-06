@@ -10,10 +10,6 @@ import {
 import { Helmet } from 'react-helmet';
 
 import { CommentsBox } from './comments/Sample.jsx';
-import { StyledComponentsDemo } from './styled-components.jsx';
-import { EmotionDemo } from './emotion.jsx';
-import { ReactJssDemo } from './react-jss.jsx';
-import { LazyLoadDemo } from './lazy-load.jsx';
 
 class Navbar extends Component {
 	render() {
@@ -24,18 +20,6 @@ class Navbar extends Component {
 				</li>
 				<li>
 					<Link to="/comments">Comments Demo</Link>
-				</li>
-				<li>
-					<Link to="/styled-components">Styled Components Demo</Link>
-				</li>
-				<li>
-					<Link to="/react-jss">React-JSS Demo</Link>
-				</li>
-				<li>
-					<Link to="/emotion">Emotion Demo</Link>
-				</li>
-				<li>
-					<Link to="/lazy-load">Lazy loading demo</Link>
 				</li>
 			</ul>
 		);
@@ -79,21 +63,7 @@ export default class HomeComponent extends Component {
 								/>
 							)}
 						/>
-						<Route
-							path="/styled-components"
-							component={StyledComponentsDemo}
-						/>
-						<Route path="/react-jss" component={ReactJssDemo} />
-						<Route path="/emotion" component={EmotionDemo} />
-						<Route path="/lazy-load" component={LazyLoadDemo} />
-						<Route
-							path="*"
-							component={({ staticContext }) => {
-								if (staticContext) staticContext.status = 404;
-
-								return <h1>Not Found :(</h1>;
-							}}
-						/>
+						
 					</Switch>
 				</div>
 			</div>

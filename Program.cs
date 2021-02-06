@@ -9,12 +9,7 @@ namespace BRIM
 	{
 		public static void Main(string[] args)
 		{
-			Inventory test = new Inventory();
-			test.GetItemList();
-			test.GetRecipeList();
-			Console.WriteLine(test.ItemList);
-
-			//BuildWebHost(args).Run();
+			BuildWebHost(args).Run();
 		}
 
 		public static IWebHost BuildWebHost(string[] args) =>
