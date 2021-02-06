@@ -21,41 +21,84 @@ namespace BRIM
             DataTable dt = new DataTable();
             MySqlCommand cmd = new MySqlCommand(query, conn);
             MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+            int rowsReturned;
+
             //Is there a reason we open and close for every query instead of just keeping it open?
             //beats me, but I'll ask the others later
-            conn.Open();
-            int rowsReturned = adapter.Fill(dt);
-            conn.Close();
-            if (dt.Rows.Count == 0)
+            try {
+                conn.Open();
+                rowsReturned = adapter.Fill(dt);
+                conn.Close();
+            } catch (MySqlException ex) {
+                Console.WriteLine("MYSQL ERROR OCCURED! ERROR MESSAGE: " + ex.Message);
+            }
+
+            if (rowsReturned == 0)
             {
                 Console.WriteLine("The database query returned no data");
             }
             return dt;
         }
 
-        //Runs the given insert, update, or delete statement to add affect the database, returns true if it succeeds, false otherwise
-        private bool runSqlQuery(string query)
+        // Runs the given insert, update, or delete statement to add affect the database, 
+        //returns true if Command successful executes, otherwise returns false
+        private bool runSqlInsertUpdateOrDeleteCommand(string query)
         {
-            MySqlCommand cmd = new MySqlCommand(query, conn);
-            conn.Open();
-            int rowsAffected = cmd.ExecuteNonQuery();
-            conn.Close();
-
-            if(rowsAffected <= 0)
-            {
-                Console.WriteLine("The database query could not run the query");
-                
+            int rowsAffected;
+            try {
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                conn.Open();
+                rowsAffected = cmd.ExecuteNonQuery();
+                conn.Close();
+            } catch (MySqlException ex) {
+                Console.WriteLine("MYSQL ERROR OCCURED! ERROR MESSAGE: " + ex.Message);
                 return false;
             }
 
+            if (rowsAffected == 0) {
+                Console.WriteLine("The Command was Valid, but no Rows where affected: ");
+            } else if (rowsAffected < 0){
+                Console.WriteLine("The Given Query was not for an Update, or Delete Command: ");
+                return false;
+            }
             return true;
         }
+
+        // Runs the given insert statement to affect the database, 
+        // returns the value given to the Auto-incremented Colmun of the last insert made
+        // assuming to multi-threading shenanigans happen, that should be the ID of the entry
+        // this method just inserted
+        // IF the command fails, returns -1 
+        // NOTE: while this code CAN technically Run DELETE and UPDATE Commands, the return value will only
+        // be relevant for Insert Commands
+        private int runSqlInsertCommandReturnID(string query)
+        {
+            int rowsAffected, newValueID;
+            try {
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                conn.Open();
+                rowsAffected = cmd.ExecuteNonQuery();
+                //WARNING, This method of getting the ID is the t but is NOT entirely thread safe
+                newValueID = cmd.LastInsertedId;
+                conn.Close();
+            } catch (MySqlException ex) {
+                Console.WriteLine("MYSQL ERROR OCCURED! ERROR MESSAGE: " + ex.Message);
+                return -1;
+            }
+            
+            if (rowsAffected < 0){
+                Console.WriteLine("The Given Query was not for an Insert, Update, or Delete Command: ");
+                return -1;
+            }
+            return newValueID;
+        }
+
 
         //Creates then runs a delete query
         public bool deleteDrink(Drink drink)
         {
             string query = @"delete from brim.drinks where drinkID = '" + drink.ID + "'";
-            bool result = this.runSqlQuery(query);
+            bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
             if (!result)
             {
@@ -73,12 +116,11 @@ namespace BRIM
             string query = @"insert into brim.drinks (name, lowerEstimate, upperEstimate, measurmentUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
                 + drink.Name + "', '" + drink.LowerEstimate + "', '" + drink.UpperEstimate + "', '" + drink.Measurement + "', '" + drink.ParLevel + "', '" + drink.IdealLevel
                 + "', '" + drink.BottleSize + "', '" + drink.Brand + "', '" + drink.UnitsPerCase + "', '" + drink.Vintage + "')";
-            bool result = this.runSqlQuery(query);
+            int newDrinkID = this.runSqlInsertCommandReturnID(query);
 
-            if (!result)
+            if (newDrinkID == -1)
             {
                 Console.WriteLine("Error: Drink could not be added");
-
                 return false;
             }
 
@@ -92,12 +134,11 @@ namespace BRIM
                 + "', measurmentUnit = '" + drink.Measurement + "', parLevel = '" + drink.ParLevel + "', idealLevel = '" + drink.IdealLevel + "', bottleSize = '"
                 + drink.BottleSize + "', brand = '" + drink.Brand + "', bottlesPerCase = '" + drink.UnitsPerCase + "', vintage = '" + drink.Vintage + "' where "
                 + "drinkID = '" + drink.ID + "'";
-            bool result = this.runSqlQuery(query);
+            bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
             if (!result)
             {
                 Console.WriteLine("Error: Drink could not be updated");
-
                 return false;
             }
 
@@ -118,6 +159,84 @@ namespace BRIM
             }
             return newDrinkList;
         }
+
+        //Creates then runs a delete query for entry IN RECIPES TABLE ONLY
+        //NOTE: DO NOT ATTEMPT TO USE THIS BEFORE DELETING ALL CONNECTED ENTRIES IN DRINKRECIPE TABLE 
+        public bool deleteRecipe(int recipeID)
+        {
+            string query = @"delete from brim.recipes where recipeID = '" + recipeID + "';";
+            bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Recipe Entry could not be deleted");
+                return false;
+            }
+
+            return true;
+        }
+
+        //Deletes all entries in the drinkRecipes Table with a certain recipeID
+        public bool deleteDrinkRecipesByRecipeID(int recipeID)
+        {
+            string query = @"delete from brim.drinkrecipes where recipeID = '" + recipeID + "';";
+            bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: DrinkRecipe Entries could not be deleted");
+                return false;
+            }
+
+            return true;
+        }
+
+        //Creates then runs an insert query FOR JUST THE RECIPES TABLE
+        //returns the ID of the newly Inserted Recipe
+        public int addRecipe(string name)
+        {
+            string query = @"INSERT INTO brim.recipes (name) VALUES ('" + name + "');";
+            int newRecipeID = this.runSqlInsertCommandReturnID(query);
+
+            if (newRecipeID == -1)
+            {
+                Console.WriteLine("Error: Recipe Entry Could not be Added");
+            }
+            return newRecipeID;
+        }
+
+        //Creates then runs an insert query FOR JUST THE DRINKRECIPES TABLE
+        //ASSUMES THAT RECIPE AND DRINK IDS ARE VALID. AKA THAT THEY BELONG TO DRINKS AND RECIPES THAT EXIST 
+        public int addDrinkRecipe(int recipeID, int drinkID, double itemQuantity){
+            string query = @"INSERT INTO brim.drinkrecipes (itemQuantity, recipeID, drinkID) "
+                + "VALUES ('" + itemQuantity + "', '" + recipeID + "', '" + drinkID + "');";
+            int newDrinkRecipeID = this.runSqlInsertCommandReturnID(query);
+
+            if (newDrinkRecipeID == -1)
+            {
+                Console.WriteLine("Error: DrinkRecipe Entry Could not be Added");
+            }
+            return newDrinkRecipeID;
+        }
+
+        // Creates then runs an UPDATE query FOR ONLY THE ENTRY IN THE RECIPES TABLE
+        // only sends the ID and name since RecipeObjects can get large from the itemList
+        // even though Entries is Recipes Table itself only have column that will really be modified
+        public bool updateRecipe(int recipeID, string name)
+        {
+            string query = @"UPDATE brim.recipes SET (name) VALUES ('" + name + "');"
+            bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Recipe Entry Could not be Updated");
+            }
+            return result;
+        }
+
+        /* IMPORTANT!: DrinkRecipe Table Updates for am existing Recipe will be handled by Deleting and 
+        all DrinkRecipe Entries related to that table and re-adding/replacing the entries with entire ItemList
+        of the updated Recipe Object, for Simplicity's sake. */
 
         // Querys the database for all entries in the drinkrecipes, and the pertinent information  
         // of their respectively referenced Recipe and Drink entries
