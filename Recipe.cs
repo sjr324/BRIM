@@ -14,6 +14,9 @@ namespace BRIM
         //A list of tuples that stores an item and the quantity of it used to make a recipie
         public List<(Item, double)> ItemList = new List<(Item item, double quantity)>();
 
+        //had to explicitly make a default constructor to make a test recipe to mess with the Add and Updates
+        public Recipe() {}
+
         //Data Conversion Constructor
         //takes an IEnumerable of DataRow objects(All assumed to be in the form of results from the query
         //in the getRecipes function in DatabaseManager and uses the data to create a recipe Object and 

@@ -14,7 +14,7 @@ namespace BRIM
 			test.GetRecipeList();
 			Console.WriteLine(test.ItemList);
 
-			//BuildWebHost(args).Run();
+			// BuildWebHost(args).Run();
 		}
 
 		public static IWebHost BuildWebHost(string[] args) =>

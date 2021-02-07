@@ -31,6 +31,7 @@ namespace BRIM
                 conn.Close();
             } catch (MySqlException ex) {
                 Console.WriteLine("MYSQL ERROR OCCURED! ERROR MESSAGE: " + ex.Message);
+                rowsReturned = 0;
             }
 
             if (rowsReturned == 0)
@@ -79,7 +80,7 @@ namespace BRIM
                 conn.Open();
                 rowsAffected = cmd.ExecuteNonQuery();
                 //WARNING, This method of getting the ID is the t but is NOT entirely thread safe
-                newValueID = cmd.LastInsertedId;
+                newValueID = (int) (cmd.LastInsertedId);
                 conn.Close();
             } catch (MySqlException ex) {
                 Console.WriteLine("MYSQL ERROR OCCURED! ERROR MESSAGE: " + ex.Message);
@@ -224,7 +225,8 @@ namespace BRIM
         // even though Entries is Recipes Table itself only have column that will really be modified
         public bool updateRecipe(int recipeID, string name)
         {
-            string query = @"UPDATE brim.recipes SET (name) VALUES ('" + name + "');"
+            string query = @"UPDATE brim.recipes SET name = '" + name + "'"
+                + " WHERE recipeID = '" + recipeID + "';";
             bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
             if (!result)

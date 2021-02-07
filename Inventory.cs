@@ -172,14 +172,14 @@ namespace BRIM
             recipeID = updatedRecipe.ID;
             string updatedName = updatedRecipe.Name;
             
-            if (!this.databaseManager.updateRecipe(recipeID, updatedName);)
+            if (!this.databaseManager.updateRecipe(recipeID, updatedName))
             {
                 Console.WriteLine("Error: Recipe Entry Update Failed. Stopping here");
                 return 0;
             }
             
             //deleting old DrinkRecipe table entries for this Recipe
-            if (this.databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
+            if (!this.databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
                 return 0;
             }
@@ -215,13 +215,13 @@ namespace BRIM
 
             //deleting old DrinkRecipes table entries for this Recipe
             //Should be done first since drinkrecipe Table is the one with the constraints
-            if (this.databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
+            if (!this.databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
                 return 0;
             }
 
             // delete recip entry from recipes table 
-            if (this.databaseManager.deleteRecipe(recipeID)) {
+            if (!this.databaseManager.deleteRecipe(recipeID)) {
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
                 return 0;
             }
