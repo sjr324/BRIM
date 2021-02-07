@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,7 +18,7 @@ namespace BRIM
         public DatabaseManager databaseManager = new DatabaseManager();
 
         /// <summary>
-        /// Runs anh update command on the item based off the item that is sent in from the frontend
+        /// Runs an update command on the item based off the item that is sent in from the frontend
         /// </summary>
         /// <param name="info">An item that is created from the frontend</param>
         /// <returns>an integer return based on the exit status of the function</returns>
@@ -75,6 +76,56 @@ namespace BRIM
         public int PurchseItem(Recipe r)
         {
             return 0;
+        }
+
+        /// <summary>
+        /// Takes in a JObject message from the controller. This message is the response from an API update call.
+        /// This method loops through this message and parses each lineitem that was ordered, then updates those items
+        /// in the database based off the quantity of them that is ordered.
+        /// Looks up the item in the drinks to see if it is a saved drink, if not then it looks up the recipe and updates
+        /// that. 
+        /// </summary>
+        /// <param name="message"></param>
+        public void parseUpdate(JObject message)
+        {
+            JToken msg = message;
+
+            foreach (JObject order in msg)
+            {
+                foreach(JObject lineitem in order["lineItems"])
+                {
+                    string name = lineitem["name"].ToString();
+                    double updateAmt = 0.0;
+
+                    //check if the lineItem ordered is a base drink and update
+                    //then check recipies
+                    //Modifications always come in for ordering a specific drink item, 
+                    //but in the case of cocktails(recipies) there is a possibility of there 
+                    //being no modification
+                    //TODO: If not in recipies or drinks flag it for manual update
+                    int drinkFound = ItemList.FindIndex(x => x.Name == name);
+                    if (drinkFound != -1)
+                    {
+                        Drink updatedDrink = ItemList[drinkFound] as Drink;
+
+                        //TODO: Add in code for parsing modifications
+                        JArray modifications = (JArray)lineitem["modifications"];
+                        //int modLength = modifications.Count;
+
+                        foreach (JObject mod in modifications)
+                        {
+                            string modName = mod["name"].ToString();
+                            int quantitySold = (int)mod["quantitySold"];
+
+                            //TODO: Look through modification list and see if we know what it is.
+                            //if we know what it is, that affects the quanity, else ignore it
+                        }
+
+                        databaseManager.updateDrink(updatedDrink);
+                        ItemList[drinkFound] = updatedDrink;
+                    }
+                }
+            }
         }
 
         /// <summary>
