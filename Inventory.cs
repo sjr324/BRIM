@@ -104,6 +104,7 @@ namespace BRIM
                     //being no modification
                     //TODO: If not in recipies or drinks flag it for manual update
                     int drinkFound = ItemList.FindIndex(x => x.Name == name);
+                    int recipieFound = RecipeList.FindIndex(x => x.Name == name);
                     if (drinkFound != -1)
                     {
                         Drink updatedDrink = ItemList[drinkFound] as Drink;
@@ -123,6 +124,13 @@ namespace BRIM
 
                         databaseManager.updateDrink(updatedDrink);
                         ItemList[drinkFound] = updatedDrink;
+                    } else if (recipieFound != -1)
+                    {
+                        //same process as above, but for recipies
+                        //recipies may or may not have modifications
+                    } else
+                    {
+                        //TODO: Add flagging for unknown items the user has to update
                     }
                 }
             }
