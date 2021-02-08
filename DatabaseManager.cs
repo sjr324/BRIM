@@ -127,7 +127,7 @@ namespace BRIM
             //Want to talk to Alex about what he's expecting to send and get front end from recipes
             //because most of this drink information really shouldn't be neccesary for looking at, or updating, 
             //recipe components
-            string queryString = @"SELECT brim.recipes.name AS recipeName, brim.recipes.recipeID, " 
+            string queryString = @"SELECT brim.recipes.name AS recipeName, brim.recipes.baseLiquor, brim.recipes.recipeID, " 
             + "brim.drinks.drinkID, brim.drinks.name, brim.drinks.lowerEstimate, brim.drinks.upperEstimate, " 
             + "brim.drinkrecipes.itemQuantity, brim.drinks.measurementUnit, brim.drinks.parLevel, "
             + "brim.drinks.parLevel, brim.drinks.idealLevel, brim.drinks.bottleSize, brim.drinks.brand, "
@@ -139,13 +139,13 @@ namespace BRIM
             DataTable dt = this.runSelectQuery(queryString);
             //get list of recipe IDs
             var recipeIDs = dt.AsEnumerable()
-                .Select(dr=>new { ID = dr.Field<int>("recipeID"), name = dr.Field<string>("recipeName") })
+                .Select(dr=>new { ID = dr.Field<int>("recipeID"), name = dr.Field<string>("recipeName"), baseLiquor = dr.Field<string>("baseLiquor") })
                 .Distinct();
             foreach(var recipe in recipeIDs) {
                 var recipeIngredients = dt.AsEnumerable()
                     .Select(dr=>dr)
                     .Where(dr=>dr.Field<int>("recipeID") == recipe.ID);
-                Recipe tempDrink = new Recipe(recipe.ID, recipe.name, recipeIngredients);
+                Recipe tempDrink = new Recipe(recipe.ID, recipe.name, recipe.baseLiquor, recipeIngredients);
                 newRecipeList.Add(tempDrink);
             }
 
