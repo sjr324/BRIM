@@ -109,7 +109,6 @@ namespace BRIM
                     {
                         Drink updatedDrink = ItemList[drinkFound] as Drink;
 
-                        //TODO: Add in code for parsing modifications
                         JArray modifications = (JArray)lineitem["modifications"];
 
                         //should only be one, but maybe there is something im not thinking of,
