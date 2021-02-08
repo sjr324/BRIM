@@ -194,9 +194,9 @@ namespace BRIM
 
         //Creates then runs an insert query FOR JUST THE RECIPES TABLE
         //returns the ID of the newly Inserted Recipe
-        public int addRecipe(string name)
+        public int addRecipe(string name, string baseLiquor)
         {
-            string query = @"INSERT INTO brim.recipes (name) VALUES ('" + name + "');";
+            string query = @"INSERT INTO brim.recipes (name, baseLiquor) VALUES ('" + name + "', '" + baseLiquor + "');";
             int newRecipeID = this.runSqlInsertCommandReturnID(query);
 
             if (newRecipeID == -1)
@@ -221,11 +221,11 @@ namespace BRIM
         }
 
         // Creates then runs an UPDATE query FOR ONLY THE ENTRY IN THE RECIPES TABLE
-        // only sends the ID and name since RecipeObjects can get large from the itemList
+        // only sends the ID, name, and baseLiquor since RecipeObjects can get large from the itemList
         // even though Entries is Recipes Table itself only have column that will really be modified
-        public bool updateRecipe(int recipeID, string name)
+        public bool updateRecipe(int recipeID, string name, string baseLiquor)
         {
-            string query = @"UPDATE brim.recipes SET name = '" + name + "'"
+            string query = @"UPDATE brim.recipes SET name = '" + name + "', baseLiquor = '" + baseLiquor + "'"
                 + " WHERE recipeID = '" + recipeID + "';";
             bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
