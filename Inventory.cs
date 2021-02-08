@@ -153,6 +153,7 @@ namespace BRIM
             return 0;
         }
 
+        //what are these for again? Are the even still neccesary with the current plan, or are the vestigial?
         public void EmitEvent()
         {
 
@@ -180,20 +181,109 @@ namespace BRIM
             return 0;
         }
 
-        public int AddRecipe()
+        /// <summary>
+        /// Takes the recipe information sent to it from the frontend and calls database to add a recipe.
+        /// The database call returns true if the recipe is added and false otherwise.
+        /// </summary>
+        /// <param name="newRecipe">Recipe that the frontend sends to the backend</param>
+        /// <returns>An integer is returned that corresponds to the exit status of the method</returns>
+        public int AddRecipe(Recipe newRecipe)
         {
+            int recipeID, itemListResult;
+            //add entry into Recipe Table
+            recipeID = this.databaseManager.addRecipe(newRecipe.Name);
+            if (recipeID == -1)
+            {
+                Console.WriteLine("Error: Recipe Entry Addition Failed. Stopping here");
+                return 0;
+            }
 
+            //NOTE: this relies on the recipe Object sent from the frontend is a DeepCopy and not a shallow one
+            //i.e. that the Item Objects in item list are copied, and not just the references
+            foreach((Item item, double quantity) component in newRecipe.ItemList) {
+                int itemID = component.item.ID;
+                double itemQuantity = component.quantity;
+                itemListResult = this.databaseManager.addDrinkRecipe(recipeID, itemID, itemQuantity);
 
+                if (itemListResult == -1) {
+                    Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
+                    + itemID + "' ItemID and '" + itemQuantity + "' failed. Stopping here");
+                    break;
+                }
+            }
+            
+            
+            // TODO: come up with and implement a better structure for return Codes
+            // at the very Least, we should make them an Enum with Proper names for each Code;
+            return 0; 
+        }
+        
+        /// <summary>
+        /// Takes the recipe information sent to it from the frontend and calls database to update a recipe.
+        /// The database call returns true if the recipe is updated and false otherwise.
+        /// </summary>
+        /// <param name="updatedRecipe">Recipe that the frontend sends to the backend</param>
+        /// <returns>An integer is returned that corresponds to the exit status of the method</returns>
+        public int UpdateRecipe(Recipe updatedRecipe)
+        {
+            int recipeID, itemListResult;
+            //add entry into Recipe Table
+            recipeID = updatedRecipe.ID;
+            string updatedName = updatedRecipe.Name;
+            
+            if (!this.databaseManager.updateRecipe(recipeID, updatedName))
+            {
+                Console.WriteLine("Error: Recipe Entry Update Failed. Stopping here");
+                return 0;
+            }
+            
+            //deleting old DrinkRecipe table entries for this Recipe
+            if (!this.databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
+                Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
+                return 0;
+            }
+
+            //NOTE: this relies on the recipe Object sent from the frontend is a DeepCopy and not a shallow one
+            //i.e. that the Item Objects in item list are copied, and not just the references
+            foreach((Item item, double quantity) component in updatedRecipe.ItemList) {
+                int itemID = component.item.ID;
+                double itemQuantity = component.quantity;
+                itemListResult = this.databaseManager.addDrinkRecipe(recipeID, itemID, itemQuantity);
+
+                if (itemListResult == -1) {
+                    Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
+                    + itemID + "' ItemID and '" + itemQuantity + "' failed. Stopping here");
+                    break;
+                }
+            }
+            
             return 0;
         }
 
-        public int UpdateRecipe()
+        
+        /// <summary>
+        /// This method takes in a recipe to be removed and then makes a call to the database to delete 
+        /// that recipe from the recipes table, as well as any connected entries in the drinkRecipes table
+        /// The database call returns true if the recipe is removed and false otherwise.
+        /// </summary>
+        /// <param name="unwantedRecipe">The item to be deleted</param>
+        /// <returns>an integer value representing the exit status of the method</returns>
+        public int RemoveRecipe(Recipe unwantedRecipe)
         {
-            return 0;
-        }
+            int recipeID = unwantedRecipe.ID;
 
-        public int RemoveRecipe()
-        {
+            //deleting old DrinkRecipes table entries for this Recipe
+            //Should be done first since drinkrecipe Table is the one with the constraints
+            if (!this.databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
+                Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
+                return 0;
+            }
+
+            // delete recip entry from recipes table 
+            if (!this.databaseManager.deleteRecipe(recipeID)) {
+                Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
+                return 0;
+            }
             return 0;
         }
     }
