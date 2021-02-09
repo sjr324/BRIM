@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,7 +18,7 @@ namespace BRIM
         public DatabaseManager databaseManager = new DatabaseManager();
 
         /// <summary>
-        /// Runs anh update command on the item based off the item that is sent in from the frontend
+        /// Runs an update command on the item based off the item that is sent in from the frontend
         /// </summary>
         /// <param name="info">An item that is created from the frontend</param>
         /// <returns>an integer return based on the exit status of the function</returns>
@@ -78,6 +79,148 @@ namespace BRIM
         }
 
         /// <summary>
+        /// Takes in a JObject message from the controller. This message is the response from an API update call.
+        /// This method loops through this message and parses each lineitem that was ordered, then updates those items
+        /// in the database based off the quantity of them that is ordered.
+        /// Looks up the item in the drinks to see if it is a saved drink, if not then it looks up the recipe and updates
+        /// that. 
+        /// </summary>
+        /// <param name="message"></param>
+        public void parseAPIPOSUpdate(JObject message)
+        {
+            JToken msg = message;
+
+            foreach (JObject order in msg)
+            {
+                foreach(JObject lineitem in order["lineItems"])
+                {
+                    string name = lineitem["name"].ToString();
+                    double updateAmt = 0.0;
+
+                    //check if the lineItem ordered is a base drink and update
+                    //then check recipies
+                    //Modifications always come in for ordering a specific drink item, 
+                    //but in the case of cocktails(recipies) there is a possibility of there 
+                    //being no modification
+                    //TODO: If not in recipies or drinks flag it for manual update
+                    int drinkFound = ItemList.FindIndex(x => x.Name == name);
+                    int recipieFound = RecipeList.FindIndex(x => x.Name == name);
+                    if (drinkFound != -1)
+                    {
+                        Drink updatedDrink = ItemList[drinkFound] as Drink;
+
+                        JArray modifications = (JArray)lineitem["modifications"];
+
+                        //should only be one, but maybe there is something im not thinking of,
+                        //can change from a loop later
+                        foreach (JObject mod in modifications)
+                        {
+                            string modName = mod["name"].ToString();
+
+                            //if it has parenthasis then assume it is the modification that tells us the portion size
+                            if (modName.Contains("("))
+                            {
+                                string[] temppour = modName.Split('(');
+                                temppour = temppour[1].Split(')');
+                                string[] pour = temppour[0].Split(' ');
+
+                                double pourAmt = Convert.ToDouble(pour[0]);
+                                string pourMeasurement = pour[1];
+                                int quantitySold = (int)lineitem["quantitySold"];
+
+                                if (pourMeasurement == "oz")
+                                {
+                                    pourAmt = pourAmt * 29.5735; //conversion for fluid oz to ml
+                                }
+
+                                //naive. does not account for spillage or over/under pouring
+                                updateAmt += pourAmt * quantitySold;
+                            }
+                        }
+
+                        updatedDrink.LowerEstimate -= updateAmt;
+                        updatedDrink.UpperEstimate -= updateAmt;
+
+                        //TODO: should update the user if any of these is true
+                        if (updatedDrink.LowerEstimate < 0.0)
+                        {
+                            updatedDrink.LowerEstimate = 0.0;
+                        }
+
+                        if (updatedDrink.UpperEstimate < 0.0)
+                        {
+                            updatedDrink.UpperEstimate = 0.0;
+                        }
+
+                        databaseManager.updateDrink(updatedDrink);
+                        ItemList[drinkFound] = updatedDrink;
+                        updateAmt = 0.0;
+                    } else if (recipieFound != -1)
+                    {
+                        //same process as above, but for recipies
+                        //recipies may or may not have modifications
+                        Recipe orderedRecipe = RecipeList[recipieFound];
+                        List<(Item item, double quantity)> parts = orderedRecipe.ItemList;
+                        int amtOrdered = (int)lineitem["quantitySold"];
+
+                        JArray modifications = (JArray)lineitem["modifications"];
+                        if (modifications.Count > 0)
+                        {
+                            string modName = modifications[0]["name"].ToString();
+
+                            if (modName != orderedRecipe.BaseLiquor)
+                            {
+                                //process the modification
+                                int modIndex = RecipeList.FindIndex(x => x.Name == modName);
+
+                                if (modIndex != -1)
+                                {
+                                    int baseIndex = parts.FindIndex(x => x.item.Name == orderedRecipe.BaseLiquor);
+                                    double q = parts[baseIndex].quantity;
+                                    parts.RemoveAt(baseIndex);
+                                    parts.Add((ItemList[modIndex], q));
+                                } else
+                                {
+                                    //TODO: Flag for the user because modification is unknown
+                                }
+                            }
+
+                            //update every drink that was a part of the recipe
+                            foreach ((Item item, double quantity) part in parts)
+                            {
+                                //calcualte and update every item
+                                Drink updatedDrink = part.item as Drink;
+
+                                updateAmt += part.quantity * amtOrdered;
+
+                                updatedDrink.LowerEstimate -= updateAmt;
+                                updatedDrink.UpperEstimate -= updateAmt;
+
+                                //TODO: should update the user if any of these is true
+                                if (updatedDrink.LowerEstimate < 0.0)
+                                {
+                                    updatedDrink.LowerEstimate = 0.0;
+                                }
+
+                                if (updatedDrink.UpperEstimate < 0.0)
+                                {
+                                    updatedDrink.UpperEstimate = 0.0;
+                                }
+
+                                databaseManager.updateDrink(updatedDrink);
+                                ItemList[drinkFound] = updatedDrink;
+                                updateAmt = 0.0;
+                            }
+                        }
+                    } else
+                    {
+                        //TODO: Add flagging for unknown items the user has to update
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Makes a call to the drinks table of the brim database to get the list of all drinks 
         /// that the user has registerd. 
         /// Creates a new item list and replaces the global ItemList with that when it is finished.
@@ -132,7 +275,7 @@ namespace BRIM
         {
             int recipeID, itemListResult;
             //add entry into Recipe Table
-            recipeID = this.databaseManager.addRecipe(newRecipe.Name);
+            recipeID = this.databaseManager.addRecipe(newRecipe.Name, newRecipe.BaseLiquor);
             if (recipeID == -1)
             {
                 Console.WriteLine("Error: Recipe Entry Addition Failed. Stopping here");
@@ -171,8 +314,9 @@ namespace BRIM
             //add entry into Recipe Table
             recipeID = updatedRecipe.ID;
             string updatedName = updatedRecipe.Name;
+            string updatedBase = updatedRecipe.BaseLiquor;
             
-            if (!this.databaseManager.updateRecipe(recipeID, updatedName))
+            if (!this.databaseManager.updateRecipe(recipeID, updatedName, updatedBase))
             {
                 Console.WriteLine("Error: Recipe Entry Update Failed. Stopping here");
                 return 0;

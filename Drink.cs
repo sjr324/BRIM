@@ -25,6 +25,8 @@ namespace BRIM
         public int UnitsPerCase;
         public Boolean Vintage;
 
+        public Drink() { }
+
         //Data Conversion Constructor
         //takes a DataRow object(assumed for a drink) and uses the data to create a Drink Object
         //makes it less cluttered to convert results form database queries into objects

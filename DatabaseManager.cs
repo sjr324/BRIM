@@ -194,9 +194,9 @@ namespace BRIM
 
         //Creates then runs an insert query FOR JUST THE RECIPES TABLE
         //returns the ID of the newly Inserted Recipe
-        public int addRecipe(string name)
+        public int addRecipe(string name, string baseLiquor)
         {
-            string query = @"INSERT INTO brim.recipes (name) VALUES ('" + name + "');";
+            string query = @"INSERT INTO brim.recipes (name, baseLiquor) VALUES ('" + name + "', '" + baseLiquor + "');";
             int newRecipeID = this.runSqlInsertCommandReturnID(query);
 
             if (newRecipeID == -1)
@@ -221,11 +221,11 @@ namespace BRIM
         }
 
         // Creates then runs an UPDATE query FOR ONLY THE ENTRY IN THE RECIPES TABLE
-        // only sends the ID and name since RecipeObjects can get large from the itemList
+        // only sends the ID, name, and baseLiquor since RecipeObjects can get large from the itemList
         // even though Entries is Recipes Table itself only have column that will really be modified
-        public bool updateRecipe(int recipeID, string name)
+        public bool updateRecipe(int recipeID, string name, string baseLiquor)
         {
-            string query = @"UPDATE brim.recipes SET name = '" + name + "'"
+            string query = @"UPDATE brim.recipes SET name = '" + name + "', baseLiquor = '" + baseLiquor + "'"
                 + " WHERE recipeID = '" + recipeID + "';";
             bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
@@ -248,7 +248,7 @@ namespace BRIM
             //Want to talk to Alex about what he's expecting to send and get front end from recipes
             //because most of this drink information really shouldn't be neccesary for looking at, or updating, 
             //recipe components
-            string queryString = @"SELECT brim.recipes.name AS recipeName, brim.recipes.recipeID, " 
+            string queryString = @"SELECT brim.recipes.name AS recipeName, brim.recipes.baseLiquor, brim.recipes.recipeID, " 
             + "brim.drinks.drinkID, brim.drinks.name, brim.drinks.lowerEstimate, brim.drinks.upperEstimate, " 
             + "brim.drinkrecipes.itemQuantity, brim.drinks.measurementUnit, brim.drinks.parLevel, "
             + "brim.drinks.parLevel, brim.drinks.idealLevel, brim.drinks.bottleSize, brim.drinks.brand, "
@@ -260,13 +260,13 @@ namespace BRIM
             DataTable dt = this.runSelectQuery(queryString);
             //get list of recipe IDs
             var recipeIDs = dt.AsEnumerable()
-                .Select(dr=>new { ID = dr.Field<int>("recipeID"), name = dr.Field<string>("recipeName") })
+                .Select(dr=>new { ID = dr.Field<int>("recipeID"), name = dr.Field<string>("recipeName"), baseLiquor = dr.Field<string>("baseLiquor") })
                 .Distinct();
             foreach(var recipe in recipeIDs) {
                 var recipeIngredients = dt.AsEnumerable()
                     .Select(dr=>dr)
                     .Where(dr=>dr.Field<int>("recipeID") == recipe.ID);
-                Recipe tempDrink = new Recipe(recipe.ID, recipe.name, recipeIngredients);
+                Recipe tempDrink = new Recipe(recipe.ID, recipe.name, recipe.baseLiquor, recipeIngredients);
                 newRecipeList.Add(tempDrink);
             }
 

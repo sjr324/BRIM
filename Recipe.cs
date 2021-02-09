@@ -10,6 +10,7 @@ namespace BRIM
     {
         public int ID;
         public string Name;
+        public string BaseLiquor;
 
         //A list of tuples that stores an item and the quantity of it used to make a recipie
         public List<(Item, double)> ItemList = new List<(Item item, double quantity)>();
@@ -22,9 +23,10 @@ namespace BRIM
         //in the getRecipes function in DatabaseManager and uses the data to create a recipe Object and 
         //populate it's ItemList
         //makes it less cluttered to convert results form database queries into objects
-        public Recipe(int recipeID, string recipeName, IEnumerable<DataRow> itemListData) {
+        public Recipe(int recipeID, string recipeName, string baseLiquor, IEnumerable<DataRow> itemListData) {
             ID = recipeID;
             Name = recipeName;
+            BaseLiquor = baseLiquor;
             
             foreach(DataRow dr in itemListData) {
                 //I kept the column for the drink's name as just "name" so I could piggyback off of the 
