@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.11.3",
+    "@material-ui/icons": "^4.11.2",
     "emotion": "^9.2.12",
     "emotion-server": "^9.2.12",
     "react": "^16.8.2",
