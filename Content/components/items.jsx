@@ -7,6 +7,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import FormDialog from './ItemDialog.jsx'
 
 const useStyles = makeStyles({
   table: {
@@ -29,6 +30,7 @@ export default function BasicTable(props) {
             <TableCell align="center">Drink</TableCell>
             <TableCell align="center">Quantity</TableCell>
             <TableCell align="center">Status</TableCell>
+            <TableCell align="center">Details</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -39,6 +41,7 @@ export default function BasicTable(props) {
               </TableCell>
               <TableCell align="right">{row.lowerEstimate}-{row.upperEstimate}</TableCell>
               <TableCell align="right">{row.status}</TableCell>
+              <TableCell align="center"><FormDialog item={row} /></TableCell>
             </TableRow>
           ))}
         </TableBody>

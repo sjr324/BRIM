@@ -7,7 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
-export default function FormDialog() {
+export default function ItemDialog(props) {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -17,34 +17,35 @@ export default function FormDialog() {
   const handleClose = () => {
     setOpen(false);
   };
-
+  console.log(props);
   return (
     <div>
       <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        Open form dialog
+        Details
       </Button>
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+        <DialogTitle id="form-dialog-title">{props.item.name}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            To subscribe to this website, please enter your email address here. We will send updates
-            occasionally.
+            Item information:
           </DialogContentText>
           <TextField
             autoFocus
+            disabled
             margin="dense"
             id="name"
-            label="Email Address"
-            type="email"
-            fullWidth
+            label="Name"
+            defaultValue = {props.item.name}
+            variant="filled"
           />
+          
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
+          <Button variant = "contained" onClick={handleClose} color="primary">
+           Edit 
           </Button>
-          <Button onClick={handleClose} color="primary">
-            Subscribe
+          <Button variant = "contained" onClick={handleClose} color="primary">
+           Close 
           </Button>
         </DialogActions>
       </Dialog>
