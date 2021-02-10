@@ -8,6 +8,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import ItemTextFeild from './ItemTextFeild.jsx'
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import CloseIcon from '@material-ui/icons/Close'
+import DoneIcon from '@material-ui/icons/Done'
 
 export default function ItemDialog(props) {
   const [open, setOpen] = React.useState(false);
@@ -46,11 +48,11 @@ export default function ItemDialog(props) {
           <ItemTextFeild id={"newItem" + "Measurement"} label = "Measurement" dbl={false}/> 
         </DialogContent>
         <DialogActions>
-          <Button variant = "contained" onClick={handleClose} color="primary">
-           Edit 
+          <Button variant = "contained" onClick={handleClose} color="secondary" startIcon={<CloseIcon/>}>
+            Cancel
           </Button>
-          <Button variant = "contained" onClick={handleClose} color="primary">
-           Close 
+          <Button variant = "contained" onClick={handleClose} color="primary" startIcon={<DoneIcon/>}>
+            Create Item
           </Button>
         </DialogActions>
       </Dialog>
