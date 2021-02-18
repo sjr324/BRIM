@@ -20,6 +20,6 @@ namespace BRIM
         unit Measurement { get; set; }
         status Status { get; set; }
 
-        void CalculateStatus();
+        Boolean CalculateStatus();
     }
 }
