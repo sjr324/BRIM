@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BRIM
+namespace BackendClassLibrary
 {
     //The main class of the program. 
     public class Inventory
