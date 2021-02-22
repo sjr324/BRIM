@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BackendClassLibrary
+namespace BRIM.BackendClassLibrary
 {
     //The main class of the program. 
     public class Inventory
@@ -30,6 +30,11 @@ namespace BackendClassLibrary
             if (!result)
             {
                 Console.WriteLine("Error: Item Update Failed");
+
+                string mes = updateItem.Name + " could not be updated";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
             }
 
             return 0;
@@ -49,6 +54,11 @@ namespace BackendClassLibrary
             if (!result)
             {
                 Console.WriteLine("Error: Item Addition Failed");
+
+                string mes = newItem.Name + " could not be added";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
             }
 
             return 0;
@@ -68,6 +78,11 @@ namespace BackendClassLibrary
             if (!result)
             {
                 Console.WriteLine("Error: Item removal failed");
+
+                string mes = removeItem.Name + " could not be removed";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
             }
 
             return 0;
@@ -152,6 +167,23 @@ namespace BackendClassLibrary
                             updatedDrink.UpperEstimate = 0.0;
                         }
 
+                        if (updatedDrink.CalculateStatus())
+                        {
+                            if (updatedDrink.Status == status.belowIdeal)
+                            {
+                                string mes = updatedDrink.Name + " is below ideal level";
+                                NotificationManager.AddNotification(mes);
+                            } else if (updatedDrink.Status == status.belowPar)
+                            {
+                                string mes = updatedDrink.Name + " is below par level";
+                                NotificationManager.AddNotification(mes);
+                            } else if (updatedDrink.Status == status.empty)
+                            {
+                                string mes = updatedDrink.Name + " is empty";
+                                NotificationManager.AddNotification(mes);
+                            }
+                        }
+
                         databaseManager.updateDrink(updatedDrink);
                         ItemList[drinkFound] = updatedDrink;
                         updateAmt = 0.0;
@@ -205,6 +237,25 @@ namespace BackendClassLibrary
                                 if (updatedDrink.UpperEstimate < 0.0)
                                 {
                                     updatedDrink.UpperEstimate = 0.0;
+                                }
+
+                                if (updatedDrink.CalculateStatus())
+                                {
+                                    if (updatedDrink.Status == status.belowIdeal)
+                                    {
+                                        string mes = updatedDrink.Name + " is below ideal level";
+                                        NotificationManager.AddNotification(mes);
+                                    }
+                                    else if (updatedDrink.Status == status.belowPar)
+                                    {
+                                        string mes = updatedDrink.Name + " is below par level";
+                                        NotificationManager.AddNotification(mes);
+                                    }
+                                    else if (updatedDrink.Status == status.empty)
+                                    {
+                                        string mes = updatedDrink.Name + " is empty";
+                                        NotificationManager.AddNotification(mes);
+                                    }
                                 }
 
                                 databaseManager.updateDrink(updatedDrink);
@@ -279,7 +330,11 @@ namespace BackendClassLibrary
             if (recipeID == -1)
             {
                 Console.WriteLine("Error: Recipe Entry Addition Failed. Stopping here");
-                return 0;
+
+                string mes = newRecipe.Name + " could not be added";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
             }
 
             //NOTE: this relies on the recipe Object sent from the frontend is a DeepCopy and not a shallow one
@@ -292,7 +347,11 @@ namespace BackendClassLibrary
                 if (itemListResult == -1) {
                     Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
                     + itemID + "' ItemID and '" + itemQuantity + "' failed. Stopping here");
-                    break;
+
+                    string mes = component.item.Name + " could not be added to the recipie";
+                    NotificationManager.AddNotification(mes);
+
+                    return 1;
                 }
             }
             
@@ -319,13 +378,21 @@ namespace BackendClassLibrary
             if (!this.databaseManager.updateRecipe(recipeID, updatedName, updatedBase))
             {
                 Console.WriteLine("Error: Recipe Entry Update Failed. Stopping here");
-                return 0;
+
+                string mes = updatedName + " could not be updated";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
             }
             
             //deleting old DrinkRecipe table entries for this Recipe
             if (!this.databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
-                return 0;
+
+                string mes = updatedName + " could not be updated";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
             }
 
             //NOTE: this relies on the recipe Object sent from the frontend is a DeepCopy and not a shallow one
@@ -338,7 +405,11 @@ namespace BackendClassLibrary
                 if (itemListResult == -1) {
                     Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
                     + itemID + "' ItemID and '" + itemQuantity + "' failed. Stopping here");
-                    break;
+
+                    string mes = component.item.Name + " could not be updated";
+                    NotificationManager.AddNotification(mes);
+
+                    return 1;
                 }
             }
             
@@ -361,13 +432,21 @@ namespace BackendClassLibrary
             //Should be done first since drinkrecipe Table is the one with the constraints
             if (!this.databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
-                return 0;
+
+                string mes = unwantedRecipe.Name + " could not be deleted";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
             }
 
             // delete recip entry from recipes table 
             if (!this.databaseManager.deleteRecipe(recipeID)) {
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
-                return 0;
+
+                string mes = unwantedRecipe.Name + " could not be deleted";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
             }
             return 0;
         }
