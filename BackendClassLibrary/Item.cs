@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BackendClassLibrary
+namespace BRIM.BackendClassLibrary
 {
     public enum unit { milliliters, ounces } //standard measurement units
     public enum status { empty, belowPar, belowIdeal, aboveIdeal } //the status of an inventory item

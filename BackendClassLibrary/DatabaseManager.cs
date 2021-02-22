@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BackendClassLibrary
+namespace BRIM.BackendClassLibrary
 {
     public class DatabaseManager
     {

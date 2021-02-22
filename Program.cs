@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using BackendClassLibrary;	
+using BackendClassLibrary;
 //why is This Using Directive unneccesary? Is it because it's not in a 
 //separate Project, but rather a free-floating file in the project that contain the Class Library? 
 
@@ -12,12 +12,7 @@ namespace BRIM
 	{
 		public static void Main(string[] args)
 		{
-			Inventory test = new Inventory();
-			test.GetItemList();
-			test.GetRecipeList();
-			Console.WriteLine(test.ItemList);
-
-			// BuildWebHost(args).Run();
+			BuildWebHost(args).Run();
 		}
 
 		public static IWebHost BuildWebHost(string[] args) =>
