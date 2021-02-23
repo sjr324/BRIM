@@ -7,6 +7,11 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import FormDialog from './ItemDialog.jsx'
+import AddItemFab from './AddItemFab.jsx'
+import { Container } from '@material-ui/core';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 
 const useStyles = makeStyles({
   table: {
@@ -40,6 +45,7 @@ export default function ItemTableBasic(props) {
 
 	console.log(props);
   return (
+    <Container maxWidth="md">
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="simple table">
         <TableHead>
@@ -47,20 +53,25 @@ export default function ItemTableBasic(props) {
             <TableCell align="center">Drink</TableCell>
             <TableCell align="center">Quantity</TableCell>
             <TableCell align="center">Status</TableCell>
+            <TableCell align="center">Details</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {state.items.map((row) => (
             <TableRow key={row.name}>
-              <TableCell component="th" scope="row">
+              <TableCell component="th" scope="row" align="center">
                 {row.name}
               </TableCell>
-              <TableCell align="right">{row.lowerEstimate}-{row.upperEstimate}</TableCell>
-              <TableCell align="right">{row.status}</TableCell>
+              <TableCell align="center">{row.lowerEstimate}-{row.upperEstimate}</TableCell>
+              <TableCell align="center">{row.status}</TableCell>
+              <TableCell align="center"><FormDialog item={row} /></TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </TableContainer>
+    <AddItemFab />
+  </Container>
+  
   );
 }
