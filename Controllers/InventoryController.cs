@@ -9,7 +9,6 @@ namespace BRIM
 	{
 
 		private Inventory inventory;
-		private const int COMMENTS_PER_PAGE = 3;
 
 
 		public InventoryController()
@@ -19,12 +18,24 @@ namespace BRIM
 			inventory.GetItemList();
 			inventory.GetRecipeList();	
 		}
-		[Route("items")]
-		[HttpGet]
-		public ActionResult Items(){
+		public ActionResult Index(){
 			return View(new ItemViewModel{
 				Items = this.inventory.ItemList.AsReadOnly()
 			});
+		}
+		
+		public ActionResult Items(){
+
+			if (ControllerContext.HttpContext.Request.ContentType == "application/json")
+			{
+				return new JsonResult(new
+				{
+					Items= inventory.ItemList.AsReadOnly()
+				});
+			}
+			return View("~/Views/Home/Index.cshtml",new ItemViewModel{
+				Items = this.inventory.ItemList.AsReadOnly()
+			});	
 		}
 		
 		public class ItemViewModel
@@ -33,13 +44,6 @@ namespace BRIM
 
 		}
 
-/*
-		public class IndexViewModel
-		{
-			public IReadOnlyList<CommentModel> Comments { get; set; }
-			public int CommentsPerPage { get; set; }
-			public int Page { get; set; }
-		}
-		*/
+
 	}
 }

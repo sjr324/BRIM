@@ -12,7 +12,12 @@
 
 	var chainedFunctions = new ChainedRenderFunctions(emotionFunctions, styledComponentsFunctions, reactJssFunctions, helmetFunctions);
 }
-@Html.ReactRouter("Components.RootComponent", new { initialItems= Model.Items }, renderFunctions: chainedFunctions)
+@Html.ReactRouter(
+	"Components.RootComponent", 
+	new { 
+		initialItems= Model.Items, 
+	},
+	renderFunctions: chainedFunctions)
 @{
 	ViewBag.ServerStyles = styledComponentsFunctions.RenderedStyles + reactJssFunctions.RenderedStyles;
 	ViewBag.HelmetTitle = helmetFunctions.RenderedHelmet?.GetValueOrDefault("title");

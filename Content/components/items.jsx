@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -19,7 +19,6 @@ const useStyles = makeStyles({
   },
 });
 
-
 export default function ItemTableBasic(props) {
   const classes = useStyles();
 	let [state, updateState]= React.useState({
@@ -27,19 +26,27 @@ export default function ItemTableBasic(props) {
 	});
 
   const loadItemsFromServer=()=>{
+    let itemurl='/items'
     let xhr = new XMLHttpRequest();
-    xhr.open('get',this.props.itemurl,true);
+    xhr.open('get',itemurl,true);
     xhr.setRequestHeader('Content-Type','application/json');
     xhr.onload = ()=>{
+      console.log("##################################################################################")
+      console.log(xhr.responseText);
+
+      console.log("##################################################################################")
+      /*
       let data = JSON.parse(xhr.responseText);
       updateState({
         items: data
       });
+      */
     };
     xhr.send();
   }
 
   useEffect(()=>{
+    //loadItemsFromServer();
     window.setInterval(loadItemsFromServer,2000);
   });
 
