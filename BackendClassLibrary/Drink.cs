@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Data;
 
-namespace BRIM
+namespace BRIM.BackendClassLibrary
 {
     public class Drink : Item
     {
@@ -24,6 +24,8 @@ namespace BRIM
         public string Brand;
         public int UnitsPerCase;
         public Boolean Vintage;
+
+        public Drink() { }
 
         //Data Conversion Constructor
         //takes a DataRow object(assumed for a drink) and uses the data to create a Drink Object
@@ -49,9 +51,28 @@ namespace BRIM
             }
         }
 
-        public void CalculateStatus()
+        //recalculates Item's status based on it's quantity range
+        //returns True if the It's Status changes from what it was before the method was called, 
+        //otherwise returns False
+        public Boolean CalculateStatus()
         {
-            
+            //average value (should) provide a good balance between False Positive and False Negative Risk
+            double averageQuantity = (LowerEstimate + UpperEstimate) / 2;
+            status oldStatus = this.Status;
+            if (averageQuantity > IdealLevel) {
+                this.Status = status.aboveIdeal;
+            } else if (averageQuantity <= IdealLevel && averageQuantity > ParLevel) {
+                this.Status = status.belowIdeal;
+            } else if (averageQuantity <= ParLevel && averageQuantity > 0) {
+                this.Status = status.belowPar;
+            } else {
+                this.Status = status.empty;
+            }
+
+            if (oldStatus != this.Status) {
+                return true;
+            }
+            return false;
         }
     }
 }

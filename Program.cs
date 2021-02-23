@@ -1,6 +1,8 @@
 using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+//why is This Using Directive unneccesary? Is it because it's not in a 
+//separate Project, but rather a free-floating file in the project that contain the Class Library? 
 
 //namespace React.Sample.Webpack.CoreMvc
 namespace BRIM
