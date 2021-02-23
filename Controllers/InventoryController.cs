@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using BRIM;
 using BRIM.BackendClassLibrary;
 
-namespace React.Sample.Webpack.CoreMvc.Controllers
+namespace BRIM 
 {
 	public class InventoryController: Controller
 	{
@@ -20,23 +19,14 @@ namespace React.Sample.Webpack.CoreMvc.Controllers
 			inventory.GetItemList();
 			inventory.GetRecipeList();	
 		}
-		public ActionResult Index(){
+		[Route("items")]
+		[HttpGet]
+		public ActionResult Items(){
 			return View(new ItemViewModel{
 				Items = this.inventory.ItemList.AsReadOnly()
 			});
 		}
-/*
-		public ActionResult Index()
-		{
-			return View(new IndexViewModel
-			{
-				Comments = _comments.Take(COMMENTS_PER_PAGE).ToList().AsReadOnly(),
-				CommentsPerPage = COMMENTS_PER_PAGE,
-				Page = 1
-			});
-		}
-		*/
-
+		
 		public class ItemViewModel
 		{
 			public IReadOnlyList<Item> Items { get; set; }

@@ -58,15 +58,17 @@ namespace BRIM
 
 			app.UseEndpoints(endpoints =>
 			{
+				/*
 				endpoints.MapControllerRoute(
 					name:"home",
 					pattern:"/",
 					defaults: new {controller = "Home", action = "loadurls"}
 				);
+				*/
 				endpoints.MapControllerRoute(
 					name: "default",
 					pattern: "/items",
-					defaults: new { controller = "Inventory", action = "Index" }
+					defaults: new { controller = "Inventory", action = "Items" }
 				);
 				endpoints.MapControllerRoute(
 					name: "default",

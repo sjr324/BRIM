@@ -1,7 +1,7 @@
 @using React.AspNet
 @using React.RenderFunctions
 @using React.Router
-@model React.Sample.Webpack.CoreMvc.Controllers.InventoryController.ItemViewModel
+@model BRIM.InventoryController.ItemViewModel
 
 @{
 	Layout = "_Layout";
@@ -12,7 +12,13 @@
 
 	var chainedFunctions = new ChainedRenderFunctions(emotionFunctions, styledComponentsFunctions, reactJssFunctions, helmetFunctions);
 }
-@Html.ReactRouter("Components.RootComponent", new { initialItems= Model.Items }, renderFunctions: chainedFunctions)
+@Html.ReactRouter(
+	"Components.RootComponent", 
+	new { 
+		initialItems= Model.Items, 
+		itemurl=Url.Action("Items")
+	},
+	renderFunctions: chainedFunctions)
 @{
 	ViewBag.ServerStyles = styledComponentsFunctions.RenderedStyles + reactJssFunctions.RenderedStyles;
 	ViewBag.HelmetTitle = helmetFunctions.RenderedHelmet?.GetValueOrDefault("title");
