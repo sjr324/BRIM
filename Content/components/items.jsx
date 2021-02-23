@@ -15,11 +15,29 @@ const useStyles = makeStyles({
 });
 
 
-export default function BasicTable(props) {
+export default function ItemTableBasic(props) {
   const classes = useStyles();
 	let [state, updateState]= React.useState({
 		items:props.initialItems
 	});
+
+  const loadItemsFromServer=()=>{
+    let xhr = new XMLHttpRequest();
+    xhr.open('get',this.props.itemurl,true);
+    xhr.setRequestHeader('Content-Type','application/json');
+    xhr.onload = ()=>{
+      let data = JSON.parse(xhr.responseText);
+      updateState({
+        items: data
+      });
+    };
+    xhr.send();
+  }
+
+  useEffect(()=>{
+    window.setInterval(loadItemsFromServer,2000);
+  });
+
 	console.log(props);
   return (
     <TableContainer component={Paper}>
