@@ -49,6 +49,7 @@ namespace BackendClassLibrary
                 Console.WriteLine("The Datarow given does not contain one or more of the columns in a Drink Object");
                 Console.WriteLine(exp.Message);
             }
+            CalculateStatus();
         }
 
         //recalculates Item's status based on it's quantity range

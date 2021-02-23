@@ -34,6 +34,11 @@ namespace BackendClassLibrary
     //ASSUMES THAT RECIPE AND DRINK IDS ARE VALID. AKA THAT THEY BELONG TO DRINKS AND RECIPES THAT EXIST 
     int addDrinkRecipe(int recipeID, int drinkID, double itemQuantity);
 
+    // Creates then runs an UPDATE query FOR ONLY THE ENTRY IN THE RECIPES TABLE
+    // only sends the ID, name, and baseLiquor since RecipeObjects can get large from the itemList
+    // even though Entries is Recipes Table itself only have column that will really be modified
+    bool updateRecipe(int recipeID, string name, string baseLiquor);
+
     /* IMPORTANT!: DrinkRecipe Table Updates for am existing Recipe will be handled by Deleting and 
     all DrinkRecipe Entries related to that table and re-adding/replacing the entries with entire ItemList
     of the updated Recipe Object, for Simplicity's sake. */
