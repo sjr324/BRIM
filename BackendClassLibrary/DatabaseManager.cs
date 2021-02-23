@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BRIM.BackendClassLibrary
 {
-    public class DatabaseManager
+    public class DatabaseManager : IDatabaseManager
     {
         //Should probably move this somewhere more secure eventually
         private static string connString = @"SERVER=68.84.78.85;PORT=3306;DATABASE=brim;UID=dev;PASSWORD=devpassword;";

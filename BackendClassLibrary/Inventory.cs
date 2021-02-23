@@ -15,7 +15,17 @@ namespace BRIM.BackendClassLibrary
         public List<Item> ItemList = new List<Item>(); //holds all items registered to this BRIM instance
         public List<Recipe> RecipeList = new List<Recipe>(); //holds all of the recipes for this BRIM instance
         public string Country;
-        public DatabaseManager databaseManager = new DatabaseManager();
+        public IDatabaseManager databaseManager;
+
+        // Default Constructor, makes its own DatabaseManager
+        public Inventory() {
+            this.databaseManager = new DatabaseManager();
+        }
+
+        //  Overloaded Constructor, takes IDatabaseManager instance (For Mocking when Unit Testing)
+        public Inventory(IDatabaseManager dbManager) {
+            this.databaseManager = dbManager;
+        }
 
         /// <summary>
         /// Runs an update command on the item based off the item that is sent in from the frontend
