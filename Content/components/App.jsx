@@ -12,12 +12,12 @@ const useStyles = makeStyles({
 });
 
 export default function App(props) {
+  console.log("App Props: ");
   console.log(props);
   let [state, updateState]= React.useState({
 		items:props.initialItems
 	});
   const classes = useStyles();
-  console.log("here");
   const app = (
     <div className={classes.container}>
       <NavDrawer />
@@ -27,6 +27,7 @@ export default function App(props) {
     </div>
   );
   if (typeof window === 'undefined') {
+    console.log("Undefined window");
 			return (
 				<StaticRouter
 					context={props.context}

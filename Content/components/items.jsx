@@ -9,7 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import FormDialog from './ItemDialog.jsx'
 import AddItemFab from './AddItemFab.jsx'
-import { Container } from '@material-ui/core';
+import { Button, Container } from '@material-ui/core';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 
@@ -26,9 +26,10 @@ export default function ItemTableBasic(props) {
 	});
 
   const loadItemsFromServer=()=>{
-    let itemurl='/items'
+    console.log("Loading items:")
+    let itemurl='/items/load'
     let xhr = new XMLHttpRequest();
-    xhr.open('get',itemurl,true);
+    xhr.open('GET',itemurl,true);
     xhr.setRequestHeader('Content-Type','application/json');
     xhr.onload = ()=>{
       console.log("##################################################################################")
@@ -43,14 +44,16 @@ export default function ItemTableBasic(props) {
       */
     };
     xhr.send();
+    
   }
-
+  /*
   useEffect(()=>{
     //loadItemsFromServer();
-    window.setInterval(loadItemsFromServer,2000);
+    //window.setInterval(loadItemsFromServer,1000);
   });
+  */
 
-	console.log(props);
+	console.log("Rendering table");
   return (
     <Container maxWidth="md">
     <TableContainer component={Paper}>
@@ -78,7 +81,8 @@ export default function ItemTableBasic(props) {
       </Table>
     </TableContainer>
     <AddItemFab />
-  </Container>
+    <Button variant="contained" onClick={loadItemsFromServer} color="primary">Refresh Table</Button>
+    </Container>
   
   );
 }

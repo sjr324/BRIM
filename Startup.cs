@@ -65,20 +65,21 @@ namespace BRIM
 					defaults: new {controller = "Home", action = "loadurls"}
 				);
 				*/
+				
 				endpoints.MapControllerRoute(
-					name: "test",
-					pattern: "{path?}",
-					new {controller = "Inventory", action = "Index"}
-				);
-				endpoints.MapControllerRoute(
-					name: "default",
-					pattern: "/items",
+					name: "items",
+					pattern: "items/load",
 					defaults: new { controller = "Inventory", action = "Items" }
 				);
 				endpoints.MapControllerRoute(
-					name: "default",
-					pattern: "/loaditems",
+					name: "loaditems",
+					pattern: "loaditems",
 					defaults: new { controller = "Inventory", action = "LoadItems" }
+				);
+				endpoints.MapControllerRoute(
+					name: "default",
+					pattern: "{path?}",
+					new {controller = "Inventory", action = "Index"}
 				);
 				
 				//endpoints.MapControllerRoute("default", "{path?}", new { controller = "Home", action = "Index" });
