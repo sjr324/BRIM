@@ -24,7 +24,6 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
   </ItemGroup>
 
-
   <Target Name="ReactBuild" AfterTargets="Build">
     <Exec Command="npm i &amp;&amp; npm run build" />
   </Target>
