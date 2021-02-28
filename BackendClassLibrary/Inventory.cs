@@ -114,6 +114,7 @@ namespace BRIM.BackendClassLibrary
         public void parseAPIPOSUpdate(JObject message)
         {
             JToken msg = message;
+            double varianceMultiplier = 0.15;
 
             foreach (JObject order in msg)
             {
@@ -158,13 +159,15 @@ namespace BRIM.BackendClassLibrary
                                     pourAmt = pourAmt * 29.5735; //conversion for fluid oz to ml
                                 }
 
-                                //naive. does not account for spillage or over/under pouring
+                                //setup the total amount that should have been poured
                                 updateAmt += pourAmt * quantitySold;
                             }
                         }
 
-                        updatedDrink.LowerEstimate -= updateAmt;
-                        updatedDrink.UpperEstimate -= updateAmt;
+                        //account for possible spillage/ over or under pouring
+                        double varianceAmount = varianceMultiplier * updateAmt;
+                        updatedDrink.LowerEstimate -= (updateAmt + varianceAmount);
+                        updatedDrink.UpperEstimate -= (updateAmt - varianceAmount);
 
                         //TODO: should update the user if any of these is true
                         if (updatedDrink.LowerEstimate < 0.0)
@@ -223,7 +226,9 @@ namespace BRIM.BackendClassLibrary
                                     parts.Add((ItemList[modIndex], q));
                                 } else
                                 {
-                                    //TODO: Flag for the user because modification is unknown
+                                    //Flag for the user because modification is unknown
+                                    string mes = modName + " is unknown. Must be updated manually.";
+                                    NotificationManager.AddNotification(mes);
                                 }
                             }
 
@@ -235,18 +240,26 @@ namespace BRIM.BackendClassLibrary
 
                                 updateAmt += part.quantity * amtOrdered;
 
-                                updatedDrink.LowerEstimate -= updateAmt;
-                                updatedDrink.UpperEstimate -= updateAmt;
+                                //account for possible spillage/ over or under pouring
+                                double varianceAmount = varianceMultiplier * updateAmt;
+                                updatedDrink.LowerEstimate -= (updateAmt + varianceAmount);
+                                updatedDrink.UpperEstimate -= (updateAmt - varianceAmount);
 
-                                //TODO: should update the user if any of these is true
+                                //update the user if any of these is true
                                 if (updatedDrink.LowerEstimate < 0.0)
                                 {
                                     updatedDrink.LowerEstimate = 0.0;
+
+                                    string mes = updatedDrink.Name + " may be empty";
+                                    NotificationManager.AddNotification(mes);
                                 }
 
                                 if (updatedDrink.UpperEstimate < 0.0)
                                 {
                                     updatedDrink.UpperEstimate = 0.0;
+
+                                    string mes = updatedDrink.Name + " may be empty";
+                                    NotificationManager.AddNotification(mes);
                                 }
 
                                 if (updatedDrink.CalculateStatus())
@@ -275,7 +288,9 @@ namespace BRIM.BackendClassLibrary
                         }
                     } else
                     {
-                        //TODO: Add flagging for unknown items the user has to update
+                        //flag user for unknown items the user has to update
+                        string mes = name + " is unknown. Please update manually.";
+                        NotificationManager.AddNotification(mes);
                     }
                 }
             }
