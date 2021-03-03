@@ -24,7 +24,7 @@ export default function ItemDialog(props) {
       <Button variant="outlined" color="primary" onClick={handleClickOpen}>
         Details
       </Button>
-      <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
+      <Dialog data-testid="modal" open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">{props.item.name}</DialogTitle>
         <DialogContent>
           <DialogContentText>

@@ -4,37 +4,67 @@ import { fireEvent, render } from '@testing-library/react'
 
 import FormDialog from '../ItemDialog.jsx'
 
-
-/*test("renders without crashing", () => {
-    const div = document.createElement("div");
+const setup = () => {
     let row = {
-        name: "shit",
-        id: "123"
+        name: "testName"
     }
-    ReactDom.render(<FormDialog item={row} />, div)
-})*/
+
+    const { getByText, getByLabelText, queryByLabelText } = render(<FormDialog item={row} />)
+
+    return {
+        getByText, queryByLabelText
+    }
+}
 
 test("renders without crashing again", () => {
-    let row = {
-        name: "shit",
-        id: "123"
-    }
-    const { getByText } = render(<FormDialog item={row} />)
+    const { getByText } = setup()
 
     getByText('Details')
 })
 
-test("clicking details button triggers modal", () => {
-    let row = {
-        name: "shit",
-        id: "123"
-    }
-
-    const { getByText } = render(<FormDialog item={row} />)
+test("clicking details button triggers modal open", () => {
+    const { getByText } = setup()
     const detailsButton = getByText(/Details/i)
 
     fireEvent.click(detailsButton)
     expect(getByText(/Item information:/i)).toBeTruthy()
 })
 
+test("opening item modal has row item's name", () => {
+    const { getByText } = setup()
+    const detailsButton = getByText(/Details/i)
+
+    fireEvent.click(detailsButton)
+    expect(getByText(/testName/i)).toBeTruthy()
+})
+
+
+test("clicking exit button triggers modal exit", () => {
+    const { getByText, queryByLabelText } = setup()
+    const detailsButton = getByText(/Details/i)
+
+    fireEvent.click(detailsButton)
+    expect(getByText(/Item information:/i)).toBeTruthy()
+
+    const exitButton = getByText(/Close/i)
+
+    fireEvent.click(exitButton)
+    expect(queryByLabelText(/"form-dialog-title/i)).toBeNull();
+})
+
+test("failing test for edit button", () => {
+    const { getByText, queryByLabelText } = setup()
+    const detailsButton = getByText(/Details/i)
+
+    fireEvent.click(detailsButton)
+    expect(getByText(/Item information:/i)).toBeTruthy()
+
+    const editButton = getByText(/Edit/i)
+    fireEvent.click(editButton)
+
+    //not a real test, just failing so that we know that edit functionailty doesn't work
+    expect(queryByLabelText(/"form-dialog-title/i)).toBeTruthy();
+})
+
+    //TODO tests: edit (save?) button? 
 
