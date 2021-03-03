@@ -23,9 +23,14 @@ const NavDrawer = props => {
   const classes = useStyles();
   const itemsList = [
     {
-      text: "Home",
+      text: "Items",
       icon: <InboxIcon />,
       onClick: () => history.push("/")
+    },
+    {
+      text: "Recipes",
+      icon: <InboxIcon />,
+      onClick: () => history.push("/recipes")
     },
   ];
   return (

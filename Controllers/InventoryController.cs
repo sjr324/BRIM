@@ -44,6 +44,17 @@ namespace BRIM
 				Items = this.inventory.ItemList.AsReadOnly()
 			});	
 		}
+		public ActionResult Recipes(){
+			_logger.LogInformation("Recipe call");
+			if (ControllerContext.HttpContext.Request.ContentType == "application/json"){
+				return new JsonResult(new{
+					Recipes = inventory.RecipeList.AsReadOnly()
+				});
+			}
+			return View("~/Views/Home/Index.cshtml",new ItemViewModel{
+				Items = this.inventory.ItemList.AsReadOnly()
+			});
+		}
 		
 		public class ItemViewModel
 		{

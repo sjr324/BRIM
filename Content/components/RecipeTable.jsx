@@ -1,0 +1,44 @@
+import React, {useEffect} from 'react';
+
+export default function RecipeTable(props){
+  let cdate = new Date();
+  console.log("hey, it's me again");
+  let [state,updateState]=React.useState({
+    recipes:{},
+    curdate:cdate.toLocaleString()
+  });
+	const loadRecipesFromServer=()=>{
+		console.log("Loading items:")
+    let itemurl='/inventory/recipes'
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET',itemurl,true);
+    xhr.setRequestHeader('Content-Type','application/json');
+    xhr.onload = ()=>{
+      /*
+      console.log("##################################################################################")
+      console.log(xhr.responseText);
+
+      console.log("##################################################################################")
+      */
+      let data = JSON.parse(xhr.responseText);
+      console.log(state.curdate+ " Tag:" + Math.floor(Math.random()*1000));
+      console.log(data);
+      updateState(prevState=>({
+        ...prevState,
+        recipes: data,
+        curdate: cdate.toLocaleString()
+      }));
+    };
+    xhr.send();
+	}
+	useEffect(()=>{
+		loadRecipesFromServer();
+	},[]);
+  //let currentdate= new Date().toLocaleString();
+  //  console.log("Last Load: " + currentdate);
+	return(
+		<p>
+     {state.curdate} 
+		</p>
+	);
+}

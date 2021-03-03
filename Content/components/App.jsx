@@ -1,6 +1,7 @@
 import React from 'react'
 import { BrowserRouter, Route,StaticRouter, Switch } from "react-router-dom";
-import ItemTableBasic from './items.jsx'
+import ItemTableBasic from './ItemTable.jsx'
+import RecipeTable from './RecipeTable.jsx'
 import NavDrawer from "./NavDrawer.jsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { PinDropSharp } from '@material-ui/icons';
@@ -23,6 +24,9 @@ export default function App(props) {
       <NavDrawer />
       <Switch>
         <Route exact from="/" render={props => <ItemTableBasic initialItems={state.items} {...props} />} />
+      </Switch>
+      <Switch>
+        <Route exact from="/recipes" render={props => <RecipeTable {...props} />} />
       </Switch>
     </div>
   );

@@ -27,7 +27,7 @@ export default function ItemTableBasic(props) {
 
   const loadItemsFromServer=()=>{
     console.log("Loading items:")
-    let itemurl='/items/load'
+    let itemurl='/inventory/items'
     let xhr = new XMLHttpRequest();
     xhr.open('GET',itemurl,true);
     xhr.setRequestHeader('Content-Type','application/json');
@@ -68,7 +68,7 @@ export default function ItemTableBasic(props) {
         </TableHead>
         <TableBody>
           {state.items.map((row) => (
-            <TableRow key={row.name}>
+            <TableRow key={row.id}>
               <TableCell component="th" scope="row" align="center">
                 {row.name}
               </TableCell>
