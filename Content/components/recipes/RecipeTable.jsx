@@ -1,10 +1,11 @@
 import React, {useEffect} from 'react';
+import RecipeCard from './RecipeCard.jsx'
 
 export default function RecipeTable(props){
   let cdate = new Date();
   console.log("hey, it's me again");
   let [state,updateState]=React.useState({
-    recipes:{},
+    recipes:[],
     curdate:cdate.toLocaleString()
   });
 	const loadRecipesFromServer=()=>{
@@ -25,7 +26,7 @@ export default function RecipeTable(props){
       console.log(data);
       updateState(prevState=>({
         ...prevState,
-        recipes: data,
+        recipes: data.recipes,
         curdate: cdate.toLocaleString()
       }));
     };
@@ -34,11 +35,14 @@ export default function RecipeTable(props){
 	useEffect(()=>{
 		loadRecipesFromServer();
 	},[]);
+  console.log(state.recipes)
   //let currentdate= new Date().toLocaleString();
   //  console.log("Last Load: " + currentdate);
 	return(
-		<p>
-     {state.curdate} 
-		</p>
+		<div>
+      {state.recipes.map((row)=> (
+        <RecipeCard key={row.id} {...row}></RecipeCard>
+      ))}
+		</div>
 	);
 }

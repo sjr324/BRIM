@@ -1,7 +1,7 @@
-import React from 'react'
+import React from 'react';
 import { BrowserRouter, Route,StaticRouter, Switch } from "react-router-dom";
 import ItemTableBasic from './ItemTable.jsx'
-import RecipeTable from './RecipeTable.jsx'
+import RecipeTable from './recipes/RecipeTable.jsx'
 import NavDrawer from "./NavDrawer.jsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { PinDropSharp } from '@material-ui/icons';

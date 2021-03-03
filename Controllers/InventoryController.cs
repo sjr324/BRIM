@@ -47,8 +47,20 @@ namespace BRIM
 		public ActionResult Recipes(){
 			_logger.LogInformation("Recipe call");
 			if (ControllerContext.HttpContext.Request.ContentType == "application/json"){
+				List<RecipeView> reclist = this.inventory.RecipeList.Select(p=>new RecipeView()
+				{
+					id = p.ID,
+					name = p.Name,
+					baseliquor = p.BaseLiquor,
+					components = p.ItemList.Select(q=>new RecipeComponent()
+					{
+						component = q.Item1,
+						amount = q.Item2
+					}).ToList()
+				}).ToList();
 				return new JsonResult(new{
-					Recipes = inventory.RecipeList.AsReadOnly()
+					Recipes = reclist.AsReadOnly()//,
+					//RecursionLimit=100
 				});
 			}
 			return View("~/Views/Home/Index.cshtml",new ItemViewModel{
@@ -60,6 +72,24 @@ namespace BRIM
 		{
 			public IReadOnlyList<Item> Items { get; set; }
 
+		}
+		public class RecipeView
+		{
+			public int id {get;set;}
+			public string name{get;set;}
+
+			public string baseliquor{get;set;}
+			public IReadOnlyList<RecipeComponent> components {get;set;}
+
+		}
+		public class RecipeComponent
+		{
+			public Item component{get;set;}
+			public double amount{get;set;}
+		}
+		public class RecipeListViewModel
+		{
+			public IReadOnlyList<RecipeView> recipes { get;set;}
 		}
 
 
