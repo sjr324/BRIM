@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route,StaticRouter, Switch } from "react-router-dom";
-import ItemTableBasic from './ItemTable.jsx'
+import ItemTableBasic from './items/ItemTable.jsx'
 import RecipeTable from './recipes/RecipeTable.jsx'
 import NavDrawer from "./NavDrawer.jsx";
 import { makeStyles } from "@material-ui/core/styles";
