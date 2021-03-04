@@ -10,6 +10,8 @@ export default function ItemTextFeild(props){
         label={props.label}
         defaultValue = {props.defVal}
         variant="filled"
+        value = {props.value}
+        onChange= {props.onChange}
       />
 
     );

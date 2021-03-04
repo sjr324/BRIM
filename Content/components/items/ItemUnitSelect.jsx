@@ -16,26 +16,20 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ItemUnitSelect(){
+export default function ItemUnitSelect(props){
 	const classes = useStyles();
-	const [units, setUnits]= React.useState('');
-
-	const handleChange = (event) => {
-		setUnits(event.target.value);
-	};
-
 	return(
-		<FormControl className = {classes.formControl}>
+		<FormControl className = {classes.formControl} >
 			<InputLabel id="unitselectlabel">Units:</InputLabel>
 			<Select
 				labelId="unitselectlabel"
-				id="unitselect"
-				value = {units}
-				onChange = {handleChange}
+				id={props.id}
+				value = {props.value}
+				onChange = {props.onChange}
 			>
-				<MenuItem value = {1}>ml</MenuItem>
+				<MenuItem value = {1} >ml</MenuItem>
 
-				<MenuItem value = {2}>fl oz</MenuItem>
+				<MenuItem value = {2} >fl oz</MenuItem>
 			</Select>
 		</FormControl>
 	);

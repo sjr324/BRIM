@@ -15,15 +15,66 @@ import ItemUnitSelect from './ItemUnitSelect.jsx';
 
 export default function ItemDialog(props) {
   const [open, setOpen] = React.useState(false);
+  const [values, setValues] = React.useState({
+    newItemName: '',
+    newItemLoEst: '',
+    newItemHiEst: '',
+    newItemIdeal: '',
+    newItemPar: '',
+    newItemBrand: '',
+    newItemPrice: '',
+    newItemBotSize: '',
+    newItemUPC: '',
+    newItemVintage: false,
+    newItemUnits: 1,
+  })
 
   const handleClickOpen = () => {
     setOpen(true);
   };
+  const handleCancel = () => {
 
-  const handleClose = () => {
     setOpen(false);
+  }
+  const handleClose = () => {
+    let data = new FormData();
+    let submitUrl = "/inventory/newitem" 
+    data.append('name', values.newItemName);
+    data.append('lo', values.newItemLoEst);
+    data.append('hi', values.newItemHiEst);
+    data.append('ideal', values.newItemIdeal);
+    data.append('par', values.newItemPar);
+    data.append('brand', values.newItemBrand);
+    data.append('price', values.newItemPrice);
+    data.append('size', values.newItemBotSize);
+    data.append('upc', values.newItemUPC);
+    data.append('vinatage', values.newItemVintage);
+    data.append('units', values.newItemUnits);
+    let xhr = new XMLHttpRequest(); 
+
+    xhr.open('POST',submitUrl,true);
+    xhr.onload = () =>{
+      console.log("Done");
+    }
+    xhr.send(data);
+    setOpen(false);
+    
   };
-  console.log(props);
+
+  const handleChangeText =(event)=>{
+    setValues({...values,[event.target.id]:event.target.value});
+  };
+  const handleChangeSelect = (event)=>{
+    setValues({...values,newItemUnits:event.target.value});
+  }
+  const handleChangeSwitch =(event)=>{
+
+    setValues({...values,[event.target.id]:event.target.checked});
+  };
+  const displayValues = ()=>{
+    console.log(values);
+  };
+  //console.log(props);
   return (
     <div>
         <Fab color="primary" aria-label="add" onClick={handleClickOpen}>
@@ -35,17 +86,17 @@ export default function ItemDialog(props) {
           <DialogContentText>
             Item information:
           </DialogContentText>
-          <ItemTextFeild id={"newItem" + "Name"} label = "Name" dbl={false}/> 
-          <ItemTextFeild id={"newItem" + "loEst"} label = "Lower Estimate" dbl={false}/> 
-          <ItemTextFeild id={"newItem" + "upEst"} label = "Upper Estimate" dbl={false}/> 
-          <ItemTextFeild id={"newItem" + "Ideal"} label = "Ideal Level" dbl={false}/> 
-          <ItemTextFeild id={"newItem" + "Par"} label = "Par Level" dbl={false}/> 
-          <ItemTextFeild id={"newItem" + "Brand"} label = "Brand" dbl={false}/> 
-          <ItemTextFeild id={"newItem" + "Price"} label = "Price"  dbl={false}/> 
-          <ItemTextFeild id={"newItem" + "bottleSize"} label = "Bottle Size" dbl={false}/> 
-          <ItemTextFeild id={"newItem" + "UPC"} label = "Units per Case" dbl={false}/> 
-          <ItemUnitSelect />
-          <GreenSwitch label={"Vintage"} />
+          <ItemTextFeild id={"newItem" + "Name"} label = "Name" dbl={false} onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"newItem" + "LoEst"} label = "Lower Estimate" dbl={false}onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"newItem" + "HiEst"} label = "Upper Estimate" dbl={false}onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"newItem" + "Ideal"} label = "Ideal Level" dbl={false}onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"newItem" + "Par"} label = "Par Level" dbl={false}onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"newItem" + "Brand"} label = "Brand" dbl={false}onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"newItem" + "Price"} label = "Price"  dbl={false}onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"newItem" + "BotSize"} label = "Bottle Size" dbl={false}onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"newItem" + "UPC"} label = "Units per Case" dbl={false}onChange = {handleChangeText}/> 
+          <ItemUnitSelect id={"newItem" + "Units"} value={values.newItemUnits} onChange={handleChangeSelect}/>
+          <GreenSwitch id={"newItem"+"Vintage"} checked={values.newItemVintage} onChange={handleChangeSwitch} label={"Vintage"} />
         </DialogContent>
         <DialogActions>
           <Button variant = "contained" onClick={handleClose} color="secondary" startIcon={<CloseIcon/>}>
@@ -54,6 +105,7 @@ export default function ItemDialog(props) {
           <Button variant = "contained" onClick={handleClose} color="primary" startIcon={<DoneIcon/>}>
             Create Item
           </Button>
+          <Button variant = "contained" onClick={displayValues} color = "primary">ViewValues</Button>
         </DialogActions>
       </Dialog>
     </div>

@@ -68,6 +68,48 @@ namespace BRIM
 			});
 		}
 		
+		public ActionResult SubmitItem(ItemModel item){
+			int maxid = this.inventory.ItemList.Select(p=> p.ID).Max();
+			Drink dr = new Drink();
+			dr.ID = maxid+1;
+			dr.Name = item.Name;
+			dr.LowerEstimate = Convert.ToDouble(item.Lo);
+			dr.UpperEstimate = Convert.ToDouble(item.Hi);
+			dr.Measurement= (unit) Enum.Parse(typeof(unit), item.Units);
+			dr.Price = Convert.ToDouble(item.Price);
+			dr.IdealLevel = Convert.ToDouble(item.Ideal);
+			dr.ParLevel = Convert.ToDouble(item.Par);
+			dr.BottleSize = Convert.ToInt32(item.Size);
+			dr.UnitsPerCase = Convert.ToInt32(item.Upc);
+			dr.Vintage = item.Vintage;
+			dr.CalculateStatus();
+			this.inventory.AddItem(dr);
+			return Content("Success");
+		}
+		public class ItemModel{
+			public string Name{get;set;}
+			public string Lo{get;set;}
+			
+			public string Hi{get;set;}
+
+			public string Ideal{get;set;}
+
+			public string Par{get;set;}
+
+			public string Brand{get;set;}
+
+			public string Price{get;set;}
+
+			public string Size{get;set;}
+
+			public string Upc{get;set;}
+
+			public bool Vintage{get;set;}
+
+			public string Units{get;set;}
+
+		}
+		
 		public class ItemViewModel
 		{
 			public IReadOnlyList<Item> Items { get; set; }

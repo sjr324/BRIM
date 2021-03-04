@@ -21,16 +21,13 @@ const SwitchGreen = withStyles({
 
 export default function GreenSwitch(props){
 	const [state, setState] = React.useState({
-		checked : true,
+		checked : props.checked,
 	})
 
-	const handleChange = (event) =>{
-		setState({...state, [event.target.name]:event.target.checked});
-	}
 
 	return(
 		<FormControlLabel
-			control={<SwitchGreen checked={state.checked} onChange = {handleChange} name = "checked" />}
+			control={<SwitchGreen id={props.id} checked={props.checked} onChange = {props.onChange} name = "checked" />}
 			label={props.label}
 		/> 
 	);
