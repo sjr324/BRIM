@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using BRIM.BackendClassLibrary;
+using Microsoft.Extensions.Logging;
 //why is This Using Directive unneccesary? Is it because it's not in a 
 //separate Project, but rather a free-floating file in the project that contain the Class Library? 
 
@@ -17,6 +17,11 @@ namespace BRIM
 
 		public static IWebHost BuildWebHost(string[] args) =>
 			WebHost.CreateDefaultBuilder(args)
+			.ConfigureLogging(logging =>
+			{
+				logging.ClearProviders();
+				logging.AddDebug();
+			})
 				.UseStartup<Startup>()
 				.Build();
 	}

@@ -5,7 +5,7 @@ using System.Data;
 using Xunit;
 using Moq;
 using System.Linq;
-using BackendClassLibrary;
+using BRIM.BackendClassLibrary;
 
 namespace BackendClassUnitTests
 {

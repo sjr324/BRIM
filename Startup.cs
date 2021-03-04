@@ -58,9 +58,38 @@ namespace BRIM
 
 			app.UseEndpoints(endpoints =>
 			{
-				endpoints.MapControllerRoute("default", "{path?}", new { controller = "Home", action = "Index" });
-				endpoints.MapControllerRoute("comments-root", "comments", new { controller = "Home", action = "Index" });
-				endpoints.MapControllerRoute("comments", "comments/page-{page}", new { controller = "Home", action = "Comments" });
+				/*
+				endpoints.MapControllerRoute(
+					name:"home",
+					pattern:"/",
+					defaults: new {controller = "Home", action = "loadurls"}
+				);
+				*/
+				
+				endpoints.MapControllerRoute(
+					name: "items",
+					pattern: "inventory/items",
+					defaults: new { controller = "Inventory", action = "Items" }
+				);
+				endpoints.MapControllerRoute(
+					name: "additem",
+					pattern: "inventory/newitem",
+					defaults: new { controller = "Inventory", action = "SubmitItem" }
+				);
+				endpoints.MapControllerRoute(
+					name:"recipes",
+					pattern:"inventory/recipes",
+					defaults: new { controller = "Inventory", action = "Recipes"}
+				);
+				endpoints.MapControllerRoute(
+					name: "default",
+					pattern: "{path?}",
+					new {controller = "Inventory", action = "Index"}
+				);
+				
+				//endpoints.MapControllerRoute("default", "{path?}", new { controller = "Home", action = "Index" });
+				//endpoints.MapControllerRoute("comments-root", "comments", new { controller = "Home", action = "Index" });
+				//endpoints.MapControllerRoute("comments", "comments/page-{page}", new { controller = "Home", action = "Comments" });
 			});
 		}
 	}
