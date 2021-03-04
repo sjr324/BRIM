@@ -73,6 +73,7 @@ namespace BRIM
 			Drink dr = new Drink();
 			dr.ID = maxid+1;
 			dr.Name = item.Name;
+			dr.Brand = item.Brand;
 			dr.LowerEstimate = Convert.ToDouble(item.Lo);
 			dr.UpperEstimate = Convert.ToDouble(item.Hi);
 			dr.Measurement= (unit) Enum.Parse(typeof(unit), item.Units);
