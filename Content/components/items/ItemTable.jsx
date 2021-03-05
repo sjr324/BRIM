@@ -12,6 +12,7 @@ import AddItemFab from './AddItemFab.jsx'
 import { Button, Container } from '@material-ui/core';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles({
   table: {
@@ -27,7 +28,7 @@ export default function ItemTableBasic(props) {
 
   const loadItemsFromServer=()=>{
     console.log("Loading items:")
-    let itemurl='/items/load'
+    let itemurl='/inventory/items'
     let xhr = new XMLHttpRequest();
     xhr.open('GET',itemurl,true);
     xhr.setRequestHeader('Content-Type','application/json');
@@ -55,34 +56,41 @@ export default function ItemTableBasic(props) {
 
 	console.log("Rendering table");
   return (
-    <Container maxWidth="md">
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell align="center">Drink</TableCell>
-            <TableCell align="center">Quantity</TableCell>
-            <TableCell align="center">Status</TableCell>
-            <TableCell align="center">Details</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {state.items.map((row) => (
-            <TableRow key={row.name}>
-              <TableCell component="th" scope="row" align="center">
-                {row.name}
-              </TableCell>
-              <TableCell align="center">{row.lowerEstimate}-{row.upperEstimate}</TableCell>
-              <TableCell align="center">{row.status}</TableCell>
-              <TableCell align="center"><FormDialog item={row} /></TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-    <AddItemFab />
-    <Button variant="contained" onClick={loadItemsFromServer} color="primary">Refresh Table</Button>
-    </Container>
-  
+    <Grid container spacing = {3} >
+      <Grid item xs ={3} justify="right" >
+        <AddItemFab />
+      </Grid>
+      <Grid item xs={6}>
+        <TableContainer component={Paper}>
+          <Table className={classes.table} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell align="center">Drink</TableCell>
+                <TableCell align="center">Quantity</TableCell>
+                <TableCell align="center">Status</TableCell>
+                <TableCell align="center">Details</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {state.items.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell component="th" scope="row" align="center">
+                    {row.name}
+                  </TableCell>
+                  <TableCell align="center">{row.lowerEstimate}-{row.upperEstimate}</TableCell>
+                  <TableCell align="center">{row.status}</TableCell>
+                  <TableCell align="center"><FormDialog item={row} /></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Grid item xs={3} justify="center">
+
+          <Button variant="contained" onClick={loadItemsFromServer} color="primary">Refresh Table</Button>
+        </Grid>
+      </Grid>
+
+    </Grid>
   );
 }
