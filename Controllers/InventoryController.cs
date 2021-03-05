@@ -87,34 +87,54 @@ namespace BRIM
 			this.inventory.AddItem(dr);
 			return Content("Success");
 		}
+		public ActionResult SubmitRecipe(RecipeModel recipe){
+
+			return Content("Success");
+		}
+		public ActionResult ItemNames(){
+			List<RecipeComponentModel> names = this.inventory.ItemList.Select(p=>new RecipeComponentModel
+			{
+				id = p.ID,
+				name = p.Name,
+				brand = ((Drink)p).Brand,
+				baseliquor = false
+			}).ToList();
+			return new JsonResult(new{
+				items = names.AsReadOnly()
+			});
+		}
 		public class ItemModel{
 			public string Name{get;set;}
 			public string Lo{get;set;}
-			
 			public string Hi{get;set;}
-
 			public string Ideal{get;set;}
-
 			public string Par{get;set;}
-
 			public string Brand{get;set;}
-
 			public string Price{get;set;}
-
 			public string Size{get;set;}
-
 			public string Upc{get;set;}
-
 			public bool Vintage{get;set;}
-
 			public string Units{get;set;}
-
 		}
 		
 		public class ItemViewModel
 		{
 			public IReadOnlyList<Item> Items { get; set; }
 
+		}
+		public class RecipeModel
+		{
+			public string name{get;set;}
+			public List<RecipeComponentModel> componenets; 
+		}
+		/// <summary>
+		/// This should be renamed to something else less confusing
+		/// </summary>
+		public class RecipeComponentModel{
+			public int id{get;set;}
+			public string name{get;set;}
+			public string brand{get;set;}
+			public bool baseliquor{get;set;}
 		}
 		public class RecipeView
 		{

@@ -82,6 +82,16 @@ namespace BRIM
 					defaults: new { controller = "Inventory", action = "Recipes"}
 				);
 				endpoints.MapControllerRoute(
+					name: "addrecipe",
+					pattern: "inventory/newrecipe",
+					defaults: new {controller = "Inventory", action = "SubmitRecipe"}
+				);
+				endpoints.MapControllerRoute(
+					name:"item_names",
+					pattern: "inventory/itemnames"
+					defaults: new {controller = "Inventory", action = "ItemNames"}
+				);
+				endpoints.MapControllerRoute(
 					name: "default",
 					pattern: "{path?}",
 					new {controller = "Inventory", action = "Index"}
