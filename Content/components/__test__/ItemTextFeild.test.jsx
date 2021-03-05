@@ -1,12 +1,21 @@
-﻿/*test("opening item modal has row item's id", () => {
-    let row = {
-        name: "shit",
-        id: "123"
+﻿import React from 'react'
+import { fireEvent, render } from '@testing-library/react'
+
+import ItemTextFeild from '../ItemTextFeild.jsx'
+
+const setup = () => {
+    const { getByText, getByLabelText } = render(<ItemTextFeild id={"itemId"} label="Name" defVal={"defName"} dbl={true} />)
+
+    return {
+        getByLabelText,
+        getByText
+
     }
+}
 
-    const { getByText, getByLabelText } = render(<FormDialog item={row} />)
-    const detailsButton = getByText(/Details/i)
+test("renders without crashing again", () => {
+    const { getByLabelText, getByText } = setup()
 
-    fireEvent.click(detailsButton)
-    expect(getByLabelText(/123/i)).toBeTruthy()
-})*/
+    getByText('Name')
+})
+

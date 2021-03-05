@@ -1,5 +1,4 @@
 ﻿import React from 'react'
-import ReactDom from 'react-dom'
 import { fireEvent, render } from '@testing-library/react'
 
 import FormDialog from '../ItemDialog.jsx'
@@ -9,14 +8,14 @@ const setup = () => {
         name: "testName"
     }
 
-    const { getByText, getByLabelText, queryByLabelText } = render(<FormDialog item={row} />)
+    const { getByText, queryByLabelText } = render(<FormDialog item={row} />)
 
     return {
         getByText, queryByLabelText
     }
 }
 
-test("renders without crashing again", () => {
+test("renders details button", () => {
     const { getByText } = setup()
 
     getByText('Details')
@@ -62,7 +61,7 @@ test("failing test for edit button", () => {
     const editButton = getByText(/Edit/i)
     fireEvent.click(editButton)
 
-    //not a real test, just failing so that we know that edit functionailty doesn't work
+    //not a real test, just failing so that we know that edit functionailty doesn't work yet
     expect(queryByLabelText(/"form-dialog-title/i)).toBeTruthy();
 })
 
