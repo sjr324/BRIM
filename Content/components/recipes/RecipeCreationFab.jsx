@@ -13,6 +13,13 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import ItemTextFeild from '../items/ItemTextFeild.jsx'
 import Chip from '@material-ui/core/Chip';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
 
 export default function ItemDialog(props) {
 	const [open, setOpen] = React.useState(false);
@@ -106,10 +113,35 @@ export default function ItemDialog(props) {
 						onChange={(event,newValue)=>{
 							console.log(newValue);
 							selections.comps = newValue	
+							setSelections({...selections})
 							console.log(selections);
 						}}
 					/>
-				<Button variant="contained" onClick={moveSelection} color="primary">Shift Selection</Button>
+				<Button variant="contained" onClick={moveSelection} color="primary">Select Items</Button>
+				<TableContainer component={Paper}>
+					<Table size="small">
+						<TableHead>
+							<TableRow>
+								<TableCell align="center">Component</TableCell>
+								<TableCell align="center">Quantity</TableCell>
+							</TableRow>
+						</TableHead>
+						<TableBody>
+							{
+								selections.comps.map((row)=>(
+									<TableRow key={row.id}>
+										<TableCell component="th" scope="row">
+											{row.name}
+										</TableCell>
+										<TableCell align="center">
+											<TextField variant="filled"/>
+										</TableCell>
+									</TableRow>
+								))
+							}
+						</TableBody>
+					</Table>
+				</TableContainer>
 				</DialogContent>
 				<DialogActions>
 					<Button variant="contained" onClick={handleCancel} color="secondary" startIcon={<CloseIcon />}>
