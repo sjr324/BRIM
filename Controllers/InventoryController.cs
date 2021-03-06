@@ -87,16 +87,16 @@ namespace BRIM
 			this.inventory.AddItem(dr);
 			return Content("Success");
 		}
-		public ActionResult SubmitRecipe(RecipeModel recipe){
+		public ActionResult SubmitRecipe([FromBody]RecipeModel recipe){
 			int maxid = this.inventory.RecipeList.Select(p=>p.ID).Max();
 			Recipe r = new Recipe();
 			r.ID = maxid;
 			r.Name = recipe.name;
 			r.ItemList =
 				(from item in inventory.ItemList
-				join comp in recipe.componenets
+				join comp in recipe.components
 				on item.ID equals comp.id
-				select (item, comp.quantity)).ToList();
+				select (item, Convert.ToDouble(comp.quantity))).ToList();
 			inventory.AddRecipe(r);
 			return Content("Success");
 		}
@@ -106,7 +106,8 @@ namespace BRIM
 				id = p.ID,
 				name = p.Name,
 				brand = ((Drink)p).Brand,
-				baseliquor = false
+				baseliquor = false,
+				quantity = "0" 
 			}).ToList();
 			return new JsonResult(new{
 				items = names.AsReadOnly()
@@ -134,7 +135,7 @@ namespace BRIM
 		public class RecipeModel
 		{
 			public string name{get;set;}
-			public List<RecipeComponentModel> componenets; 
+			public List<RecipeComponentModel> components{get;set;}
 		}
 		/// <summary>
 		/// This should be renamed to something else less confusing
@@ -144,7 +145,7 @@ namespace BRIM
 			public string name{get;set;}
 			public string brand{get;set;}
 			public bool baseliquor{get;set;}
-			public double quantity{get;set;}
+			public string quantity{get;set;}
 		}
 		public class RecipeView
 		{

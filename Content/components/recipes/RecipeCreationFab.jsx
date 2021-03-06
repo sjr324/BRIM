@@ -36,7 +36,6 @@ export default function ItemDialog(props) {
 		let xhr = new XMLHttpRequest();
 		xhr.open('GET', dataurl, true);
 
-		xhr.setRequestHeader('Content-Type', 'application/json');
 		xhr.onload = () => {
 			let data = JSON.parse(xhr.responseText);
 			console.log(data);
@@ -53,24 +52,28 @@ export default function ItemDialog(props) {
 		setOpen(false);
 	}
 	const handleClose = () => {
-		let data = new FormData();
 		let submitUrl = "/inventory/newrecipe"
-		data.append('name', values.newRecipeName);
-		data.append('components', selections.comps);
+		let combined = {
+			name: values.newRecipeName,
+			components: selections.comps
+		}
+		
 		let xhr = new XMLHttpRequest();
-
+		console.log(selections.comps);
 		xhr.open('POST', submitUrl, true);
+		xhr.setRequestHeader('Content-Type','application/json');
 		xhr.onload = () => {
 			console.log("Done");
 		}
-		xhr.send(data);
-		setOpen(false);
+		xhr.send(JSON.stringify(combined));
 
+		setOpen(false);
 	};
 
 	const handleChangeText = (event) => {
 		setValues({ ...values, [event.target.id]: event.target.value });
 	};
+
 	const moveSelection = () =>{
 		console.log(values.selComponents);
 	};
@@ -90,7 +93,7 @@ export default function ItemDialog(props) {
 					<DialogContentText>
 						Recipe Information:
           			</DialogContentText>
-					<ItemTextFeild id={"newItem" + "Recipe"} label="Name" dbl={false} onChange={handleChangeText} />
+					<ItemTextFeild id={"newRecipe" + "Name"} label="Name" dbl={false} onChange={handleChangeText} />
 					<Autocomplete
 						id="component_select"
 						multiple
@@ -134,7 +137,14 @@ export default function ItemDialog(props) {
 											{row.name}
 										</TableCell>
 										<TableCell align="center">
-											<TextField variant="filled"/>
+											<TextField 
+												variant="filled" 
+												type="number" 
+												onChange={(event)=>{
+													selections.comps[selections.comps.indexOf(row)].quantity = event.target.value;
+													console.log(selections.comps[selections.comps.indexOf(row)]);
+												}}
+											/>
 										</TableCell>
 									</TableRow>
 								))
