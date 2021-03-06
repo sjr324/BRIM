@@ -88,7 +88,7 @@ namespace BRIM
 				);
 				endpoints.MapControllerRoute(
 					name:"item_names",
-					pattern: "inventory/itemnames"
+					pattern: "inventory/itemnames",
 					defaults: new {controller = "Inventory", action = "ItemNames"}
 				);
 				endpoints.MapControllerRoute(

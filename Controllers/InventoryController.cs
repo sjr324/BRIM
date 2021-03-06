@@ -88,7 +88,16 @@ namespace BRIM
 			return Content("Success");
 		}
 		public ActionResult SubmitRecipe(RecipeModel recipe){
-
+			int maxid = this.inventory.RecipeList.Select(p=>p.ID).Max();
+			Recipe r = new Recipe();
+			r.ID = maxid;
+			r.Name = recipe.name;
+			r.ItemList =
+				(from item in inventory.ItemList
+				join comp in recipe.componenets
+				on item.ID equals comp.id
+				select (item, comp.quantity)).ToList();
+			inventory.AddRecipe(r);
 			return Content("Success");
 		}
 		public ActionResult ItemNames(){
@@ -135,6 +144,7 @@ namespace BRIM
 			public string name{get;set;}
 			public string brand{get;set;}
 			public bool baseliquor{get;set;}
+			public double quantity{get;set;}
 		}
 		public class RecipeView
 		{
