@@ -33,16 +33,12 @@ export default function ItemTableBasic(props) {
     xhr.open('GET',itemurl,true);
     xhr.setRequestHeader('Content-Type','application/json');
     xhr.onload = ()=>{
-      console.log("##################################################################################")
-      console.log(xhr.responseText);
 
-      console.log("##################################################################################")
-      /*
       let data = JSON.parse(xhr.responseText);
       updateState({
         items: data
       });
-      */
+      
     };
     xhr.send();
     

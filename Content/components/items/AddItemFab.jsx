@@ -27,6 +27,7 @@ export default function ItemDialog(props) {
     newItemUPC: '',
     newItemVintage: false,
     newItemUnits: 1,
+    newItemID: -1,
   })
 
   const handleClickOpen = () => {
@@ -50,6 +51,7 @@ export default function ItemDialog(props) {
     data.append('upc', values.newItemUPC);
     data.append('vinatage', values.newItemVintage);
     data.append('units', values.newItemUnits);
+    data.appent('id',values.newItemID);
     let xhr = new XMLHttpRequest(); 
 
     xhr.open('POST',submitUrl,true);
@@ -99,7 +101,7 @@ export default function ItemDialog(props) {
           <GreenSwitch id={"newItem"+"Vintage"} checked={values.newItemVintage} onChange={handleChangeSwitch} label={"Vintage"} />
         </DialogContent>
         <DialogActions>
-          <Button variant = "contained" onClick={handleClose} color="secondary" startIcon={<CloseIcon/>}>
+          <Button variant = "contained" onClick={handleCancel} color="secondary" startIcon={<CloseIcon/>}>
             Cancel
           </Button>
           <Button variant = "contained" onClick={handleClose} color="primary" startIcon={<DoneIcon/>}>
