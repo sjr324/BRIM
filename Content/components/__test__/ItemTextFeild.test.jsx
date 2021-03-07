@@ -1,21 +1,29 @@
 ﻿import React from 'react'
-import { fireEvent, render } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import '@testing-library/jest-dom'
 
-import ItemTextFeild from '../ItemTextFeild.jsx'
+import ItemTextFeild from '../items/ItemTextFeild.jsx'
 
-const setup = () => {
-    const { getByText, getByLabelText } = render(<ItemTextFeild id={"itemId"} label="Name" defVal={"defName"} dbl={true} />)
+const setup = (itemId, Label, defaultName, disabled) => {
+    const { getByText } =
+        render(<ItemTextFeild id={itemId} label={Label} defVal={defaultName} dbl={disabled} />)
 
     return {
-        getByLabelText,
-        getByText
-
+        getByText,
     }
 }
 
-test("renders without crashing again", () => {
-    const { getByLabelText, getByText } = setup()
+test("renders without crashing", () => {
+    const { getByText } = setup("TestId", "TestLabel", "DefaultValue", true)
 
-    getByText('Name')
+    getByText('TestLabel')
 })
 
+test("text input changes value", () => {
+    setup("TestId", "TestLabel", "DefaultValue", false)
+
+    userEvent.type(screen.getByLabelText(/TestLabel/i), '{selectall}{del}new value')
+
+    expect(screen.getByLabelText(/TestLabel/i)).toHaveValue('new value')
+})
