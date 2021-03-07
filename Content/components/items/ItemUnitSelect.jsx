@@ -26,10 +26,12 @@ export default function ItemUnitSelect(props){
 				id={props.id}
 				value = {props.value}
 				onChange = {props.onChange}
+				disabled={props.disabled}
+				variant="filled"
 			>
-				<MenuItem value = {1} >ml</MenuItem>
+				<MenuItem value = {0} >ml</MenuItem>
 
-				<MenuItem value = {2} >fl oz</MenuItem>
+				<MenuItem value = {1} >fl oz</MenuItem>
 			</Select>
 		</FormControl>
 	);

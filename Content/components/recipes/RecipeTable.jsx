@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import RecipeCard from './RecipeCard.jsx'
+import RecipeCreationFab from './RecipeCreationFab.jsx'
 
 export default function RecipeTable(props){
   let cdate = new Date();
@@ -40,6 +41,7 @@ export default function RecipeTable(props){
   //  console.log("Last Load: " + currentdate);
 	return(
 		<div>
+      <RecipeCreationFab />
       {state.recipes.map((row)=> (
         <RecipeCard key={row.id} {...row}></RecipeCard>
       ))}
