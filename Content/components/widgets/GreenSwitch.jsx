@@ -27,7 +27,7 @@ export default function GreenSwitch(props){
 
 	return(
 		<FormControlLabel
-			control={<SwitchGreen id={props.id} checked={props.checked} onChange = {props.onChange} name = "checked" />}
+			control={<SwitchGreen id={props.id} checked={props.checked} onChange = {props.onChange} name = "checked" disabled={props.disabled} />}
 			label={props.label}
 		/> 
 	);

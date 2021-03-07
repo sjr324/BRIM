@@ -69,9 +69,15 @@ namespace BRIM
 		}
 		
 		public ActionResult SubmitItem(ItemModel item){
-			int maxid = this.inventory.ItemList.Select(p=> p.ID).Max();
-			Drink dr = new Drink();
-			dr.ID = maxid+1;
+			Drink dr;
+			if(item.id==-1){
+
+				dr = new Drink();
+				//set the id to the next highest one
+				dr.ID =  this.inventory.ItemList.Select(p=> p.ID).Max()+1;
+			}else{
+				dr=(Drink)this.inventory.ItemList.Where(p=>p.ID == item.id).ToList().First();
+			}
 			dr.Name = item.Name;
 			dr.Brand = item.Brand;
 			dr.LowerEstimate = Convert.ToDouble(item.Lo);
@@ -84,7 +90,11 @@ namespace BRIM
 			dr.UnitsPerCase = Convert.ToInt32(item.Upc);
 			dr.Vintage = item.Vintage;
 			dr.CalculateStatus();
-			this.inventory.AddItem(dr);
+			if(item.id == -1){
+				this.inventory.AddItem(dr);
+			}else{
+				this.inventory.UpdateItem(dr);
+			}
 			return Content("Success");
 		}
 		public ActionResult SubmitRecipe([FromBody]RecipeModel recipe){
@@ -125,6 +135,7 @@ namespace BRIM
 			public string Upc{get;set;}
 			public bool Vintage{get;set;}
 			public string Units{get;set;}
+			public int id{get;set;}
 		}
 		
 		public class ItemViewModel
