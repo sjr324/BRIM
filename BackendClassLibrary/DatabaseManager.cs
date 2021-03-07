@@ -114,9 +114,10 @@ namespace BRIM.BackendClassLibrary
         //Creates then runs an insert query
         public bool addDrink(Drink drink)
         {
+            //TODO: Re-add vintage
             string query = @"insert into brim.drinks (name, lowerEstimate, upperEstimate, measurementUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
                 + drink.Name + "', '" + drink.LowerEstimate + "', '" + drink.UpperEstimate + "', '" + drink.Measurement + "', '" + drink.ParLevel + "', '" + drink.IdealLevel
-                + "', '" + drink.BottleSize + "', '" + drink.Brand + "', '" + drink.UnitsPerCase + "', '" + drink.Vintage + "')";
+                + "', '" + drink.BottleSize + "', '" + drink.Brand + "', '" + drink.UnitsPerCase + "', '" + 2000 + "')";
             int newDrinkID = this.runSqlInsertCommandReturnID(query);
 
             if (newDrinkID == -1)
@@ -131,9 +132,10 @@ namespace BRIM.BackendClassLibrary
         //Creates then runs an update query
         public bool updateDrink(Drink drink)
         {
+            //TODO: Re-add vintage
             string query = @"update brim.drinks set name = '" + drink.Name + "', lowerEstimate = '" + drink.LowerEstimate + "', upperEstimate = '" + drink.UpperEstimate
                 + "', measurementUnit = '" + drink.Measurement + "', parLevel = '" + drink.ParLevel + "', idealLevel = '" + drink.IdealLevel + "', bottleSize = '"
-                + drink.BottleSize + "', brand = '" + drink.Brand + "', bottlesPerCase = '" + drink.UnitsPerCase + "', vintage = '" + drink.Vintage + "' where "
+                + drink.BottleSize + "', brand = '" + drink.Brand + "', bottlesPerCase = '" + drink.UnitsPerCase + "', vintage = '" + 2000 + "' where "
                 + "drinkID = '" + drink.ID + "'";
             bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
 

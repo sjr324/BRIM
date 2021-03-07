@@ -43,7 +43,9 @@ namespace BRIM.BackendClassLibrary
                 BottleSize = dr.Field<int>("bottleSize");
                 Brand = dr.Field<string>("brand");
                 UnitsPerCase = dr.Field<int>("bottlesPerCase");
-                Vintage = Convert.ToBoolean(dr.Field<SByte>("vintage"));
+                //TODO: Re-enable vintage
+                //Vintage = Convert.ToBoolean(dr.Field<SByte>("vintage"));
+                Vintage = true;
                 Price = dr.Field<double>("price");
             } catch (IndexOutOfRangeException exp) {
                 Console.WriteLine("The Datarow given does not contain one or more of the columns in a Drink Object");
