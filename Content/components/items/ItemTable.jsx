@@ -52,12 +52,10 @@ export default function ItemTableBasic(props) {
 
 	console.log("Rendering table");
   return (
-    <Grid container spacing = {3} >
-      <Grid item xs ={3} justify="right" >
-        <AddItemFab />
-      </Grid>
-      <Grid item xs={6}>
-        <TableContainer component={Paper}>
+      <Grid container direction="column" justify="space-around">
+      
+      <Grid item xs={4} md={9}>
+        <TableContainer component={Paper} >
           <Table className={classes.table} aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -81,10 +79,17 @@ export default function ItemTableBasic(props) {
             </TableBody>
           </Table>
         </TableContainer>
-        <Grid item xs={3} justify="center">
 
-          <Button variant="contained" onClick={loadItemsFromServer} color="primary">Refresh Table</Button>
+        <Grid container direction="row" justify="space-between" alignItems="flex-start">
+            <Grid item xs={2}>
+                <Button variant="contained" onClick={loadItemsFromServer} color="primary">Refresh Table</Button>
+            </Grid>
+
+            <Grid item xs={1} >
+                <AddItemFab />
+            </Grid>
         </Grid>
+
       </Grid>
 
     </Grid>
