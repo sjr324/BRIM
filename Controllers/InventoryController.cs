@@ -47,15 +47,17 @@ namespace BRIM
 		public ActionResult Recipes(){
 			_logger.LogInformation("Recipe call");
 			if (ControllerContext.HttpContext.Request.ContentType == "application/json"){
-				List<RecipeView> reclist = this.inventory.RecipeList.Select(p=>new RecipeView()
+				List<RecipeModel> reclist = this.inventory.RecipeList.Select(p=>new RecipeModel()
 				{
 					id = p.ID,
 					name = p.Name,
-					baseliquor = p.BaseLiquor,
-					components = p.ItemList.Select(q=>new RecipeComponent()
+					components = p.ItemList.Select(q=>new RecipeComponentModel()
 					{
-						component = q.Item1,
-						amount = q.Item2
+						id = q.Item1.ID,
+						name= q.Item1.Name,
+						brand=((Drink)q.Item1).Brand,
+						baseliquor = false,
+						quantity= Convert.ToString(q.Item2)
 					}).ToList()
 				}).ToList();
 				return new JsonResult(new{
@@ -145,6 +147,7 @@ namespace BRIM
 		}
 		public class RecipeModel
 		{
+			public int id{get;set;}
 			public string name{get;set;}
 			public List<RecipeComponentModel> components{get;set;}
 		}

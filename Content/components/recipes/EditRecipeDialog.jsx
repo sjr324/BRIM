@@ -24,12 +24,18 @@ export default function EditRecipeDialog(props) {
 
 	const [open, setOpen] = React.useState(false);
 	const [values, setValues] = React.useState({
-		newRecipeName: '',
+		recipeName: props.name,
 		components: [],
 	});
 	const [selections, setSelections] = React.useState({
-		comps: []
+		comps: [],
 	});
+	React.useEffect(()=>{
+		let c = props.components;
+		setSelections({
+			comps: c,
+		})
+	},[]);
 
 	const handleClickOpen = () => {
 		let dataurl = "/inventory/itemnames"
@@ -75,7 +81,7 @@ export default function EditRecipeDialog(props) {
 	const handleChangeText = (event) => {
 		setValues({ ...values, [event.target.id]: event.target.value });
 	};
-
+	console.log(selections.comps);
 	return (
 		<div>
 			<Button variant="outlined" color="primary" aria-label="add" onClick={handleClickOpen}>
@@ -88,13 +94,15 @@ export default function EditRecipeDialog(props) {
 					<DialogContentText>
 						Recipe Information:
           				</DialogContentText>
-					<ItemTextFeild id={"newRecipe" + "Name"} label="Name" dbl={false} onChange={handleChangeText} />
+					<ItemTextFeild id={"newRecipe" + "Name"} label="Name" dbl={false} onChange={handleChangeText} value={values.recipeName} />
 					<Autocomplete
 						id="component_select"
 						multiple
 						filterSelectedOptions
+						value={selections.comps}
 						options={values.components}
 						getOptionLabel={(option) => option.name}
+						getOptionSelected={(option,value)=>value.id === option.id}
 						style={{ width: 300 }}
 						renderTags={(value, getTagProps) =>
 							value.map((option, index) => (
@@ -134,6 +142,7 @@ export default function EditRecipeDialog(props) {
 												<TextField
 													variant="filled"
 													type="number"
+													value={row.quantity}
 													onChange={(event) => {
 														selections.comps[selections.comps.indexOf(row)].quantity = event.target.value;
 														console.log(selections.comps[selections.comps.indexOf(row)]);

@@ -23,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function RecipeTable(props){
   let cdate = new Date();
-  console.log("hey, it's me again");
   let [state,updateState]=React.useState({
     recipes:[],
     curdate:cdate.toLocaleString()

@@ -37,15 +37,15 @@ export default function RecipeCard(props){
 				</Typography>
 
 				{props.components.map((component) => (
-					<Typography key={component.component.id} variant="body2" component="p">
-						{component.component.name}
+					<Typography key={component.id} variant="body2" component="p">
+						{component.name}
 					</Typography>
 				))}
 
 			</CardContent>
 
 			<CardActions>
-				<EditRecipe />
+				<EditRecipe {...props}/>
 			</CardActions>
 
 		</Card>
