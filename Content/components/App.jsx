@@ -5,13 +5,19 @@ import RecipeTable from './recipes/RecipeTable.jsx'
 import NavDrawer from "./NavDrawer.jsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { Helmet} from 'react-helmet';
-import { PinDropSharp } from '@material-ui/icons';
+import { ThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import CssBaseline from '@material-ui/core/CssBaseline';
 
 const useStyles = makeStyles({
   container: {
     display: "flex"
   }
 });
+const theme = createMuiTheme({
+  palette:{
+    type: "dark",
+  }
+})
 
 export default function App(props) {
   console.log("App Props: ");
@@ -21,6 +27,8 @@ export default function App(props) {
 	});
   const classes = useStyles();
   const app = (
+    <ThemeProvider theme={theme}>
+      <CssBaseline/>
     <div className={classes.container}>
       <Helmet>
         <title>
@@ -35,6 +43,7 @@ export default function App(props) {
         <Route exact from="/recipes" render={props => <RecipeTable  />} />
       </Switch>
     </div>
+  </ThemeProvider>
   );
   if (typeof window === 'undefined') {
     console.log("Undefined window");
