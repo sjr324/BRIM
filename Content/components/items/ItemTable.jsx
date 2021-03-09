@@ -18,6 +18,9 @@ const useStyles = makeStyles({
   table: {
     minWidth: 650,
   },
+  root:{
+    width: 1000,
+  },
 });
 
 export default function ItemTableBasic(props) {
@@ -25,6 +28,13 @@ export default function ItemTableBasic(props) {
 	let [state, updateState]= React.useState({
 		items:props.initialItems
 	});
+
+  useEffect(()=>{
+    const interval = setInterval(()=>{
+      loadItemsFromServer()
+    },5000);
+    return ()=> clearInterval(interval);
+  },[]);
 
   const loadItemsFromServer=()=>{
     console.log("Loading items:")
@@ -34,14 +44,29 @@ export default function ItemTableBasic(props) {
     xhr.setRequestHeader('Content-Type','application/json');
     xhr.onload = ()=>{
 
+      console.log("Updated items");
       let data = JSON.parse(xhr.responseText);
       updateState({
-        items: data
+        items: data.items
       });
       
     };
     xhr.send();
     
+  }
+  const setStatus=(status)=>{
+    switch(status){
+      case 0:
+        return "Empty";
+      case 1:
+        return "Below Par";
+      case 2:
+        return "Below Ideal";
+      case 3:
+        return "Above Ideal";
+      default:
+        return "Failed to parse";
+    }
   }
   /*
   useEffect(()=>{
@@ -50,43 +75,44 @@ export default function ItemTableBasic(props) {
   });
   */
 
-	console.log("Rendering table");
   return (
-    <Grid container spacing = {3} >
-      <Grid item xs ={3} justify="right" >
-        <AddItemFab />
-      </Grid>
-      <Grid item xs={6}>
-        <TableContainer component={Paper}>
-          <Table className={classes.table} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center">Drink</TableCell>
-                <TableCell align="center">Quantity</TableCell>
-                <TableCell align="center">Status</TableCell>
-                <TableCell align="center">Details</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {state.items.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell component="th" scope="row" align="center">
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="center">{row.lowerEstimate}-{row.upperEstimate}</TableCell>
-                  <TableCell align="center">{row.status}</TableCell>
-                  <TableCell align="center"><FormDialog item={row} /></TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Grid item xs={3} justify="center">
+    <Grid container className={classes.root} spacing={2}>
+      <Grid item xs={12}>
+        <Grid container justify="center" spacing={2} direction="row" alignItems = "flex-start">
+          <Grid item xs={1} >
+            <AddItemFab />
+          </Grid>
+          <Grid item xs={11}>
+            <TableContainer component={Paper}>
+              <Table className={classes.table} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">Drink</TableCell>
+                    <TableCell align="center">Quantity</TableCell>
+                    <TableCell align="center">Status</TableCell>
+                    <TableCell align="center">Details</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {state.items.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell component="th" scope="row" align="center">
+                        {row.name}
+                      </TableCell>
+                      <TableCell align="center">{row.lowerEstimate}-{row.upperEstimate}</TableCell>
+                      <TableCell align="center">{setStatus(row.status)}</TableCell>
+                      <TableCell align="center"><FormDialog item={row} /></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
 
-          <Button variant="contained" onClick={loadItemsFromServer} color="primary">Refresh Table</Button>
+
         </Grid>
-      </Grid>
 
+      </Grid>
     </Grid>
   );
 }
