@@ -23,8 +23,6 @@ export default function RecipeTable(props){
       console.log("##################################################################################")
       */
       let data = JSON.parse(xhr.responseText);
-      console.log(state.curdate+ " Tag:" + Math.floor(Math.random()*1000));
-      console.log(data);
       updateState(prevState=>({
         ...prevState,
         recipes: data.recipes,
@@ -41,10 +39,11 @@ export default function RecipeTable(props){
   //  console.log("Last Load: " + currentdate);
 	return(
 		<div>
-      <RecipeCreationFab />
-      {state.recipes.map((row)=> (
-        <RecipeCard key={row.id} {...row}></RecipeCard>
-      ))}
+            {state.recipes.map((row)=> (
+            <RecipeCard key={row.id} {...row}></RecipeCard>
+            ))}
+
+            <RecipeCreationFab />
 		</div>
 	);
 }

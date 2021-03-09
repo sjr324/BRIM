@@ -32,6 +32,9 @@ export default function RecipeCard(props){
 				<Typography className={classes.title} color="textSecondary" gutterBottom>
 					{props.name}	
 				</Typography>
+        <Typography className={classes.title} color="textSecondary" gutterBottom>
+					{props.name}	
+				</Typography>
 			</CardContent>
 		</Card>
 	);

@@ -12,6 +12,8 @@ import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
 import GreenSwitch from '../widgets/GreenSwitch.jsx';
 import ItemUnitSelect from './ItemUnitSelect.jsx';
+import Box from '@material-ui/core/Box';
+import Container from '@material-ui/core/Container';
 
 export default function ItemDialog(props) {
   const [open, setOpen] = React.useState(false);
@@ -51,7 +53,7 @@ export default function ItemDialog(props) {
     data.append('upc', values.newItemUPC);
     data.append('vinatage', values.newItemVintage);
     data.append('units', values.newItemUnits);
-    data.appent('id',values.newItemID);
+    data.append('id',values.newItemID);
     let xhr = new XMLHttpRequest(); 
 
     xhr.open('POST',submitUrl,true);
@@ -78,7 +80,7 @@ export default function ItemDialog(props) {
   };
   //console.log(props);
   return (
-    <div>
+    <Container>
         <Fab color="primary" aria-label="add" onClick={handleClickOpen}>
             <AddIcon />
         </Fab>
@@ -110,6 +112,6 @@ export default function ItemDialog(props) {
           <Button variant = "contained" onClick={displayValues} color = "primary">ViewValues</Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </Container>
   );
 }
