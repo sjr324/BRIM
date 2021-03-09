@@ -39,10 +39,11 @@ export default function RecipeTable(props){
   //  console.log("Last Load: " + currentdate);
 	return(
 		<div>
-      <RecipeCreationFab />
-      {state.recipes.map((row)=> (
-        <RecipeCard key={row.id} {...row}></RecipeCard>
-      ))}
+            {state.recipes.map((row)=> (
+            <RecipeCard key={row.id} {...row}></RecipeCard>
+            ))}
+
+            <RecipeCreationFab />
 		</div>
 	);
 }
