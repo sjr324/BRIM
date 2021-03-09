@@ -15,7 +15,6 @@ export default function ItemDialog(props) {
   const [values, setValues] = React.useState({
     ...props.item
   })
-  console.log(values)
   const [edit,setEdit]= React.useState(true);
   const [text,setText]= React.useState("Edit") 
 
@@ -70,7 +69,6 @@ export default function ItemDialog(props) {
       setText("Edit")
     }
   }
-  console.log(values);
   return (
     <div>
       <Button variant="outlined" color="primary" onClick={handleClickOpen}>

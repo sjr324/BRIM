@@ -23,8 +23,6 @@ export default function RecipeTable(props){
       console.log("##################################################################################")
       */
       let data = JSON.parse(xhr.responseText);
-      console.log(state.curdate+ " Tag:" + Math.floor(Math.random()*1000));
-      console.log(data);
       updateState(prevState=>({
         ...prevState,
         recipes: data.recipes,
