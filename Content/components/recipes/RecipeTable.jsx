@@ -1,10 +1,28 @@
-import React, {useEffect} from 'react';
-import RecipeCard from './RecipeCard.jsx'
-import RecipeCreationFab from './RecipeCreationFab.jsx'
+import React, { useEffect } from 'react';
+import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
+
+import RecipeCard from './RecipeCard.jsx';
+import RecipeCreationFab from './RecipeCreationFab.jsx';
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        flexGrow: 1,
+    },
+    paper: {
+        padding: theme.spacing(2),
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+    },
+    fab: {
+        position: 'fixed',
+        bottom: theme.spacing(2),
+        right: theme.spacing(2),
+    },
+}));
 
 export default function RecipeTable(props){
   let cdate = new Date();
-  console.log("hey, it's me again");
   let [state,updateState]=React.useState({
     recipes:[],
     curdate:cdate.toLocaleString()
@@ -36,14 +54,27 @@ export default function RecipeTable(props){
 	},[]);
   console.log(state.recipes)
   //let currentdate= new Date().toLocaleString();
-  //  console.log("Last Load: " + currentdate);
-	return(
-		<div>
-            {state.recipes.map((row)=> (
-            <RecipeCard key={row.id} {...row}></RecipeCard>
-            ))}
 
-            <RecipeCreationFab />
-		</div>
-	);
+  //  console.log("Last Load: " + currentdate);         
+    const classes = useStyles();
+
+    return (
+        <div className={classes.root}>
+            <Grid container justify="flex-start" alignItems="stretch" >
+                <Grid container item xs={10} direction="row"
+                    justify="space-around" >
+                    {state.recipes.map((row) => (
+                        <RecipeCard key={row.id} {...row}></RecipeCard>
+                        ))}
+                </Grid>
+
+                <Grid container item xs={1} alignItems="flex-end">
+                    <Grid item xs={12}> 
+                        <RecipeCreationFab />
+                    </Grid>
+                </Grid>
+            </Grid>
+        </div>
+    );
+
 }
