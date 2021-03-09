@@ -54,6 +54,7 @@ export default function ItemDialog(props) {
 
     xhr.open('POST',submitUrl,true);
     xhr.onload = () =>{
+      props.onItemSubmit();
       console.log("Done");
     }
     xhr.send(data);
