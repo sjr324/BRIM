@@ -77,13 +77,12 @@ export default function ItemTableBasic(props) {
 
   return (
 
-    <Grid container className={classes.root} spacing={2}>
+    <Grid container className={classes.root} spacing={5} direction="column"
+          justify="flex-start"
+          alignItems="stretch">
       <Grid item xs={12}>
         <Grid container justify="center" spacing={2} direction="row" alignItems = "flex-start">
-          <Grid item xs={1} >
-            <AddItemFab />
-          </Grid>
-          <Grid item xs={11}>
+          <Grid item xs={12}>
             <TableContainer component={Paper}>
               <Table className={classes.table} aria-label="simple table">
                 <TableHead>
@@ -109,11 +108,15 @@ export default function ItemTableBasic(props) {
               </Table>
             </TableContainer>
           </Grid>
-
-
         </Grid>
-
       </Grid>
+
+      <Grid container item xs={12} justify="flex-end">
+        <Grid item xs={1}>
+            <AddItemFab />
+        </Grid>
+      </Grid>
+          
     </Grid>
   );
 }
