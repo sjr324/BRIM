@@ -120,7 +120,6 @@ export default function ItemDialog(props) {
 							console.log(selections);
 						}}
 					/>
-				<Button variant="contained" onClick={moveSelection} color="primary">Select Items</Button>
 				<TableContainer component={Paper}>
 					<Table size="small">
 						<TableHead>
@@ -160,7 +159,6 @@ export default function ItemDialog(props) {
 					<Button variant="contained" onClick={handleClose} color="primary" startIcon={<DoneIcon />}>
 						Create Item
           			</Button>
-					<Button variant="contained" onClick={displayValues} color="primary">ViewValues</Button>
 				</DialogActions>
 			</Dialog>
 		</div>
