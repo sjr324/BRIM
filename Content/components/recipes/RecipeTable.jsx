@@ -49,40 +49,15 @@ export default function RecipeTable(props){
   console.log(state.recipes)
   //let currentdate= new Date().toLocaleString();
   //  console.log("Last Load: " + currentdate);
-	return(
-        <Grid container spacing={3} direction="column" > 
-            <Grid item md={9} > 
+    return (
 
-                //grid of cards instead of table
-                <TableContainer component={Paper}>
-                    <Table aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell align="center">Recipe Name</TableCell>
-                                <TableCell align="center">Recipe Details</TableCell>
-                            </TableRow>
-                        </TableHead>
-                    </Table>
-                    <TableBody key={row.id}>
-                        {state.recipes.map((row) => (
-                            <TableRow>
-                                <TableCell component="th" scope="row" align="center">
-                                    <RecipeCard key={row.id} {...row}></RecipeCard>
-                                </TableCell>
-                                <TableCell align="center">
-                                    <Button>
-                                        details
-          			                </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </TableContainer>
-            </Grid>
+        <div>
+            {state.recipes.map((row) => (
+                <RecipeCard key={row.id} {...row}></RecipeCard>
+            ))}
 
-            <Grid item sm={1} >
-                <RecipeCreationFab />
-            </Grid>
-        </Grid>
+            <RecipeCreationFab />
+        </div>
+
     );
 }
