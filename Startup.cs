@@ -2,6 +2,7 @@ using JavaScriptEngineSwitcher.ChakraCore;
 using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,6 +24,12 @@ namespace BRIM
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddMvc();
+			services.AddAuthentication(
+        CertificateAuthenticationDefaults.AuthenticationScheme)
+        .AddCertificate()
+        // Adding an ICertificateValidationCache results in certificate auth caching the results.
+        // The default implementation uses a memory cache.
+        .AddCertificateCache();
 
 			services.AddJsEngineSwitcher(options => options.DefaultEngineName = ChakraCoreJsEngine.EngineName)
 				.AddChakraCore();
@@ -51,6 +58,8 @@ namespace BRIM
 			{
 					app.UseDeveloperExceptionPage();
 			}
+
+			app.UseAuthentication();
 
 			app.UseStaticFiles();
 
