@@ -6,6 +6,8 @@ import Typography from '@material-ui/core/Typography'
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 
+import EditRecipe from './EditRecipeDialog.jsx'
+
 const useStyles = makeStyles({
   root: {
     minWidth: 275,
@@ -43,7 +45,7 @@ export default function RecipeCard(props){
 			</CardContent>
 
 			<CardActions>
-				<Button size="small">Edit</Button>
+				<EditRecipe />
 			</CardActions>
 
 		</Card>

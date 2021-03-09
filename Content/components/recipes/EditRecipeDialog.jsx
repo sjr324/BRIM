@@ -1,17 +1,14 @@
-import React from 'react';
+﻿import React from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
 import CloseIcon from '@material-ui/icons/Close';
 import DoneIcon from '@material-ui/icons/Done';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
-import ItemTextFeild from '../items/ItemTextFeild.jsx'
 import Chip from '@material-ui/core/Chip';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -21,13 +18,16 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
-export default function ItemDialog(props) {
+import ItemTextFeild from '../items/ItemTextFeild.jsx'
+
+export default function EditRecipeDialog(props) {
+
 	const [open, setOpen] = React.useState(false);
 	const [values, setValues] = React.useState({
 		newRecipeName: '',
 		components: [],
 	});
-	const [selections, setSelections]=React.useState({
+	const [selections, setSelections] = React.useState({
 		comps: []
 	});
 
@@ -46,53 +46,48 @@ export default function ItemDialog(props) {
 		};
 		xhr.send();
 		setOpen(true);
+
+		//fetch recipe data and populate
 	};
 	const handleCancel = () => {
 
 		setOpen(false);
 	}
-	const handleClose = () => {
-		let submitUrl = "/inventory/newrecipe"
+	const handleSave = () => {
+		/*let submitUrl = "/inventory/newrecipe"
 		let combined = {
 			name: values.newRecipeName,
 			components: selections.comps
 		}
-		
+
 		let xhr = new XMLHttpRequest();
 		console.log(selections.comps);
 		xhr.open('POST', submitUrl, true);
-		xhr.setRequestHeader('Content-Type','application/json');
+		xhr.setRequestHeader('Content-Type', 'application/json');
 		xhr.onload = () => {
 			console.log("Done");
 		}
 		xhr.send(JSON.stringify(combined));
 
-		setOpen(false);
+		setOpen(false);*/
 	};
 
 	const handleChangeText = (event) => {
 		setValues({ ...values, [event.target.id]: event.target.value });
 	};
 
-	const moveSelection = () =>{
-		console.log(values.selComponents);
-	};
-
-	const displayValues = () => {
-		console.log(values);
-	};
-
 	return (
 		<div>
-			<Fab color="primary" aria-label="add" onClick={handleClickOpen}>
-				<AddIcon />
-			</Fab>
-			<Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
-				<DialogTitle id="form-dialog-title">Create New Recipe</DialogTitle>
+			<Button variant="outlined" color="primary" aria-label="add" onClick={handleClickOpen}>
+				Details
+			</Button>
+
+			<Dialog open={open} onClose={handleSave} aria-labelledby="form-dialog-title">
+				<DialogTitle id="form-dialog-title">Edit Recipe</DialogTitle>
 				<DialogContent>
 					<DialogContentText>
 						Recipe Information:
-          			</DialogContentText>
+          				</DialogContentText>
 					<ItemTextFeild id={"newRecipe" + "Name"} label="Name" dbl={false} onChange={handleChangeText} />
 					<Autocomplete
 						id="component_select"
@@ -113,54 +108,52 @@ export default function ItemDialog(props) {
 								variant="filled"
 							/>
 						}
-						onChange={(event,newValue)=>{
+						onChange={(event, newValue) => {
 							console.log(newValue);
-							selections.comps = newValue	
-							setSelections({...selections})
+							selections.comps = newValue
+							setSelections({ ...selections })
 							console.log(selections);
 						}}
 					/>
-				<Button variant="contained" onClick={moveSelection} color="primary">Select Items</Button>
-				<TableContainer component={Paper}>
-					<Table size="small">
-						<TableHead>
-							<TableRow>
-								<TableCell align="center">Component</TableCell>
-								<TableCell align="center">Quantity</TableCell>
-							</TableRow>
-						</TableHead>
-						<TableBody>
-							{
-								selections.comps.map((row)=>(
-									<TableRow key={row.id}>
-										<TableCell component="th" scope="row">
-											{row.name}
-										</TableCell>
-										<TableCell align="center">
-											<TextField 
-												variant="filled" 
-												type="number" 
-												onChange={(event)=>{
-													selections.comps[selections.comps.indexOf(row)].quantity = event.target.value;
-													console.log(selections.comps[selections.comps.indexOf(row)]);
-												}}
-											/>
-										</TableCell>
-									</TableRow>
-								))
-							}
-						</TableBody>
-					</Table>
-				</TableContainer>
+					<TableContainer component={Paper}>
+						<Table size="small">
+							<TableHead>
+								<TableRow>
+									<TableCell align="center">Component</TableCell>
+									<TableCell align="center">Quantity</TableCell>
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{
+									selections.comps.map((row) => (
+										<TableRow key={row.id}>
+											<TableCell component="th" scope="row">
+												{row.name}
+											</TableCell>
+											<TableCell align="center">
+												<TextField
+													variant="filled"
+													type="number"
+													onChange={(event) => {
+														selections.comps[selections.comps.indexOf(row)].quantity = event.target.value;
+														console.log(selections.comps[selections.comps.indexOf(row)]);
+													}}
+												/>
+											</TableCell>
+										</TableRow>
+									))
+								}
+							</TableBody>
+						</Table>
+					</TableContainer>
 				</DialogContent>
 				<DialogActions>
 					<Button variant="contained" onClick={handleCancel} color="secondary" startIcon={<CloseIcon />}>
 						Cancel
-          			</Button>
-					<Button variant="contained" onClick={handleClose} color="primary" startIcon={<DoneIcon />}>
-						Create Item
-          			</Button>
-					<Button variant="contained" onClick={displayValues} color="primary">ViewValues</Button>
+          				</Button>
+					<Button variant="contained" onClick={handleSave} color="primary" startIcon={<DoneIcon />}>
+						Save Item
+          				</Button>
 				</DialogActions>
 			</Dialog>
 		</div>
