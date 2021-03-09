@@ -71,7 +71,7 @@ export default function ItemDialog(props) {
   }
   return (
     <div>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
+      <Button variant="contained" color="primary" onClick={handleClickOpen}>
         Details
       </Button>
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">

@@ -7,7 +7,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import FormDialog from './ItemDialog.jsx'
+import ItemDialog from './ItemDialog.jsx'
 import AddItemFab from './AddItemFab.jsx'
 import { Button, Container } from '@material-ui/core';
 import Fab from '@material-ui/core/Fab';
@@ -102,7 +102,7 @@ export default function ItemTableBasic(props) {
                       </TableCell>
                       <TableCell align="center">{row.lowerEstimate}-{row.upperEstimate}</TableCell>
                       <TableCell align="center">{setStatus(row.status)}</TableCell>
-                      <TableCell align="center"><FormDialog item={row} /></TableCell>
+                      <TableCell align="center"><ItemDialog item={row} /></TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
