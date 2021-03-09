@@ -41,8 +41,6 @@ export default function RecipeTable(props){
       console.log("##################################################################################")
       */
       let data = JSON.parse(xhr.responseText);
-      console.log(state.curdate+ " Tag:" + Math.floor(Math.random()*1000));
-      console.log(data);
       updateState(prevState=>({
         ...prevState,
         recipes: data.recipes,
@@ -56,6 +54,7 @@ export default function RecipeTable(props){
 	},[]);
   console.log(state.recipes)
   //let currentdate= new Date().toLocaleString();
+
   //  console.log("Last Load: " + currentdate);         
     const classes = useStyles();
 
@@ -77,4 +76,5 @@ export default function RecipeTable(props){
             </Grid>
         </div>
     );
+
 }

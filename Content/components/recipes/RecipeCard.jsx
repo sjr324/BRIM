@@ -42,6 +42,7 @@ export default function RecipeCard(props){
 					</Typography>
 				))}
 
+
 			</CardContent>
 
 			<CardActions>
