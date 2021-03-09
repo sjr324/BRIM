@@ -1,6 +1,16 @@
-import React, {useEffect} from 'react';
-import RecipeCard from './RecipeCard.jsx'
-import RecipeCreationFab from './RecipeCreationFab.jsx'
+import React, { useEffect } from 'react';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import RecipeCard from './RecipeCard.jsx';
+import Grid from '@material-ui/core/Grid';
+import Button from '@material-ui/core';
+import RecipeCreationFab from './RecipeCreationFab.jsx';
+
 
 export default function RecipeTable(props){
   let cdate = new Date();
@@ -40,11 +50,39 @@ export default function RecipeTable(props){
   //let currentdate= new Date().toLocaleString();
   //  console.log("Last Load: " + currentdate);
 	return(
-		<div>
-      <RecipeCreationFab />
-      {state.recipes.map((row)=> (
-        <RecipeCard key={row.id} {...row}></RecipeCard>
-      ))}
-		</div>
-	);
+        <Grid container spacing={3} direction="column" > 
+            <Grid item md={9} > 
+
+                //grid of cards instead of table
+                <TableContainer component={Paper}>
+                    <Table aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell align="center">Recipe Name</TableCell>
+                                <TableCell align="center">Recipe Details</TableCell>
+                            </TableRow>
+                        </TableHead>
+                    </Table>
+                    <TableBody key={row.id}>
+                        {state.recipes.map((row) => (
+                            <TableRow>
+                                <TableCell component="th" scope="row" align="center">
+                                    <RecipeCard key={row.id} {...row}></RecipeCard>
+                                </TableCell>
+                                <TableCell align="center">
+                                    <Button>
+                                        details
+          			                </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </TableContainer>
+            </Grid>
+
+            <Grid item sm={1} >
+                <RecipeCreationFab />
+            </Grid>
+        </Grid>
+    );
 }

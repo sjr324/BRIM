@@ -159,7 +159,7 @@ export default function ItemDialog(props) {
           			</Button>
 					<Button variant="contained" onClick={handleClose} color="primary" startIcon={<DoneIcon />}>
 						Create Item
-          		</Button>
+          			</Button>
 					<Button variant="contained" onClick={displayValues} color="primary">ViewValues</Button>
 				</DialogActions>
 			</Dialog>
