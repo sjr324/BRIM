@@ -28,7 +28,7 @@ export default function RecipeCard(props){
 	const classes = useStyles();
 	console.log(props);
 	return(
-		<Card className={classes.root} >
+		<Card className={classes.root} variant="outlined">
 			<CardContent>
 				<Typography className={classes.title} variant="h5" component="h2" gutterBottom>
 					{props.name}	
