@@ -35,13 +35,14 @@ namespace BRIM
 			_logger.LogInformation("Content type"+ ControllerContext.HttpContext.Request.ContentType, DateTimeOffset.Now);
 			if (ControllerContext.HttpContext.Request.ContentType == "application/json")
 			{
+				List<Drink> items = inventory.ItemList.Select(p=>(Drink)p).ToList();
 				return new JsonResult(new
 				{
-					Items= inventory.ItemList.AsReadOnly()
+					Items= items.AsReadOnly()
 				});
 			}
 			return View("~/Views/Home/Index.cshtml",new ItemViewModel{
-				Items = this.inventory.ItemList.AsReadOnly()
+				Items = this.inventory.ItemList.Select(p=>(Drink)p).ToList().AsReadOnly()
 			});	
 		}
 		public ActionResult Recipes(){

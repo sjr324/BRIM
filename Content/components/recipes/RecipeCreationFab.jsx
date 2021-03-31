@@ -63,6 +63,7 @@ export default function ItemDialog(props) {
 		xhr.open('POST', submitUrl, true);
 		xhr.setRequestHeader('Content-Type','application/json');
 		xhr.onload = () => {
+			props.onRecipeSubmit();
 			console.log("Done");
 		}
 		xhr.send(JSON.stringify(combined));

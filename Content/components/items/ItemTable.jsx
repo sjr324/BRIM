@@ -50,10 +50,12 @@ export default function ItemTableBasic(props) {
     xhr.onload = ()=>{
 
       console.log("Updated items");
+
       let data = JSON.parse(xhr.responseText);
       updateState({
         items: data.items
       });
+      console.log(data.items);
       
     };
     xhr.send();
@@ -80,6 +82,7 @@ export default function ItemTableBasic(props) {
   });
   */
 
+      console.log(state.items);
   return (
 
     <Grid container className={classes.root} spacing={5} direction="column"
