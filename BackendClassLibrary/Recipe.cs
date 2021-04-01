@@ -13,7 +13,7 @@ namespace BRIM.BackendClassLibrary
         public string BaseLiquor;
 
         //A list of tuples that stores an item and the quantity of it used to make a recipie
-        public List<(Item, double)> ItemList = new List<(Item item, double quantity)>();
+        public List<RecipeItem> ItemList = new List<RecipeItem>();
 
         //had to explicitly make a default constructor to make a test recipe to mess with the Add and Updates
         public Recipe() {}
@@ -33,7 +33,7 @@ namespace BRIM.BackendClassLibrary
                 //Constructor in Drink
                 Drink tempDrink = new Drink(dr);
                 double tempQuantity = dr.Field<double>("itemQuantity");
-                ItemList.Add((tempDrink, tempQuantity));
+                ItemList.Add(new RecipeItem(tempDrink, tempQuantity));
             }
         }
     }
