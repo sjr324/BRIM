@@ -13,8 +13,7 @@ namespace BRIM.BackendClassLibrary
         int ID { get; set; }
         string Name { get; set; }
         double Price { get; set; }
-        double LowerEstimate { get; set; }
-        double UpperEstimate { get; set; }
+        double Estimate { get; set; }
         double ParLevel { get; set; }
         double IdealLevel { get; set; }
         unit Measurement { get; set; }

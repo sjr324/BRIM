@@ -164,20 +164,13 @@ namespace BRIM.BackendClassLibrary
                             }
                         }
 
-                        //account for possible spillage/ over or under pouring
-                        double varianceAmount = varianceMultiplier * updateAmt;
-                        updatedDrink.LowerEstimate -= (updateAmt + varianceAmount);
-                        updatedDrink.UpperEstimate -= (updateAmt - varianceAmount);
+                        //update drink amount
+                        updatedDrink.Estimate -= updateAmt;
 
-                        //TODO: should update the user if any of these is true
-                        if (updatedDrink.LowerEstimate < 0.0)
+                        //update the user if any of these is true
+                        if (updatedDrink.Estimate < 0.0)
                         {
-                            updatedDrink.LowerEstimate = 0.0;
-                        }
-
-                        if (updatedDrink.UpperEstimate < 0.0)
-                        {
-                            updatedDrink.UpperEstimate = 0.0;
+                            updatedDrink.Estimate = 0.0;
                         }
 
                         if (updatedDrink.CalculateStatus())
@@ -240,26 +233,16 @@ namespace BRIM.BackendClassLibrary
 
                                 updateAmt += part.quantity * amtOrdered;
 
-                                //account for possible spillage/ over or under pouring
-                                double varianceAmount = varianceMultiplier * updateAmt;
-                                updatedDrink.LowerEstimate -= (updateAmt + varianceAmount);
-                                updatedDrink.UpperEstimate -= (updateAmt - varianceAmount);
+                                //update
+                                updatedDrink.Estimate -= updateAmt;
 
                                 //update the user if any of these is true
-                                if (updatedDrink.LowerEstimate < 0.0)
+                                if (updatedDrink.Estimate < 0.0)
                                 {
-                                    updatedDrink.LowerEstimate = 0.0;
+                                    updatedDrink.Estimate = 0.0;
 
-                                    string mes = updatedDrink.Name + " may be empty";
-                                    NotificationManager.AddNotification(mes);
-                                }
-
-                                if (updatedDrink.UpperEstimate < 0.0)
-                                {
-                                    updatedDrink.UpperEstimate = 0.0;
-
-                                    string mes = updatedDrink.Name + " may be empty";
-                                    NotificationManager.AddNotification(mes);
+                                    //string mes = updatedDrink.Name + " is empty";
+                                    //NotificationManager.AddNotification(mes);
                                 }
 
                                 if (updatedDrink.CalculateStatus())
