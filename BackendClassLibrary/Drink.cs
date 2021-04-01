@@ -20,10 +20,10 @@ namespace BRIM.BackendClassLibrary
         public status Status { get; set; }
 
         //drink properties
-        public int BottleSize;
-        public string Brand;
-        public int UnitsPerCase;
-        public Boolean Vintage;
+        public int BottleSize {get; set ;}
+        public string Brand {get; set;}
+        public int UnitsPerCase {get; set;}
+        public Boolean Vintage{get;set;}
 
         public Drink() { }
 

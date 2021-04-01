@@ -71,15 +71,15 @@ namespace BRIM
 			});
 		}
 		
-		public ActionResult SubmitItem(ItemModel item){
+		public ActionResult SubmitItem(DrinkSubmissionModel item){
 			Drink dr;
-			if(item.id==-1){
+			if(item.Id==-1){
 
 				dr = new Drink();
 				//set the id to the next highest one
 				dr.ID =  this.inventory.ItemList.Select(p=> p.ID).Max()+1;
 			}else{
-				dr=(Drink)this.inventory.ItemList.Where(p=>p.ID == item.id).ToList().First();
+				dr=(Drink)this.inventory.ItemList.Where(p=>p.ID == item.Id).ToList().First();
 			}
 			dr.Name = item.Name;
 			dr.Brand = item.Brand;
@@ -93,7 +93,7 @@ namespace BRIM
 			dr.UnitsPerCase = Convert.ToInt32(item.Upc);
 			dr.Vintage = item.Vintage;
 			dr.CalculateStatus();
-			if(item.id == -1){
+			if(item.Id == -1){
 				this.inventory.AddItem(dr);
 			}else{
 				this.inventory.UpdateItem(dr);
