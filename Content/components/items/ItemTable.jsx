@@ -26,15 +26,20 @@ const useStyles = makeStyles({
 export default function ItemTableBasic(props) {
   const classes = useStyles();
 	let [state, updateState]= React.useState({
-		items:props.initialItems
+		items:[],
 	});
+  useEffect(()=>{
+    loadItemsFromServer()
+  },[]);
 
+  
   useEffect(()=>{
     const interval = setInterval(()=>{
       loadItemsFromServer()
-    },5000);
+    },60000);
     return ()=> clearInterval(interval);
   },[]);
+  
 
   const loadItemsFromServer=()=>{
     console.log("Loading items:")
@@ -45,10 +50,12 @@ export default function ItemTableBasic(props) {
     xhr.onload = ()=>{
 
       console.log("Updated items");
+
       let data = JSON.parse(xhr.responseText);
       updateState({
         items: data.items
       });
+      console.log(data.items);
       
     };
     xhr.send();
@@ -75,6 +82,7 @@ export default function ItemTableBasic(props) {
   });
   */
 
+      console.log(state.items);
   return (
 
     <Grid container className={classes.root} spacing={5} direction="column"
@@ -101,7 +109,7 @@ export default function ItemTableBasic(props) {
                       </TableCell>
                       <TableCell align="center">{row.lowerEstimate}-{row.upperEstimate}</TableCell>
                       <TableCell align="center">{setStatus(row.status)}</TableCell>
-                      <TableCell align="center"><ItemDialog item={row} /></TableCell>
+                      <TableCell align="center"><ItemDialog item={row} onItemSubmit={loadItemsFromServer}/></TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -113,7 +121,7 @@ export default function ItemTableBasic(props) {
 
       <Grid container item xs={12} justify="flex-end">
         <Grid item xs={1}>
-            <AddItemFab />
+            <AddItemFab onNewItem={loadItemsFromServer}/>
         </Grid>
       </Grid>
           

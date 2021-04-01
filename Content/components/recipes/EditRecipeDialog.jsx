@@ -84,7 +84,7 @@ export default function EditRecipeDialog(props) {
 	console.log(selections.comps);
 	return (
 		<div>
-			<Button variant="outlined" color="primary" aria-label="add" onClick={handleClickOpen}>
+			<Button variant="contained" color="primary" aria-label="add" onClick={handleClickOpen}>
 				Details
 			</Button>
 

@@ -58,6 +58,7 @@ export default function ItemDialog(props) {
 
     xhr.open('POST',submitUrl,true);
     xhr.onload = () =>{
+      props.onNewItem();
       console.log("Done");
     }
     xhr.send(data);
@@ -109,7 +110,6 @@ export default function ItemDialog(props) {
           <Button variant = "contained" onClick={handleClose} color="primary" startIcon={<DoneIcon/>}>
             Create Item
           </Button>
-          <Button variant = "contained" onClick={displayValues} color = "primary">ViewValues</Button>
         </DialogActions>
       </Dialog>
     </Container>

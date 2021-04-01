@@ -70,7 +70,7 @@ export default function RecipeTable(props){
 
                 <Grid container item xs={1} alignItems="flex-end">
                     <Grid item xs={12}> 
-                        <RecipeCreationFab />
+                        <RecipeCreationFab onRecipeSubmit={loadRecipesFromServer}/>
                     </Grid>
                 </Grid>
             </Grid>
