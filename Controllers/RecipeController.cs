@@ -91,25 +91,12 @@ namespace BRIM
 			public bool baseliquor{get;set;}
 			public string quantity{get;set;}
 		}
-		public class RecipeView
-		{
-			public int id {get;set;}
-			public string name{get;set;}
-
-			public string baseliquor{get;set;}
-			public IReadOnlyList<RecipeComponent> components {get;set;}
-
-		}
+		
 		public class RecipeComponent
 		{
 			public Item component{get;set;}
 			public double amount{get;set;}
 		}
-		public class RecipeListViewModel
-		{
-			public IReadOnlyList<RecipeView> recipes { get;set;}
-		}
-
 
 	}
 }

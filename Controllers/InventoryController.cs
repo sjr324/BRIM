@@ -45,31 +45,6 @@ namespace BRIM
 				Items = this.inventory.ItemList.Select(p=>(Drink)p).ToList().AsReadOnly()
 			});	
 		}
-		public ActionResult Recipes(){
-			_logger.LogInformation("Recipe call");
-			if (ControllerContext.HttpContext.Request.ContentType == "application/json"){
-				List<RecipeModel> reclist = this.inventory.RecipeList.Select(p=>new RecipeModel()
-				{
-					id = p.ID,
-					name = p.Name,
-					components = p.ItemList.Select(q=>new RecipeComponentModel()
-					{
-						id = q.Item1.ID,
-						name= q.Item1.Name,
-						brand=((Drink)q.Item1).Brand,
-						baseliquor = false,
-						quantity= Convert.ToString(q.Item2)
-					}).ToList()
-				}).ToList();
-				return new JsonResult(new{
-					Recipes = reclist.AsReadOnly()//,
-					//RecursionLimit=100
-				});
-			}
-			return View("~/Views/Home/Index.cshtml",new ItemViewModel{
-				Items = this.inventory.ItemList.AsReadOnly()
-			});
-		}
 		
 		public ActionResult SubmitItem(DrinkSubmissionModel item){
 			Drink dr;
@@ -100,87 +75,13 @@ namespace BRIM
 			}
 			return Content("Success");
 		}
-		public ActionResult SubmitRecipe([FromBody]RecipeModel recipe){
-			int maxid = this.inventory.RecipeList.Select(p=>p.ID).Max();
-			Recipe r = new Recipe();
-			r.ID = maxid;
-			r.Name = recipe.name;
-			r.ItemList =
-				(from item in inventory.ItemList
-				join comp in recipe.components
-				on item.ID equals comp.id
-				select (item, Convert.ToDouble(comp.quantity))).ToList();
-			inventory.AddRecipe(r);
-			return Content("Success");
-		}
-		public ActionResult ItemNames(){
-			List<RecipeComponentModel> names = this.inventory.ItemList.Select(p=>new RecipeComponentModel
-			{
-				id = p.ID,
-				name = p.Name,
-				brand = ((Drink)p).Brand,
-				baseliquor = false,
-				quantity = "0" 
-			}).ToList();
-			return new JsonResult(new{
-				items = names.AsReadOnly()
-			});
-		}
-		public class ItemModel{
-			public string Name{get;set;}
-			public string Lo{get;set;}
-			public string Hi{get;set;}
-			public string Ideal{get;set;}
-			public string Par{get;set;}
-			public string Brand{get;set;}
-			public string Price{get;set;}
-			public string Size{get;set;}
-			public string Upc{get;set;}
-			public bool Vintage{get;set;}
-			public string Units{get;set;}
-			public int id{get;set;}
-		}
+		
 		
 		public class ItemViewModel
 		{
 			public IReadOnlyList<Item> Items { get; set; }
 
 		}
-		public class RecipeModel
-		{
-			public int id{get;set;}
-			public string name{get;set;}
-			public List<RecipeComponentModel> components{get;set;}
-		}
-		/// <summary>
-		/// This should be renamed to something else less confusing
-		/// </summary>
-		public class RecipeComponentModel{
-			public int id{get;set;}
-			public string name{get;set;}
-			public string brand{get;set;}
-			public bool baseliquor{get;set;}
-			public string quantity{get;set;}
-		}
-		public class RecipeView
-		{
-			public int id {get;set;}
-			public string name{get;set;}
-
-			public string baseliquor{get;set;}
-			public IReadOnlyList<RecipeComponent> components {get;set;}
-
-		}
-		public class RecipeComponent
-		{
-			public Item component{get;set;}
-			public double amount{get;set;}
-		}
-		public class RecipeListViewModel
-		{
-			public IReadOnlyList<RecipeView> recipes { get;set;}
-		}
-
 
 	}
 }
