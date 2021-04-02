@@ -164,20 +164,13 @@ namespace BRIM.BackendClassLibrary
                             }
                         }
 
-                        //account for possible spillage/ over or under pouring
-                        double varianceAmount = varianceMultiplier * updateAmt;
-                        updatedDrink.LowerEstimate -= (updateAmt + varianceAmount);
-                        updatedDrink.UpperEstimate -= (updateAmt - varianceAmount);
+                        //update drink amount
+                        updatedDrink.Estimate -= updateAmt;
 
-                        //TODO: should update the user if any of these is true
-                        if (updatedDrink.LowerEstimate < 0.0)
+                        //update the user if any of these is true
+                        if (updatedDrink.Estimate < 0.0)
                         {
-                            updatedDrink.LowerEstimate = 0.0;
-                        }
-
-                        if (updatedDrink.UpperEstimate < 0.0)
-                        {
-                            updatedDrink.UpperEstimate = 0.0;
+                            updatedDrink.Estimate = 0.0;
                         }
 
                         if (updatedDrink.CalculateStatus())
@@ -205,7 +198,7 @@ namespace BRIM.BackendClassLibrary
                         //same process as above, but for recipies
                         //recipies may or may not have modifications
                         Recipe orderedRecipe = RecipeList[recipieFound];
-                        List<(Item item, double quantity)> parts = orderedRecipe.ItemList;
+                        List<RecipeItem> parts = orderedRecipe.ItemList;
                         int amtOrdered = (int)lineitem["quantitySold"];
 
                         JArray modifications = (JArray)lineitem["modifications"];
@@ -220,10 +213,10 @@ namespace BRIM.BackendClassLibrary
 
                                 if (modIndex != -1)
                                 {
-                                    int baseIndex = parts.FindIndex(x => x.item.Name == orderedRecipe.BaseLiquor);
-                                    double q = parts[baseIndex].quantity;
+                                    int baseIndex = parts.FindIndex(x => x.Item.Name == orderedRecipe.BaseLiquor);
+                                    double q = parts[baseIndex].Quantity;
                                     parts.RemoveAt(baseIndex);
-                                    parts.Add((ItemList[modIndex], q));
+                                    parts.Add(new RecipeItem(ItemList[modIndex] as Drink, q));
                                 } else
                                 {
                                     //Flag for the user because modification is unknown
@@ -233,33 +226,23 @@ namespace BRIM.BackendClassLibrary
                             }
 
                             //update every drink that was a part of the recipe
-                            foreach ((Item item, double quantity) part in parts)
+                            foreach (RecipeItem part in parts)
                             {
                                 //calcualte and update every item
-                                Drink updatedDrink = part.item as Drink;
+                                Drink updatedDrink = part.Item;
 
-                                updateAmt += part.quantity * amtOrdered;
+                                updateAmt += part.Quantity * amtOrdered;
 
-                                //account for possible spillage/ over or under pouring
-                                double varianceAmount = varianceMultiplier * updateAmt;
-                                updatedDrink.LowerEstimate -= (updateAmt + varianceAmount);
-                                updatedDrink.UpperEstimate -= (updateAmt - varianceAmount);
+                                //update
+                                updatedDrink.Estimate -= updateAmt;
 
                                 //update the user if any of these is true
-                                if (updatedDrink.LowerEstimate < 0.0)
+                                if (updatedDrink.Estimate < 0.0)
                                 {
-                                    updatedDrink.LowerEstimate = 0.0;
+                                    updatedDrink.Estimate = 0.0;
 
-                                    string mes = updatedDrink.Name + " may be empty";
-                                    NotificationManager.AddNotification(mes);
-                                }
-
-                                if (updatedDrink.UpperEstimate < 0.0)
-                                {
-                                    updatedDrink.UpperEstimate = 0.0;
-
-                                    string mes = updatedDrink.Name + " may be empty";
-                                    NotificationManager.AddNotification(mes);
+                                    //string mes = updatedDrink.Name + " is empty";
+                                    //NotificationManager.AddNotification(mes);
                                 }
 
                                 if (updatedDrink.CalculateStatus())
@@ -364,16 +347,16 @@ namespace BRIM.BackendClassLibrary
 
             //NOTE: this relies on the recipe Object sent from the frontend is a DeepCopy and not a shallow one
             //i.e. that the Item Objects in item list are copied, and not just the references
-            foreach((Item item, double quantity) component in newRecipe.ItemList) {
-                int itemID = component.item.ID;
-                double itemQuantity = component.quantity;
+            foreach(RecipeItem component in newRecipe.ItemList) {
+                int itemID = component.Item.ID;
+                double itemQuantity = component.Quantity;
                 itemListResult = this.databaseManager.addDrinkRecipe(recipeID, itemID, itemQuantity);
 
                 if (itemListResult == -1) {
                     Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
                     + itemID + "' ItemID and '" + itemQuantity + "' failed. Stopping here");
 
-                    string mes = component.item.Name + " could not be added to the recipie";
+                    string mes = component.Item.Name + " could not be added to the recipie";
                     NotificationManager.AddNotification(mes);
 
                     return 1;
@@ -422,16 +405,16 @@ namespace BRIM.BackendClassLibrary
 
             //NOTE: this relies on the recipe Object sent from the frontend is a DeepCopy and not a shallow one
             //i.e. that the Item Objects in item list are copied, and not just the references
-            foreach((Item item, double quantity) component in updatedRecipe.ItemList) {
-                int itemID = component.item.ID;
-                double itemQuantity = component.quantity;
+            foreach(RecipeItem component in updatedRecipe.ItemList) {
+                int itemID = component.Item.ID;
+                double itemQuantity = component.Quantity;
                 itemListResult = this.databaseManager.addDrinkRecipe(recipeID, itemID, itemQuantity);
 
                 if (itemListResult == -1) {
                     Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
                     + itemID + "' ItemID and '" + itemQuantity + "' failed. Stopping here");
 
-                    string mes = component.item.Name + " could not be updated";
+                    string mes = component.Item.Name + " could not be updated";
                     NotificationManager.AddNotification(mes);
 
                     return 1;
