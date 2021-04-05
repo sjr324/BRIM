@@ -22,7 +22,7 @@ namespace BRIM.BackendClassLibrary
         public int BottleSize {get; set ;}
         public string Brand {get; set;}
         public int UnitsPerCase {get; set;}
-        public int? Vintage;
+        public int? Vintage{get;set;}
 
         public Drink() { }
 
