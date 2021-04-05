@@ -11,6 +11,8 @@ namespace BRIM.BackendClassLibrary
         public Drink Item;
         public double Quantity;
 
+        public RecipeItem() {}
+
         public RecipeItem(Drink item, double quantity)
         {
             Item = item;
