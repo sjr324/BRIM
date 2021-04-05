@@ -19,8 +19,7 @@ export default function ItemDialog(props) {
   const [open, setOpen] = React.useState(false);
   const [values, setValues] = React.useState({
     newItemName: '',
-    newItemLoEst: '',
-    newItemHiEst: '',
+    newItemEst: '',
     newItemIdeal: '',
     newItemPar: '',
     newItemBrand: '',
@@ -43,8 +42,7 @@ export default function ItemDialog(props) {
     let data = new FormData();
     let submitUrl = "/inventory/newitem" 
     data.append('name', values.newItemName);
-    data.append('lo', values.newItemLoEst);
-    data.append('hi', values.newItemHiEst);
+    data.append('est', values.newItemLoEst);
     data.append('ideal', values.newItemIdeal);
     data.append('par', values.newItemPar);
     data.append('brand', values.newItemBrand);
@@ -92,8 +90,7 @@ export default function ItemDialog(props) {
             Item information:
           </DialogContentText>
           <ItemTextFeild id={"newItem" + "Name"} label = "Name" dbl={false} onChange = {handleChangeText}/> 
-          <ItemTextFeild id={"newItem" + "LoEst"} label = "Lower Estimate" dbl={false}onChange = {handleChangeText}/> 
-          <ItemTextFeild id={"newItem" + "HiEst"} label = "Upper Estimate" dbl={false}onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"newItem" + "Est"} label = "Estimate" dbl={false}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"newItem" + "Ideal"} label = "Ideal Level" dbl={false}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"newItem" + "Par"} label = "Par Level" dbl={false}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"newItem" + "Brand"} label = "Brand" dbl={false}onChange = {handleChangeText}/> 
