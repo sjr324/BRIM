@@ -107,7 +107,7 @@ export default function ItemTableBasic(props) {
                       <TableCell component="th" scope="row" align="center">
                         {row.name}
                       </TableCell>
-                      <TableCell align="center">{row.lowerEstimate}-{row.upperEstimate}</TableCell>
+                      <TableCell align="center">{row.estimate}</TableCell>
                       <TableCell align="center">{setStatus(row.status)}</TableCell>
                       <TableCell align="center"><ItemDialog item={row} onItemSubmit={loadItemsFromServer}/></TableCell>
                     </TableRow>

@@ -49,7 +49,7 @@ export default function ItemDialog(props) {
     data.append('price', values.newItemPrice);
     data.append('size', values.newItemBotSize);
     data.append('upc', values.newItemUPC);
-    data.append('vinatage', values.newItemVintage);
+    data.append('vintage', values.newItemVintage);
     data.append('units', values.newItemUnits);
     data.append('id',values.newItemID);
     let xhr = new XMLHttpRequest(); 
@@ -98,7 +98,7 @@ export default function ItemDialog(props) {
           <ItemTextFeild id={"newItem" + "BotSize"} label = "Bottle Size" dbl={false}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"newItem" + "UPC"} label = "Units per Case" dbl={false}onChange = {handleChangeText}/> 
           <ItemUnitSelect id={"newItem" + "Units"} value={values.newItemUnits} onChange={handleChangeSelect}/>
-          <GreenSwitch id={"newItem"+"Vintage"} checked={values.newItemVintage} onChange={handleChangeSwitch} label={"Vintage"} />
+          <ItemTextFeild id={"newItem" + "Vintage"} label = "Vintage" dbl={false} onChange={handleChangeText}/>
         </DialogContent>
         <DialogActions>
           <Button variant = "contained" onClick={handleCancel} color="secondary" startIcon={<CloseIcon/>}>
