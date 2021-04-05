@@ -19,17 +19,10 @@ namespace BRIM.BackendClassLibrary
         public status Status { get; set; }
 
         //drink properties
-<<<<<<< HEAD
-        public int BottleSize;
-        public string Brand;
-        public int UnitsPerCase;
-        public int? Vintage;
-=======
         public int BottleSize {get; set ;}
         public string Brand {get; set;}
         public int UnitsPerCase {get; set;}
-        public Boolean Vintage{get;set;}
->>>>>>> added model class, fixed drink, broke out recipe functionality from inventory
+        public int? Vintage;
 
         public Drink() { }
 
