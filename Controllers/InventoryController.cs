@@ -58,15 +58,18 @@ namespace BRIM
 			}
 			dr.Name = item.Name;
 			dr.Brand = item.Brand;
-			dr.LowerEstimate = Convert.ToDouble(item.Lo);
-			dr.UpperEstimate = Convert.ToDouble(item.Hi);
+			dr.Estimate = Convert.ToDouble(item.Est);
 			dr.Measurement= (unit) Enum.Parse(typeof(unit), item.Units);
 			dr.Price = Convert.ToDouble(item.Price);
 			dr.IdealLevel = Convert.ToDouble(item.Ideal);
 			dr.ParLevel = Convert.ToDouble(item.Par);
 			dr.BottleSize = Convert.ToInt32(item.Size);
 			dr.UnitsPerCase = Convert.ToInt32(item.Upc);
-			dr.Vintage = item.Vintage;
+			if (item.Vintage != ""){
+				dr.Vintage = Convert.ToInt32(item.Vintage);
+			}else{
+				dr.Vintage = null;
+			}
 			dr.CalculateStatus();
 			if(item.Id == -1){
 				this.inventory.AddItem(dr);

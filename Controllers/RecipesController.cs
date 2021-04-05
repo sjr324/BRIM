@@ -34,11 +34,11 @@ namespace BRIM
 				name = p.Name,
 				components = p.ItemList.Select(q=>new RecipeComponentModel()
 				{
-					id = q.Item1.ID,
-					name= q.Item1.Name,
-					brand=((Drink)q.Item1).Brand,
+					id = q.Item.ID,
+					name= q.Item.Name,
+					brand=((Drink)q.Item).Brand,
 					baseliquor = false,
-					quantity= Convert.ToString(q.Item2)
+					quantity= Convert.ToString(q.Quantity)
 				}).ToList()
 			}).ToList();
 			return new JsonResult(new{
@@ -57,7 +57,8 @@ namespace BRIM
 				(from item in inventory.ItemList
 				join comp in recipe.components
 				on item.ID equals comp.id
-				select (item, Convert.ToDouble(comp.quantity))).ToList();
+				select ( new RecipeItem((Drink)item,Convert.ToDouble(comp.quantity))
+				)).ToList();
 			inventory.AddRecipe(r);
 			return Content("Success");
 		}
