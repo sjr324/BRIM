@@ -19,8 +19,7 @@ export default function ItemDialog(props) {
   const [open, setOpen] = React.useState(false);
   const [values, setValues] = React.useState({
     newItemName: '',
-    newItemLoEst: '',
-    newItemHiEst: '',
+    newItemEst: '',
     newItemIdeal: '',
     newItemPar: '',
     newItemBrand: '',
@@ -43,15 +42,14 @@ export default function ItemDialog(props) {
     let data = new FormData();
     let submitUrl = "/inventory/newitem" 
     data.append('name', values.newItemName);
-    data.append('lo', values.newItemLoEst);
-    data.append('hi', values.newItemHiEst);
+    data.append('est', values.newItemLoEst);
     data.append('ideal', values.newItemIdeal);
     data.append('par', values.newItemPar);
     data.append('brand', values.newItemBrand);
     data.append('price', values.newItemPrice);
     data.append('size', values.newItemBotSize);
     data.append('upc', values.newItemUPC);
-    data.append('vinatage', values.newItemVintage);
+    data.append('vintage', values.newItemVintage);
     data.append('units', values.newItemUnits);
     data.append('id',values.newItemID);
     let xhr = new XMLHttpRequest(); 
@@ -92,8 +90,7 @@ export default function ItemDialog(props) {
             Item information:
           </DialogContentText>
           <ItemTextFeild id={"newItem" + "Name"} label = "Name" dbl={false} onChange = {handleChangeText}/> 
-          <ItemTextFeild id={"newItem" + "LoEst"} label = "Lower Estimate" dbl={false}onChange = {handleChangeText}/> 
-          <ItemTextFeild id={"newItem" + "HiEst"} label = "Upper Estimate" dbl={false}onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"newItem" + "Est"} label = "Estimate" dbl={false}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"newItem" + "Ideal"} label = "Ideal Level" dbl={false}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"newItem" + "Par"} label = "Par Level" dbl={false}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"newItem" + "Brand"} label = "Brand" dbl={false}onChange = {handleChangeText}/> 
@@ -101,7 +98,7 @@ export default function ItemDialog(props) {
           <ItemTextFeild id={"newItem" + "BotSize"} label = "Bottle Size" dbl={false}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"newItem" + "UPC"} label = "Units per Case" dbl={false}onChange = {handleChangeText}/> 
           <ItemUnitSelect id={"newItem" + "Units"} value={values.newItemUnits} onChange={handleChangeSelect}/>
-          <GreenSwitch id={"newItem"+"Vintage"} checked={values.newItemVintage} onChange={handleChangeSwitch} label={"Vintage"} />
+          <ItemTextFeild id={"newItem" + "Vintage"} label = "Vintage" dbl={false} onChange={handleChangeText}/>
         </DialogContent>
         <DialogActions>
           <Button variant = "contained" onClick={handleCancel} color="secondary" startIcon={<CloseIcon/>}>

@@ -41,15 +41,14 @@ export default function ItemDialog(props) {
     let submitUrl = "/inventory/newitem" 
     console.log(values);
     data.append('name', values.name);
-    data.append('lo', values.lowerEstimate);
-    data.append('hi', values.upperEstimate);
+    data.append('est', values.lowerEstimate);
     data.append('ideal', values.idealLevel);
     data.append('par', values.parLevel);
     data.append('brand', values.brand);
     data.append('price', values.price);
     data.append('size', values.bottleSize);
     data.append('upc', values.unitsPerCase);
-    data.append('vinatage', values.vintage);
+    data.append('vintage', values.vintage);
     data.append('units', values.measurement);
     data.append('id',values.id);
     let xhr = new XMLHttpRequest(); 
@@ -84,8 +83,7 @@ export default function ItemDialog(props) {
             Item information:
           </DialogContentText>
           <ItemTextFeild id={"name"} label = "Name" defVal = {values.name} dbl={edit}onChange = {handleChangeText}/> 
-          <ItemTextFeild id={"lowerEstimate"} label = "Lower Estimate" defVal = {values.lowerEstimate}dbl={edit}onChange = {handleChangeText}/> 
-          <ItemTextFeild id={"upperEstimate"} label = "Upper Estimate" defVal = {values.upperEstimate}dbl={edit}onChange = {handleChangeText}/> 
+          <ItemTextFeild id={"estimate"} label = "Estimate" defVal = {values.estimate}dbl={edit}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"idealLevel"} label = "Ideal Level" defVal = {values.idealLevel}dbl={edit}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"parLevel"} label = "Par Level" defVal = {values.parLevel}dbl={edit}onChange = {handleChangeText}/> 
           <ItemTextFeild id={"brand"} label = "Brand" defVal = {values.brand}dbl={edit}onChange = {handleChangeText}/> 
@@ -95,7 +93,7 @@ export default function ItemDialog(props) {
 
           <ItemUnitSelect id={"measurement"} value={values.measurement} disabled={edit} onChange={handleChangeSelect}/>
 
-          <GreenSwitch id={"vintage"} checked={values.vintage} disabled={edit} onChange={handleChangeSwitch} label={"Vintage"} />
+          <ItemTextFeild id={"vintage"} label = "Vintage" defVal = {values.vintage}dbl={edit}onChange = {handleChangeText}/> 
         </DialogContent>
         <DialogActions>
           <Button variant = "contained" onClick={toggleEdit} color="primary">
