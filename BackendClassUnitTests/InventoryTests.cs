@@ -27,8 +27,7 @@ namespace BackendClassUnitTests
                     ID = 1,
                     Name = "Fake Drink 1",
                     Price = 9.99,
-                    LowerEstimate = 13000.00,
-                    UpperEstimate = 15000.00,
+                    Estimate = 14000.00,
                     ParLevel = 7000.00,
                     IdealLevel = 10000.00,
                     Measurement = unit.milliliters,
@@ -36,14 +35,13 @@ namespace BackendClassUnitTests
                     BottleSize = 200,
                     Brand = "Fake Brand 1",
                     UnitsPerCase = 10,
-                    Vintage = false
+                    Vintage = null
                 },
                 new Drink {
                     ID = 2,
                     Name = "Fake Drink 2",
                     Price = 12.99,
-                    LowerEstimate = 8500.00,
-                    UpperEstimate = 9250.00,
+                    Estimate = 8875.00,
                     ParLevel = 8000.00,
                     IdealLevel = 9750.00,
                     Measurement = unit.milliliters,
@@ -51,14 +49,13 @@ namespace BackendClassUnitTests
                     BottleSize = 400,
                     Brand = "Fake Brand 2",
                     UnitsPerCase = 60,
-                    Vintage = false
+                    Vintage = null
                 },
                 new Drink {
                     ID = 3,
                     Name = "Fake Drink 3",
                     Price = 16.99,
-                    LowerEstimate = 5000.00,
-                    UpperEstimate = 6000.00,
+                    Estimate = 5500.00,
                     ParLevel = 6500.00,
                     IdealLevel = 9000.00,
                     Measurement = unit.milliliters,
@@ -66,14 +63,13 @@ namespace BackendClassUnitTests
                     BottleSize = 200,
                     Brand = "Fake Brand 1",
                     UnitsPerCase = 10,
-                    Vintage = true
+                    Vintage = 1998
                 },
                 new Drink {
                     ID = 4,
                     Name = "Fake Drink 4",
                     Price = 16.99,
-                    LowerEstimate = 0.00,
-                    UpperEstimate = 0.00,
+                    Estimate = 0.00,
                     ParLevel = 220.00,
                     IdealLevel = 300.00,
                     Measurement = unit.ounces,
@@ -81,7 +77,7 @@ namespace BackendClassUnitTests
                     BottleSize = 25,
                     Brand = "Fake Brand 3",
                     UnitsPerCase = 14,
-                    Vintage = false
+                    Vintage = null
                 }
             };
 
@@ -90,7 +86,7 @@ namespace BackendClassUnitTests
                     ID = 1,
                     Name = "Fake Recipe 1",
                     BaseLiquor = "Base Liquor 1",
-                    ItemList = new List<(Item item, double quantity)> {
+                    ItemList = new List<RecipeItem> {
                         (fakeDBItems[0], 15.00)
                     }
                 },
@@ -98,7 +94,7 @@ namespace BackendClassUnitTests
                     ID = 2,
                     Name = "Fake Recipe 2",
                     BaseLiquor = "Base Liquor 2",
-                    ItemList = new List<(Item item, double quantity)> {
+                    ItemList = new List<RecipeItem> {
                         (fakeDBItems[0], 10.00),
                         (fakeDBItems[2], 15.00)
                     }
@@ -107,7 +103,7 @@ namespace BackendClassUnitTests
                     ID = 3,
                     Name = "Fake Recipe 3",
                     BaseLiquor = "Base Liquor 3",
-                    ItemList = new List<(Item item, double quantity)> {
+                    ItemList = new List<RecipeItem> {
                         (fakeDBItems[0], 8.00),
                         (fakeDBItems[2], 12.00),
                         (fakeDBItems[3], 2.30)
@@ -238,8 +234,7 @@ namespace BackendClassUnitTests
                 ID = 1,
                 Name = "Updated Drink 1",
                 Price = 9.99,
-                LowerEstimate = 12750.00,
-                UpperEstimate = 14250.00,
+                Estimate = 13500.00,
                 ParLevel = 7000.00,
                 IdealLevel = 10000.00,
                 Measurement = unit.milliliters,
@@ -247,7 +242,7 @@ namespace BackendClassUnitTests
                 BottleSize = 200,
                 Brand = "Fake Brand 4",
                 UnitsPerCase = 10,
-                Vintage = false
+                Vintage = null
             };
 
             //Act
@@ -267,8 +262,7 @@ namespace BackendClassUnitTests
                 ID = -1,
                 Name = "FakeItem 1",
                 Price = 0.99,
-                LowerEstimate = 12750.00,
-                UpperEstimate = 14250.00,
+                Estimate = 13500.00,
                 ParLevel = 7000.00,
                 IdealLevel = 10000.00,
                 Measurement = unit.milliliters,
@@ -276,7 +270,7 @@ namespace BackendClassUnitTests
                 BottleSize = 200,
                 Brand = "Fake Brand 4",
                 UnitsPerCase = 10,
-                Vintage = false
+                Vintage = null
             };
 
             //Act
@@ -292,8 +286,7 @@ namespace BackendClassUnitTests
             Drink newItem = new Drink {
                 Name = "New Item",
                 Price = 1.99,
-                LowerEstimate = 24750.00,
-                UpperEstimate = 30000.00,
+                Estimate = 27375.00,
                 ParLevel = 17000.00,
                 IdealLevel = 35000.00,
                 Measurement = unit.milliliters,
@@ -301,7 +294,7 @@ namespace BackendClassUnitTests
                 BottleSize = 450,
                 Brand = "Fake Brand 4",
                 UnitsPerCase = 7,
-                Vintage = false
+                Vintage = null
             };
             int oldDBItemCount = fakeDBItems.Count();
 
