@@ -27,8 +27,7 @@ namespace BackendClassUnitTests
                     ID = 1,
                     Name = "Fake Drink 1",
                     Price = 9.99,
-                    LowerEstimate = 13000.00,
-                    UpperEstimate = 15000.00,
+                    Estimate = 14000.00,
                     ParLevel = 7000.00,
                     IdealLevel = 10000.00,
                     Measurement = unit.milliliters,
@@ -36,14 +35,13 @@ namespace BackendClassUnitTests
                     BottleSize = 200,
                     Brand = "Fake Brand 1",
                     UnitsPerCase = 10,
-                    Vintage = false
+                    Vintage = null
                 },
                 new Drink {
                     ID = 2,
                     Name = "Fake Drink 2",
                     Price = 12.99,
-                    LowerEstimate = 8500.00,
-                    UpperEstimate = 9250.00,
+                    Estimate = 8875.00,
                     ParLevel = 8000.00,
                     IdealLevel = 9750.00,
                     Measurement = unit.milliliters,
@@ -51,14 +49,13 @@ namespace BackendClassUnitTests
                     BottleSize = 400,
                     Brand = "Fake Brand 2",
                     UnitsPerCase = 60,
-                    Vintage = false
+                    Vintage = null
                 },
                 new Drink {
                     ID = 3,
                     Name = "Fake Drink 3",
                     Price = 16.99,
-                    LowerEstimate = 5000.00,
-                    UpperEstimate = 6000.00,
+                    Estimate = 5500.00,
                     ParLevel = 6500.00,
                     IdealLevel = 9000.00,
                     Measurement = unit.milliliters,
@@ -66,14 +63,13 @@ namespace BackendClassUnitTests
                     BottleSize = 200,
                     Brand = "Fake Brand 1",
                     UnitsPerCase = 10,
-                    Vintage = true
+                    Vintage = 1998
                 },
                 new Drink {
                     ID = 4,
                     Name = "Fake Drink 4",
                     Price = 16.99,
-                    LowerEstimate = 0.00,
-                    UpperEstimate = 0.00,
+                    Estimate = 0.00,
                     ParLevel = 220.00,
                     IdealLevel = 300.00,
                     Measurement = unit.ounces,
@@ -81,7 +77,7 @@ namespace BackendClassUnitTests
                     BottleSize = 25,
                     Brand = "Fake Brand 3",
                     UnitsPerCase = 14,
-                    Vintage = false
+                    Vintage = null
                 }
             };
 
@@ -90,27 +86,45 @@ namespace BackendClassUnitTests
                     ID = 1,
                     Name = "Fake Recipe 1",
                     BaseLiquor = "Base Liquor 1",
-                    ItemList = new List<(Item item, double quantity)> {
-                        (fakeDBItems[0], 15.00)
+                    ItemList = new List<RecipeItem> {
+                        new RecipeItem {
+                            Item = (Drink) fakeDBItems[0], 
+                            Quantity = 15.00
+                        }
                     }
                 },
                 new Recipe {
                     ID = 2,
                     Name = "Fake Recipe 2",
                     BaseLiquor = "Base Liquor 2",
-                    ItemList = new List<(Item item, double quantity)> {
-                        (fakeDBItems[0], 10.00),
-                        (fakeDBItems[2], 15.00)
+                    ItemList = new List<RecipeItem> {
+                        new RecipeItem {
+                            Item = (Drink) fakeDBItems[0], 
+                            Quantity = 10.00
+                        },
+                        new RecipeItem {
+                            Item = (Drink) fakeDBItems[2], 
+                            Quantity = 15.00
+                        }
                     }
                 },
                 new Recipe {
                     ID = 3,
                     Name = "Fake Recipe 3",
                     BaseLiquor = "Base Liquor 3",
-                    ItemList = new List<(Item item, double quantity)> {
-                        (fakeDBItems[0], 8.00),
-                        (fakeDBItems[2], 12.00),
-                        (fakeDBItems[3], 2.30)
+                    ItemList = new List<RecipeItem> {
+                        new RecipeItem {
+                            Item = (Drink) fakeDBItems[0], 
+                            Quantity = 8.00
+                        },
+                        new RecipeItem {
+                            Item = (Drink) fakeDBItems[2], 
+                            Quantity = 12.00
+                        },
+                        new RecipeItem {
+                            Item = (Drink) fakeDBItems[3],
+                            Quantity = 2.30
+                        }
                     }
                 },
             };
@@ -171,7 +185,7 @@ namespace BackendClassUnitTests
                 .Returns((int recipeID) => {
                    Recipe recipe = fakeDBRecipes.FirstOrDefault(x => x.ID == recipeID);
                    if (recipe != null) {
-                       recipe.ItemList = new List<(Item item, double quantity)>();
+                       recipe.ItemList = new List<RecipeItem>();
                    }
                    return true;   
                 });
@@ -197,7 +211,7 @@ namespace BackendClassUnitTests
                     if (drink == null || recipe == null || itemQuantity < 0) {
                         return -1;
                     } else {
-                        recipe.ItemList.Add((drink, itemQuantity));
+                        recipe.ItemList.Add(new RecipeItem(drink, itemQuantity));
                         return 0;   //we don't care about Drink Recipe Ids anyways
                     }
                 });
@@ -228,7 +242,7 @@ namespace BackendClassUnitTests
             //Assert
             string resultOfGetString = JsonConvert.SerializeObject(inventory.ItemList);
             string fakeDBItemsString = JsonConvert.SerializeObject(fakeDBItems);
-            Assert.Equal(resultOfGetString, fakeDBItemsString);
+            Assert.Equal(fakeDBItemsString, resultOfGetString);
         }
 
         [Fact]
@@ -238,8 +252,7 @@ namespace BackendClassUnitTests
                 ID = 1,
                 Name = "Updated Drink 1",
                 Price = 9.99,
-                LowerEstimate = 12750.00,
-                UpperEstimate = 14250.00,
+                Estimate = 13500.00,
                 ParLevel = 7000.00,
                 IdealLevel = 10000.00,
                 Measurement = unit.milliliters,
@@ -247,17 +260,21 @@ namespace BackendClassUnitTests
                 BottleSize = 200,
                 Brand = "Fake Brand 4",
                 UnitsPerCase = 10,
-                Vintage = false
+                Vintage = null
             };
+            string expectedName = "Updated Drink 1";
+            double expectedEstimate = 13500.00;
+            string expectedBrand = "Fake Brand 4";
+            int expectedReturnCode = 0;
 
             //Act
-            inventory.UpdateItem(updatedItem1);
+            int returnCode = inventory.UpdateItem(updatedItem1);
             
             //Assert
-            Assert.Equal(fakeDBItems[0].Name, "Updated Drink 1");
-            Assert.Equal(fakeDBItems[0].LowerEstimate, 12750.00);
-            Assert.Equal(fakeDBItems[0].UpperEstimate, 14250.00);
-            Assert.Equal(((Drink) fakeDBItems[0]).Brand, "Fake Brand 4");
+            Assert.Equal(expectedName, fakeDBItems[0].Name);
+            Assert.Equal(expectedEstimate, fakeDBItems[0].Estimate);
+            Assert.Equal(expectedBrand, ((Drink) fakeDBItems[0]).Brand);
+            Assert.Equal(expectedReturnCode, returnCode);
         }
 
         [Fact]
@@ -267,8 +284,7 @@ namespace BackendClassUnitTests
                 ID = -1,
                 Name = "FakeItem 1",
                 Price = 0.99,
-                LowerEstimate = 12750.00,
-                UpperEstimate = 14250.00,
+                Estimate = 13500.00,
                 ParLevel = 7000.00,
                 IdealLevel = 10000.00,
                 Measurement = unit.milliliters,
@@ -276,14 +292,15 @@ namespace BackendClassUnitTests
                 BottleSize = 200,
                 Brand = "Fake Brand 4",
                 UnitsPerCase = 10,
-                Vintage = false
+                Vintage = null
             };
+            int expectedReturnCode = 1;
 
             //Act
             int returnCode = inventory.UpdateItem(fakeItem);
 
             //assert
-            Assert.Equal(returnCode, 0);
+            Assert.Equal(expectedReturnCode, returnCode);
         }
 
         [Fact]
@@ -292,8 +309,7 @@ namespace BackendClassUnitTests
             Drink newItem = new Drink {
                 Name = "New Item",
                 Price = 1.99,
-                LowerEstimate = 24750.00,
-                UpperEstimate = 30000.00,
+                Estimate = 27375.00,
                 ParLevel = 17000.00,
                 IdealLevel = 35000.00,
                 Measurement = unit.milliliters,
@@ -301,19 +317,21 @@ namespace BackendClassUnitTests
                 BottleSize = 450,
                 Brand = "Fake Brand 4",
                 UnitsPerCase = 7,
-                Vintage = false
+                Vintage = null
             };
             int oldDBItemCount = fakeDBItems.Count();
+            int expectedReturnCode = 0;
 
             //Act
-            inventory.AddItem(newItem);
+            int returnCode = inventory.AddItem(newItem);
 
             //Assert
             Assert.Equal(fakeDBItems.Count(), oldDBItemCount + 1);
             var addedItem = fakeDBItems.FirstOrDefault(x => x.ID == latestItemID);
             string addedItemString = addedItem != null ? JsonConvert.SerializeObject(addedItem) : "";
-            string newItemString = JsonConvert.SerializeObject(newItem);
-            Assert.Equal(newItemString, addedItemString);
+            string expectedNewItemString = JsonConvert.SerializeObject(newItem);
+            Assert.Equal(expectedNewItemString, addedItemString);
+            Assert.Equal(expectedReturnCode, returnCode);
         }
 
         [Fact]
@@ -321,13 +339,15 @@ namespace BackendClassUnitTests
             //Arrange
             var itemToRemove = fakeDBItems[1];
             int oldDBItemCount = fakeDBItems.Count();
+            int expectedReturnCode = 0;
 
             //Act
-            inventory.RemoveItem(itemToRemove);
+            int returnCode = inventory.RemoveItem(itemToRemove);
 
             //Assert
             Assert.Equal(fakeDBItems.Count(), oldDBItemCount - 1);
-            Assert.Equal(fakeDBItems.FirstOrDefault(x => x.ID == itemToRemove.ID), null);
+            Assert.Null(fakeDBItems.FirstOrDefault(x => x.ID == itemToRemove.ID));
+            Assert.Equal(expectedReturnCode, returnCode);
         }
     }
 }
