@@ -98,6 +98,7 @@ namespace BRIM.BackendClassLibrary
         //Creates then runs a delete query
         public bool deleteDrink(Drink drink)
         {
+            int drinkID = drink.ID;
             string query = @"delete from brim.drinks where drinkID = '" + drink.ID + "'";
             bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
@@ -108,13 +109,22 @@ namespace BRIM.BackendClassLibrary
                 return false;
             }
 
+            query = @"delete from brim.drinktags where drinkID = '" + drinkID + "'";
+            result = this.runSqlInsertUpdateOrDeleteCommand(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Associated tags for removed drink could not be deleted");
+
+                return false;
+            }
+
             return true;
         }
 
         //Creates then runs an insert query
         public bool addDrink(Drink drink)
         {
-            //TODO: Re-add vintage
             string query = @"insert into brim.drinks (name, estimate, measurementUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
                 + drink.Name + "', '" + drink.Estimate + "', '" + drink.Measurement + "', '" + drink.ParLevel + "', '" + drink.IdealLevel
                 + "', '" + drink.BottleSize + "', '" + drink.Brand + "', '" + drink.UnitsPerCase + "', '" + drink.Vintage + "')";
@@ -124,6 +134,22 @@ namespace BRIM.BackendClassLibrary
             {
                 Console.WriteLine("Error: Drink could not be added");
                 return false;
+            }
+
+            //Find the tag ids in the dtaabse and add them to this drink in drinkTable
+            foreach (string T in drink.Tags)
+            {
+                string tagQuery = @"select ID from brim.tags where name = '" + T + "'";
+                DataTable tagID = this.runSelectQuery(tagQuery);
+
+                tagQuery = @"insert into brim.drinktags (drinkID, tagID) values ('" + drink.ID + "', '" + tagID.Rows[0].Field<int>("ID") + "')";
+                int newTagID = this.runSqlInsertCommandReturnID(tagQuery);
+
+                if (newTagID == -1)
+                {
+                    Console.WriteLine("Error: Tag could not be added");
+                    return false;
+                }
             }
 
             return true;
@@ -158,6 +184,11 @@ namespace BRIM.BackendClassLibrary
 
             foreach(DataRow dr in dt.Rows) {
                 Drink tempDrink = new Drink(dr);
+
+                queryString = @"SELECT T.name FROM BRIM.tags T, BRIM.drinktags DT, BRIM.drinks D WHERE DT.drinkID = '" + tempDrink.ID + "' AND DT.tagID = T.ID";
+                DataTable drinkTags = this.runSelectQuery(queryString);
+                tempDrink.Tags = drinkTags.AsEnumerable().Select(r => r.Field<string>("name")).ToList();
+
                 newDrinkList.Add(tempDrink);
             }
             return newDrinkList;

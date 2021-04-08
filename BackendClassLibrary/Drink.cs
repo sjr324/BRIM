@@ -23,6 +23,7 @@ namespace BRIM.BackendClassLibrary
         public string Brand {get; set;}
         public int UnitsPerCase {get; set;}
         public int? Vintage{get;set;}
+        public List<string> Tags { get; set; }
 
         public Drink() { }
 
@@ -43,6 +44,7 @@ namespace BRIM.BackendClassLibrary
                 UnitsPerCase = dr.Field<int>("bottlesPerCase");
                 Vintage = dr.Field<int?>("vintage");
                 Price = dr.Field<double>("price");
+                Tags = new List<string>();
             } catch (IndexOutOfRangeException exp) {
                 Console.WriteLine("The Datarow given does not contain one or more of the columns in a Drink Object");
                 Console.WriteLine(exp.Message);

@@ -95,6 +95,8 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
 
+            ItemList.Remove(removeItem);
+
             return 0;
         }
 
