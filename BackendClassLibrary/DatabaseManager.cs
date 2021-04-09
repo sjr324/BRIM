@@ -128,7 +128,7 @@ namespace BRIM.BackendClassLibrary
             string query = @"insert into brim.drinks (name, estimate, measurementUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
                 + drink.Name + "', '" + drink.Estimate + "', '" + drink.Measurement + "', '" + drink.ParLevel + "', '" + drink.IdealLevel
                 + "', '" + drink.BottleSize + "', '" + drink.Brand + "', '" + drink.UnitsPerCase + "', '" + drink.Vintage + "')";
-            int newDrinkID = this.runSqlInsertCommandReturnID(query);
+            int newDrinkID = this.runSqlInsertCommandReturnID(query); //TODO: Update drink to have this ID
 
             if (newDrinkID == -1)
             {
@@ -175,7 +175,7 @@ namespace BRIM.BackendClassLibrary
         public List<Item> getDrinks()
         {
             List<Item> newDrinkList = new List<Item>();
-            string queryString = @"select * from drinks";
+            string queryString = @"select * from brim.drinks";
 
             DataTable dt = this.runSelectQuery(queryString);
 
@@ -193,6 +193,23 @@ namespace BRIM.BackendClassLibrary
                 newDrinkList.Add(tempDrink);
             }
             return newDrinkList;
+        }
+
+        public List<Tag> getTags()
+        {
+            List<Tag> newTagList = new List<Tag>();
+            string queryString = @"select * from brim.tags";
+
+            DataTable dt = this.runSelectQuery(queryString);
+
+            foreach(DataRow dr in dt.Rows)
+            {
+                Tag tempTag = new Tag(dr);
+
+                newTagList.Add(tempTag);
+            }
+
+            return newTagList;
         }
 
         //Creates then runs a delete query for entry IN RECIPES TABLE ONLY
@@ -280,6 +297,37 @@ namespace BRIM.BackendClassLibrary
             if (!result)
             {
                 Console.WriteLine("Error: COuld not add tag to database");
+                return false;
+            }
+
+            return true;
+        }
+
+        //Creates and runs an insert query for just the tags table
+        //returns the ID of the tag after it is added
+        public int addTag(string name)
+        {
+            string query = @"insert into brim.tags (name) values ('" + name + "');";
+            int result = this.runSqlInsertCommandReturnID(query);
+
+            if (result == -1)
+            {
+                Console.WriteLine("Error: Tag could not be added");
+                return -1;
+            }
+
+            return result;
+        }
+
+        //Deletes a tag from the tags table by ID
+        public bool deleteTag(int ID)
+        {
+            string query = @"delete from brim.tags where ID = '" + ID + "';";
+            bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Tag entry could not be deleted");
                 return false;
             }
 

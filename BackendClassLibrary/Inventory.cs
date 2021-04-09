@@ -14,6 +14,7 @@ namespace BRIM.BackendClassLibrary
     {
         public List<Item> ItemList = new List<Item>(); //holds all items registered to this BRIM instance
         public List<Recipe> RecipeList = new List<Recipe>(); //holds all of the recipes for this BRIM instance
+        public List<Tag> TagList = new List<Tag>(); //holds all of the tags for this BRIM instance
         public string Country;
         public IDatabaseManager databaseManager;
 
@@ -340,31 +341,43 @@ namespace BRIM.BackendClassLibrary
         //Gets the list of all tags in the tags table
         public int GetTagList()
         {
+            List<Tag> tagList = new List<Tag>();
+            tagList = this.databaseManager.getTags();
+            TagList = tagList;
 
+            return 0;
         }
 
         //Adds a tag to the tag table
         public int AddTag(string tagName)
         {
+            int tagID = this.databaseManager.addTag(tagName);
+            Tag newTag = new Tag(tagID, tagName);
+            TagList.Add(newTag);
 
+            return 0;
         }
 
         //Removes a tag from the tag table
         public int DeleteTag(int tagID)
         {
+            int removeIndex = TagList.FindIndex(x => x.ID == tagID);
+            Tag removeTag = TagList[removeIndex];
+            bool result = this.databaseManager.deleteTag(tagID);
 
-        }
-        
-        //Adds a SINGLE tag to a drink
-        public int AddTagToDrink(Item Drink, int tagID)
-        {
+            if (!result)
+            {
+                Console.WriteLine("Error: Tag removal failed");
 
-        }
+                string mes = removeTag.Name + " could not be removed";
+                NotificationManager.AddNotification(mes);
 
-        //Adds MULTIPLE tags to a drink
-        public int AddTagsToDrink(Item Drink, List<int> tagIds)
-        {
+                return 1;
+            }
 
+            TagList.Remove(removeTag);
+
+            return 0;
         }
 
         //what are these for again? Are the even still neccesary with the current plan, or are the vestigial?
