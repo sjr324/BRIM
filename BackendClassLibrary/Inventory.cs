@@ -93,12 +93,13 @@ namespace BRIM.BackendClassLibrary
         {
             Drink newItem = i as Drink;
             bool result = this.databaseManager.addDrink(newItem);
+            string mes = "";
             
             if (!result)
             {
                 Console.WriteLine("Error: Item Addition Failed");
 
-                string mes = newItem.Name + " could not be added";
+                mes = newItem.Name + " could not be added";
                 NotificationManager.AddNotification(mes);
 
                 return 1;
@@ -110,6 +111,10 @@ namespace BRIM.BackendClassLibrary
                 if (!this.databaseManager.addDrinkTag(newItem.ID, T.ID))
                 {
                     Console.WriteLine("Error: Tag could not be added");
+
+                    mes = T.Name + " could not be added";
+                    NotificationManager.AddNotification(mes);
+                    
                     return 1;
                 }
             }

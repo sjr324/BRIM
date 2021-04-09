@@ -55,7 +55,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("MYSQL ERROR OCCURED! ERROR MESSAGE: " + ex.Message);
                 return false;
             }
-
+            
             if (rowsAffected == 0) {
                 Console.WriteLine("The Command was Valid, but no Rows where affected: ");
             } else if (rowsAffected < 0){
