@@ -47,6 +47,9 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
 
+            //Similar to Recipie updates, delete all Tag entries and readd them for simplicity
+
+
             return 0;
         }
 
@@ -70,6 +73,8 @@ namespace BRIM.BackendClassLibrary
 
                 return 1;
             }
+
+            //add in the tags associated with that drink if there are any
 
             return 0;
         }

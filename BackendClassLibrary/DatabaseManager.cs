@@ -137,12 +137,9 @@ namespace BRIM.BackendClassLibrary
             }
 
             //Find the tag ids in the dtaabse and add them to this drink in drinkTable
-            foreach (string T in drink.Tags)
+            foreach (Tag T in drink.Tags)
             {
-                string tagQuery = @"select ID from brim.tags where name = '" + T + "'";
-                DataTable tagID = this.runSelectQuery(tagQuery);
-
-                tagQuery = @"insert into brim.drinktags (drinkID, tagID) values ('" + drink.ID + "', '" + tagID.Rows[0].Field<int>("ID") + "')";
+                string tagQuery = @"insert into brim.drinktags (drinkID, tagID) values ('" + drink.ID + "', '" + T.ID + "')";
                 int newTagID = this.runSqlInsertCommandReturnID(tagQuery);
 
                 if (newTagID == -1)
@@ -185,9 +182,13 @@ namespace BRIM.BackendClassLibrary
             foreach(DataRow dr in dt.Rows) {
                 Drink tempDrink = new Drink(dr);
 
-                queryString = @"SELECT T.name FROM BRIM.tags T, BRIM.drinktags DT, BRIM.drinks D WHERE DT.drinkID = '" + tempDrink.ID + "' AND DT.tagID = T.ID";
+                queryString = @"SELECT T.ID, T.name FROM BRIM.tags T, BRIM.drinktags DT, BRIM.drinks D WHERE DT.drinkID = '" + tempDrink.ID + "' AND DT.tagID = T.ID";
                 DataTable drinkTags = this.runSelectQuery(queryString);
-                tempDrink.Tags = drinkTags.AsEnumerable().Select(r => r.Field<string>("name")).ToList();
+
+                foreach (DataRow tagRow in drinkTags.Rows)
+                {
+                    tempDrink.Tags.Add(new Tag(tagRow.Field<int>("ID"), tagRow.Field<string>("name")));
+                }
 
                 newDrinkList.Add(tempDrink);
             }
@@ -204,6 +205,21 @@ namespace BRIM.BackendClassLibrary
             if (!result)
             {
                 Console.WriteLine("Error: Recipe Entry could not be deleted");
+                return false;
+            }
+
+            return true;
+        }
+
+        //Delete all entries in the drinkTags Table with a certain drinkID
+        public bool deleteDrinkTagsByDrinkID(int drinkID)
+        {
+            string query = @"delete from brim.drinktags where drinkID = '" + drinkID +"';";
+            bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: DrinkTag Entries could not be deleted");
                 return false;
             }
 
@@ -241,7 +257,8 @@ namespace BRIM.BackendClassLibrary
 
         //Creates then runs an insert query FOR JUST THE DRINKRECIPES TABLE
         //ASSUMES THAT RECIPE AND DRINK IDS ARE VALID. AKA THAT THEY BELONG TO DRINKS AND RECIPES THAT EXIST 
-        public int addDrinkRecipe(int recipeID, int drinkID, double itemQuantity){
+        public int addDrinkRecipe(int recipeID, int drinkID, double itemQuantity) 
+        {
             string query = @"INSERT INTO brim.drinkrecipes (itemQuantity, recipeID, drinkID) "
                 + "VALUES ('" + itemQuantity + "', '" + recipeID + "', '" + drinkID + "');";
             int newDrinkRecipeID = this.runSqlInsertCommandReturnID(query);
@@ -251,6 +268,13 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: DrinkRecipe Entry Could not be Added");
             }
             return newDrinkRecipeID;
+        }
+
+        //Creates and runs an insert query for just the DrinkTags table
+        //Assumes that the drink and tag IDs are valid
+        public int addDrinkTags(int drinkID, int tagID)
+        {
+
         }
 
         // Creates then runs an UPDATE query FOR ONLY THE ENTRY IN THE RECIPES TABLE
