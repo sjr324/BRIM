@@ -14,6 +14,7 @@ namespace BRIM.BackendClassLibrary
     {
         public List<Item> ItemList = new List<Item>(); //holds all items registered to this BRIM instance
         public List<Recipe> RecipeList = new List<Recipe>(); //holds all of the recipes for this BRIM instance
+        public List<Tag> TagList = new List<Tag>(); //holds all of the tags for this BRIM instance
         public string Country;
         public IDatabaseManager databaseManager;
 
@@ -50,6 +51,35 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
 
+            //Similar to Recipie updates, delete all Tag entries and readd them for simplicity
+            if (!this.databaseManager.deleteDrinkTagsByDrinkID(updateItem.ID))
+            {
+                Console.WriteLine("Error: Drink Tag Entry Deletion Failed. Stopping here");
+
+                string mes = updateItem.Name + " could not be updated";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
+            //After removing all of the tags for the drink, re-adds them
+            foreach (Tag T in updateItem.Tags)
+            {
+                int tagID = T.ID;
+                result = this.databaseManager.addDrinkTag(updateItem.ID, tagID);
+
+                if (!result)
+                {
+                    Console.WriteLine("Error: Drink Tag Entry Addition Failed For Tag '"
+                    + T.Name + "' on item '" + updateItem.Name + "'. Stopping here");
+
+                    string mes = updateItem.Name + " could not be updated";
+                    NotificationManager.AddNotification(mes);
+
+                    return 1;
+                }
+            }
+
             return 0;
         }
 
@@ -63,15 +93,30 @@ namespace BRIM.BackendClassLibrary
         {
             Drink newItem = i as Drink;
             bool result = this.databaseManager.addDrink(newItem);
+            string mes = "";
             
             if (!result)
             {
                 Console.WriteLine("Error: Item Addition Failed");
 
-                string mes = newItem.Name + " could not be added";
+                mes = newItem.Name + " could not be added";
                 NotificationManager.AddNotification(mes);
 
                 return 1;
+            }
+
+            //add in the tags associated with that drink if there are any
+            foreach (Tag T in newItem.Tags)
+            {
+                if (!this.databaseManager.addDrinkTag(newItem.ID, T.ID))
+                {
+                    Console.WriteLine("Error: Tag could not be added");
+
+                    mes = T.Name + " could not be added";
+                    NotificationManager.AddNotification(mes);
+                    
+                    return 1;
+                }
             }
 
             return 0;
@@ -97,6 +142,8 @@ namespace BRIM.BackendClassLibrary
 
                 return 1;
             }
+
+            ItemList.Remove(removeItem);
 
             return 0;
         }
@@ -276,6 +323,48 @@ namespace BRIM.BackendClassLibrary
             List<Item> drinksList = new List<Item>();
             drinksList = this.databaseManager.getDrinks();
             ItemList = drinksList;
+
+            return 0;
+        }
+
+        //Gets the list of all tags in the tags table
+        public int GetTagList()
+        {
+            List<Tag> tagList = new List<Tag>();
+            tagList = this.databaseManager.getTags();
+            TagList = tagList;
+
+            return 0;
+        }
+
+        //Adds a tag to the tag table
+        public int AddTag(string tagName)
+        {
+            int tagID = this.databaseManager.addTag(tagName);
+            Tag newTag = new Tag(tagID, tagName);
+            TagList.Add(newTag);
+
+            return 0;
+        }
+
+        //Removes a tag from the tag table
+        public int DeleteTag(int tagID)
+        {
+            int removeIndex = TagList.FindIndex(x => x.ID == tagID);
+            Tag removeTag = TagList[removeIndex];
+            bool result = this.databaseManager.deleteTag(tagID);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Tag removal failed");
+
+                string mes = removeTag.Name + " could not be removed";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
+            TagList.Remove(removeTag);
 
             return 0;
         }
