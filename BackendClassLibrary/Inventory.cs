@@ -36,6 +36,9 @@ namespace BRIM.BackendClassLibrary
         public int UpdateItem(Item info)
         {
             Drink updateItem = info as Drink;
+            //make sure status is recalculated to reflect any changes in Quantity
+            updateItem.CalculateStatus(); 
+            
             bool result = this.databaseManager.updateDrink(updateItem);
 
             if (!result)
@@ -156,7 +159,7 @@ namespace BRIM.BackendClassLibrary
         public void parseAPIPOSUpdate(JObject message)
         {
             JToken msg = message;
-            double varianceMultiplier = 0.15;
+            //double varianceMultiplier = 0.15;
 
             foreach (JObject order in msg)
             {
@@ -175,8 +178,6 @@ namespace BRIM.BackendClassLibrary
                     int recipieFound = RecipeList.FindIndex(x => x.Name == name);
                     if (drinkFound != -1)
                     {
-                        Drink updatedDrink = ItemList[drinkFound] as Drink;
-
                         JArray modifications = (JArray)lineitem["modifications"];
 
                         //should only be one, but maybe there is something im not thinking of,
@@ -205,32 +206,7 @@ namespace BRIM.BackendClassLibrary
                                 updateAmt += pourAmt * quantitySold;
                             }
                         }
-
-                        //update drink amount
-                        updatedDrink.Estimate -= updateAmt;
-
-                        //update the user if any of these is true
-                        if (updatedDrink.Estimate < 0.0)
-                        {
-                            updatedDrink.Estimate = 0.0;
-                        }
-
-                        if (updatedDrink.CalculateStatus())
-                        {
-                            if (updatedDrink.Status == status.belowIdeal)
-                            {
-                                string mes = updatedDrink.Name + " is below ideal level";
-                                NotificationManager.AddNotification(mes);
-                            } else if (updatedDrink.Status == status.belowPar)
-                            {
-                                string mes = updatedDrink.Name + " is below par level";
-                                NotificationManager.AddNotification(mes);
-                            } else if (updatedDrink.Status == status.empty)
-                            {
-                                string mes = updatedDrink.Name + " is empty";
-                                NotificationManager.AddNotification(mes);
-                            }
-                        }
+                        Drink updatedDrink = (Drink) orderItemUpdateProcedure(ItemList[drinkFound], updateAmt);
 
                         databaseManager.updateDrink(updatedDrink);
                         ItemList[drinkFound] = updatedDrink;
@@ -270,41 +246,10 @@ namespace BRIM.BackendClassLibrary
                             //update every drink that was a part of the recipe
                             foreach (RecipeItem part in parts)
                             {
-                                //calcualte and update every item
-                                Drink updatedDrink = part.Item;
-
+                                //calculate and update every item
                                 updateAmt += part.Quantity * amtOrdered;
 
-                                //update
-                                updatedDrink.Estimate -= updateAmt;
-
-                                //update the user if any of these is true
-                                if (updatedDrink.Estimate < 0.0)
-                                {
-                                    updatedDrink.Estimate = 0.0;
-
-                                    //string mes = updatedDrink.Name + " is empty";
-                                    //NotificationManager.AddNotification(mes);
-                                }
-
-                                if (updatedDrink.CalculateStatus())
-                                {
-                                    if (updatedDrink.Status == status.belowIdeal)
-                                    {
-                                        string mes = updatedDrink.Name + " is below ideal level";
-                                        NotificationManager.AddNotification(mes);
-                                    }
-                                    else if (updatedDrink.Status == status.belowPar)
-                                    {
-                                        string mes = updatedDrink.Name + " is below par level";
-                                        NotificationManager.AddNotification(mes);
-                                    }
-                                    else if (updatedDrink.Status == status.empty)
-                                    {
-                                        string mes = updatedDrink.Name + " is empty";
-                                        NotificationManager.AddNotification(mes);
-                                    }
-                                }
+                                Drink updatedDrink = (Drink) orderItemUpdateProcedure(part.Item, updateAmt);
 
                                 databaseManager.updateDrink(updatedDrink);
                                 ItemList[drinkFound] = updatedDrink;
@@ -319,6 +264,45 @@ namespace BRIM.BackendClassLibrary
                     }
                 }
             }
+        }
+        
+        /// <summary>
+        /// For use by the "parseAPIPOSUpdate":
+        /// Takes an Item Object and a Double amount, subtracts the amount from the Item's estimate
+        /// recalculates the item's status, and creates a status change notification if neccesary
+        /// </summary>
+        /// <returns>The updated Item Object</returns>
+        private Item orderItemUpdateProcedure(Item updatedItem, double amount) {
+            //update Item amount
+            updatedItem.Estimate -= amount;
+
+            //update the user if any of these is true
+            if (updatedItem.Estimate < 0.0)
+            {
+                updatedItem.Estimate = 0.0;
+            }
+            
+            //Since an Interface can only be instantiated as one of its child classes, Then
+            //Theoretically, whatever child class updatedItem is should already have their own
+            //implementation of calculate Status 
+            if (updatedItem.CalculateStatus())
+            {
+                if (updatedItem.Status == status.belowIdeal)
+                {
+                    string mes = updatedItem.Name + " is below ideal level";
+                    NotificationManager.AddNotification(mes);
+                } else if (updatedItem.Status == status.belowPar)
+                {
+                    string mes = updatedItem.Name + " is below par level";
+                    NotificationManager.AddNotification(mes);
+                } else if (updatedItem.Status == status.empty)
+                {
+                    string mes = updatedItem.Name + " is empty";
+                    NotificationManager.AddNotification(mes);
+                }
+            }
+
+            return updatedItem;
         }
 
         /// <summary>
