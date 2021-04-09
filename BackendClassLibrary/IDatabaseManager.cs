@@ -26,6 +26,9 @@ namespace BRIM.BackendClassLibrary
     //Deletes all entries in the drinkRecipes Table with a certain recipeID
     bool deleteDrinkRecipesByRecipeID(int recipeID);
 
+    //Delete all entries in the drinkTags Table with a certain drinkID
+    bool deleteDrinkTagsByDrinkID(int drinkID);
+
     //Creates then runs an insert query FOR JUST THE RECIPES TABLE
     //returns the ID of the newly Inserted Recipe
     int addRecipe(string name, string baseLiquor);
@@ -33,6 +36,10 @@ namespace BRIM.BackendClassLibrary
     //Creates then runs an insert query FOR JUST THE DRINKRECIPES TABLE
     //ASSUMES THAT RECIPE AND DRINK IDS ARE VALID. AKA THAT THEY BELONG TO DRINKS AND RECIPES THAT EXIST 
     int addDrinkRecipe(int recipeID, int drinkID, double itemQuantity);
+
+    //Creates and runs an insert query for just the DrinkTags table
+    //Assumes that the drink and tag IDs are valid
+    bool addDrinkTag(int drinkID, int tagID);
 
     // Creates then runs an UPDATE query FOR ONLY THE ENTRY IN THE RECIPES TABLE
     // only sends the ID, name, and baseLiquor since RecipeObjects can get large from the itemList

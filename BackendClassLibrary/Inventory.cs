@@ -48,6 +48,33 @@ namespace BRIM.BackendClassLibrary
             }
 
             //Similar to Recipie updates, delete all Tag entries and readd them for simplicity
+            if (!this.databaseManager.deleteDrinkTagsByDrinkID(updateItem.ID))
+            {
+                Console.WriteLine("Error: Drink Tag Entry Deletion Failed. Stopping here");
+
+                string mes = updateItem.Name + " could not be updated";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
+            //After removing all of the tags for the drink, readds them
+            foreach (Tag T in updateItem.Tags)
+            {
+                int tagID = T.ID;
+                result = this.databaseManager.addDrinkTag(updateItem.ID, tagID);
+
+                if (!result)
+                {
+                    Console.WriteLine("Error: Drink Tag Entry Addition Failed For Tag '"
+                    + T.Name + "' on item '" + updateItem.Name + "'. Stopping here");
+
+                    string mes = updateItem.Name + " could not be updated";
+                    NotificationManager.AddNotification(mes);
+
+                    return 1;
+                }
+            }
 
 
             return 0;
@@ -75,6 +102,14 @@ namespace BRIM.BackendClassLibrary
             }
 
             //add in the tags associated with that drink if there are any
+            foreach (Tag T in newItem.Tags)
+            {
+                if (!this.databaseManager.addDrinkTags(newItem.ID, T.ID))
+                {
+                    Console.WriteLine("Error: Tag could not be added");
+                    return 1;
+                }
+            }
 
             return 0;
         }

@@ -272,7 +272,7 @@ namespace BRIM.BackendClassLibrary
 
         //Creates and runs an insert query for just the DrinkTags table
         //Assumes that the drink and tag IDs are valid
-        public bool addDrinkTags(int drinkID, int tagID)
+        public bool addDrinkTag(int drinkID, int tagID)
         {
             string query = @"INSERT INTO brim.drinktags (drinkID, tagID) VALUES ('" + drinkID +"', '" + tagID +"');";
             bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
