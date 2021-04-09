@@ -272,9 +272,18 @@ namespace BRIM.BackendClassLibrary
 
         //Creates and runs an insert query for just the DrinkTags table
         //Assumes that the drink and tag IDs are valid
-        public int addDrinkTags(int drinkID, int tagID)
+        public bool addDrinkTags(int drinkID, int tagID)
         {
+            string query = @"INSERT INTO brim.drinktags (drinkID, tagID) VALUES ('" + drinkID +"', '" + tagID +"');";
+            bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
+            if (!result)
+            {
+                Console.WriteLine("Error: COuld not add tag to database");
+                return false;
+            }
+
+            return true;
         }
 
         // Creates then runs an UPDATE query FOR ONLY THE ENTRY IN THE RECIPES TABLE
