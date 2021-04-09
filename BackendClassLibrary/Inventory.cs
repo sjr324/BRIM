@@ -337,17 +337,32 @@ namespace BRIM.BackendClassLibrary
             return 0;
         }
 
+        //Gets the list of all tags in the tags table
         public int GetTagList()
         {
 
         }
 
-        public int AddTag()
+        //Adds a tag to the tag table
+        public int AddTag(string tagName)
         {
 
         }
 
-        public int DeleteTag()
+        //Removes a tag from the tag table
+        public int DeleteTag(int tagID)
+        {
+
+        }
+        
+        //Adds a SINGLE tag to a drink
+        public int AddTagToDrink(Item Drink, int tagID)
+        {
+
+        }
+
+        //Adds MULTIPLE tags to a drink
+        public int AddTagsToDrink(Item Drink, List<int> tagIds)
         {
 
         }
