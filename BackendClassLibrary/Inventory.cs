@@ -58,7 +58,7 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
 
-            //After removing all of the tags for the drink, readds them
+            //After removing all of the tags for the drink, re-adds them
             foreach (Tag T in updateItem.Tags)
             {
                 int tagID = T.ID;
@@ -75,7 +75,6 @@ namespace BRIM.BackendClassLibrary
                     return 1;
                 }
             }
-
 
             return 0;
         }
@@ -104,7 +103,7 @@ namespace BRIM.BackendClassLibrary
             //add in the tags associated with that drink if there are any
             foreach (Tag T in newItem.Tags)
             {
-                if (!this.databaseManager.addDrinkTags(newItem.ID, T.ID))
+                if (!this.databaseManager.addDrinkTag(newItem.ID, T.ID))
                 {
                     Console.WriteLine("Error: Tag could not be added");
                     return 1;
@@ -336,6 +335,21 @@ namespace BRIM.BackendClassLibrary
             ItemList = drinksList;
 
             return 0;
+        }
+
+        public int GetTagList()
+        {
+
+        }
+
+        public int AddTag()
+        {
+
+        }
+
+        public int DeleteTag()
+        {
+
         }
 
         //what are these for again? Are the even still neccesary with the current plan, or are the vestigial?
