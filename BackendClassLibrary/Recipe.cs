@@ -18,6 +18,16 @@ namespace BRIM.BackendClassLibrary
         //had to explicitly make a default constructor to make a test recipe to mess with the Add and Updates
         public Recipe() {}
 
+        //make a clone of the Current Recipe Obeject
+        public Recipe Clone() {
+            Recipe other = (Recipe) this.MemberwiseClone();
+            other.ItemList = new List<RecipeItem>();
+            foreach(RecipeItem component in ItemList) {
+                other.ItemList.Add(component);
+            }
+            return other;
+        }
+
         //Data Conversion Constructor
         //takes an IEnumerable of DataRow objects(All assumed to be in the form of results from the query
         //in the getRecipes function in DatabaseManager and uses the data to create a recipe Object and 

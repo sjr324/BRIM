@@ -209,9 +209,9 @@ namespace BackendClassUnitTests
                     if (itemToUpdateIndex != -1) {
                         //preserve Item's tag's since updateDrink does not change entries within 
                         //DrinkTags table
-                        List<Tag> tagListHolder = ((Drink) fakeDBItems[itemToUpdateIndex]).Tags;
+                        List<Tag> tagListHolder = fakeDBItems[itemToUpdateIndex].Tags;
                         fakeDBItems[itemToUpdateIndex] = drink;
-                        ((Drink) fakeDBItems[itemToUpdateIndex]).Tags = tagListHolder;
+                        fakeDBItems[itemToUpdateIndex].Tags = tagListHolder;
                         return true;
                     } else {
                         return false;
@@ -239,9 +239,9 @@ namespace BackendClassUnitTests
 
             mockDBManager.Setup(x => x.deleteDrinkRecipesByRecipeID(It.IsAny<int>()))
                 .Returns((int recipeID) => {
-                   Recipe recipe = fakeDBRecipes.FirstOrDefault(x => x.ID == recipeID);
-                   if (recipe != null) {
-                       recipe.ItemList = new List<RecipeItem>();
+                   int recipeIndex = fakeDBRecipes.FindIndex(x => x.ID == recipeID);
+                   if (recipeIndex != -1) {
+                       fakeDBRecipes[recipeIndex].ItemList = new List<RecipeItem>();
                    }
                    return true;   
                 });
@@ -301,7 +301,7 @@ namespace BackendClassUnitTests
                 .Returns((int tagID) => {
                     //DataBase Manager Should Automatically delete DrinkTags for Deleted Tags
                     for (int i = 0; i < latestItemID; i++) {
-                        for (int j = 0; j < ((Drink) fakeDBItems[i]).Tags.Count(); j++) {
+                        for (int j = 0; j < fakeDBItems[i].Tags.Count(); j++) {
                             if (fakeDBItems[i].Tags[j].ID == tagID) {
                                 fakeDBItems[i].Tags.RemoveAt(j);
                             }
@@ -341,13 +341,12 @@ namespace BackendClassUnitTests
         [Fact]
         public void GetItemListTest() {
             //Arrange
-
+            string fakeDBItemsString = JsonConvert.SerializeObject(fakeDBItems);
             //Act
             inventory.GetItemList();
 
             //Assert
-            string resultOfGetString = JsonConvert.SerializeObject(inventory.ItemList);
-            string fakeDBItemsString = JsonConvert.SerializeObject(fakeDBItems);
+            string resultOfGetString = JsonConvert.SerializeObject(inventory.ItemList);            
             Assert.Equal(fakeDBItemsString, resultOfGetString);
         }
 
@@ -384,11 +383,11 @@ namespace BackendClassUnitTests
         }
 
         [Fact]
-        public void updateItemTestFailure_NonExistentDrink() {
+        public void UpdateItemTestFailure_NonExistentDrink() {
             //Arrange
             Drink fakeItem = new Drink {
                 ID = -1,
-                Name = "FakeItem 1",
+                Name = "Invalid Item 1",
                 Price = 0.99,
                 Estimate = 13500.00,
                 ParLevel = 7000.00,
@@ -426,49 +425,256 @@ namespace BackendClassUnitTests
                 Vintage = null,
                 Tags = new List<Tag> {}
             };
-            int oldDBItemCount = fakeDBItems.Count();
+            int expectedDBItemCount = fakeDBItems.Count() + 1;
             int expectedReturnCode = 0;
+            newItem.ID = latestItemID + 1;
+            string expectedNewItemString = JsonConvert.SerializeObject(newItem);
 
             //Act
             int returnCode = inventory.AddItem(newItem);
 
             //Assert
-            Assert.Equal(fakeDBItems.Count(), oldDBItemCount + 1);
-            var addedItem = fakeDBItems.FirstOrDefault(x => x.ID == latestItemID);
+            Item addedItem = fakeDBItems.FirstOrDefault(x => x.ID == latestItemID);
             string addedItemString = addedItem != null ? JsonConvert.SerializeObject(addedItem) : "";
-            string expectedNewItemString = JsonConvert.SerializeObject(newItem);
-            Assert.Equal(expectedNewItemString, addedItemString);
+            Assert.Equal(expectedDBItemCount, fakeDBItems.Count());
             Assert.Equal(expectedReturnCode, returnCode);
+            Assert.Equal(expectedNewItemString, addedItemString); 
         }
 
         [Fact]
-        public void removeItemTestSuccess() {
+        public void RemoveItemTestSuccess() {
             //Arrange
             var itemToRemove = fakeDBItems[1];
-            int oldDBItemCount = fakeDBItems.Count();
+            int expectedDBItemCount = fakeDBItems.Count() - 1;
             int expectedReturnCode = 0;
 
             //Act
             int returnCode = inventory.RemoveItem(itemToRemove);
 
             //Assert
-            Assert.Equal(fakeDBItems.Count(), oldDBItemCount - 1);
+            Assert.Equal(expectedDBItemCount, fakeDBItems.Count());
             Assert.Null(fakeDBItems.FirstOrDefault(x => x.ID == itemToRemove.ID));
             Assert.Equal(expectedReturnCode, returnCode);
         }
 
         [Fact]
-        public void removeItemTestFailure_ItemUsedInRecipe() {
+        public void RemoveItemTestFailure_ItemUsedInRecipe() {
             //Arrange
             var itemToRemove = fakeDBItems[2];
-            int oldDBItemCount = fakeDBItems.Count();
+            int expectedDBItemCount = fakeDBItems.Count();
             int expectedReturnCode = 1;
 
             //Act
             int returnCode = inventory.RemoveItem(itemToRemove);
             //Assert
-            Assert.Equal(fakeDBItems.Count(), oldDBItemCount);
+            Assert.Equal(expectedDBItemCount, fakeDBItems.Count());
             Assert.NotNull(fakeDBItems.FirstOrDefault(x => x.ID == itemToRemove.ID));
+            Assert.Equal(expectedReturnCode, returnCode);
+        }
+
+        [Fact]
+        public void GetRecipeListTestSuccess() {
+            //Arrange
+            string fakeDBRecipesString = JsonConvert.SerializeObject(fakeDBRecipes);
+
+            //Act
+            inventory.GetRecipeList();
+
+            //Assert
+            string resultOfGetString = JsonConvert.SerializeObject(inventory.RecipeList);
+            Assert.Equal(fakeDBRecipesString, resultOfGetString);
+        }
+
+        [Fact]
+        public void AddRecipeTestSuccess() {
+            //Arrange
+            Recipe newRecipe = new Recipe {
+                Name = "New Fake Recipe",
+                BaseLiquor = "Base Liquor 1",
+                ItemList = new List<RecipeItem> {
+                    new RecipeItem {
+                        Item = (Drink) fakeDBItems[1], 
+                        Quantity = 10.00
+                    },
+                    new RecipeItem {
+                        Item = (Drink) fakeDBItems[2], 
+                        Quantity = 15.00
+                    }
+                }
+            };
+            int expectedDBRecipeCount = fakeDBRecipes.Count() + 1;
+            int expectedReturnCode = 0;
+            int newRecipeID = latestRecipeID + 1;
+            newRecipe.ID = newRecipeID;
+            string expectedNewRecipeString = JsonConvert.SerializeObject(newRecipe);
+
+            //Act
+            int returnCode = inventory.AddRecipe(newRecipe);
+
+            //Assert
+            Recipe addedRecipe = fakeDBRecipes.FirstOrDefault(x => x.ID == newRecipeID);
+            string addedRecipeString = addedRecipe != null ? JsonConvert.SerializeObject(addedRecipe) : "";
+            Assert.Equal(expectedReturnCode, returnCode);
+            Assert.Equal(expectedDBRecipeCount, fakeDBRecipes.Count());
+            Assert.Equal(expectedNewRecipeString, addedRecipeString);
+        }
+
+        [Fact]
+        public void AddRecipeTestFailure_ItemListInvalid() {
+            //Arrange
+            Recipe newRecipe = new Recipe {
+                Name = "New Fake Recipe",
+                BaseLiquor = "Base Liquor 1",
+                ItemList = new List<RecipeItem> {
+                    new RecipeItem {
+                        Item = new Drink {
+                            ID = -1,
+                            Name = "Invalid Item 1",
+                            Price = 0.99,
+                            Estimate = 13500.00,
+                            ParLevel = 7000.00,
+                            IdealLevel = 10000.00,
+                            Measurement = unit.milliliters,
+                            Status = status.aboveIdeal,
+                            BottleSize = 200,
+                            Brand = "Fake Brand 4",
+                            UnitsPerCase = 10,
+                            Vintage = null
+                        }, 
+                        Quantity = 10.00
+                    },
+                    new RecipeItem {
+                        Item = (Drink) fakeDBItems[2], 
+                        Quantity = 15.00
+                    }
+                }
+            }; 
+            int expectedDBRecipeCount = fakeDBRecipes.Count();
+            int expectedReturnCode = 1;
+            int newRecipeID = latestRecipeID + 1;
+
+            //Act
+            int returnCode = inventory.AddRecipe(newRecipe);
+
+            //Assert
+            Recipe addedRecipe = fakeDBRecipes.FirstOrDefault(x => x.ID == newRecipeID);
+            
+            Assert.Equal(expectedDBRecipeCount, fakeDBRecipes.Count());
+            Assert.Null(addedRecipe);
+            Assert.Equal(expectedReturnCode, returnCode);
+        }
+
+        [Fact]
+        public void UpdateRecipeTestSuccess(){
+            //Arrange
+            Recipe updatedRecipe = fakeDBRecipes[1].Clone();
+            updatedRecipe.Name = "Updated Fake Recipe 2";
+            updatedRecipe.BaseLiquor = "Updated Base Liquor 2";
+            updatedRecipe.ItemList.Add(new RecipeItem {
+                            Item = (Drink) fakeDBItems[2], 
+                            Quantity = 15.00 });
+
+            int expectedDBRecipeCount = fakeDBRecipes.Count();
+            int expectedReturnCode = 0;
+            string expectedUpdatedRecipeString = JsonConvert.SerializeObject(updatedRecipe);
+
+            //Act
+            int returnCode = inventory.UpdateRecipe(updatedRecipe);
+
+            //Assert
+            Recipe recipeInDB = fakeDBRecipes.FirstOrDefault(x => x.ID == updatedRecipe.ID);
+            string recipeInDBString = recipeInDB != null ? JsonConvert.SerializeObject(recipeInDB) : "";
+            Assert.Equal(expectedReturnCode, returnCode);
+            Assert.Equal(expectedDBRecipeCount, fakeDBRecipes.Count());
+            Assert.Equal(expectedUpdatedRecipeString, recipeInDBString);
+        }
+
+        [Fact]
+        public void UpdateRecipeTestFailure_InvalidRecipeID() {
+            //Arrange
+            Recipe updatedRecipe = fakeDBRecipes[1].Clone();
+            updatedRecipe.ID = -1;
+
+            int expectedReturnCode = 1;
+
+            //Act
+            int returnCode = inventory.UpdateRecipe(updatedRecipe);
+
+            //Assert            
+            Assert.Equal(expectedReturnCode, returnCode);
+        }
+
+        [Fact]
+        public void UpdateRecipeTestFailure_InvalidItemList() {
+            //Arrange
+            Recipe updatedRecipe = fakeDBRecipes[1].Clone();
+            updatedRecipe.Name = "Updated Fake Recipe 2";
+            updatedRecipe.BaseLiquor = "Updated Base Liquor 2";
+            updatedRecipe.ItemList.Add(new RecipeItem {
+                Item = new Drink {
+                    ID = -1,
+                    Name = "Invalid Item 1",
+                    Price = 0.99,
+                    Estimate = 13500.00,
+                    ParLevel = 7000.00,
+                    IdealLevel = 10000.00,
+                    Measurement = unit.milliliters,
+                    Status = status.aboveIdeal,
+                    BottleSize = 200,
+                    Brand = "Fake Brand 4",
+                    UnitsPerCase = 10,
+                    Vintage = null
+                },
+                Quantity = 15.00 });
+
+            int expectedReturnCode = 1;
+            string updatedRecipeItemListString = JsonConvert.SerializeObject(updatedRecipe.ItemList);
+
+            //Act
+            int returnCode = inventory.UpdateRecipe(updatedRecipe);
+
+            //Assert
+            Recipe recipeInDB = fakeDBRecipes.FirstOrDefault(x => x.ID == updatedRecipe.ID);
+            string recipeInDBItemListString = JsonConvert.SerializeObject(recipeInDB.ItemList);
+
+            Assert.Equal(expectedReturnCode, returnCode);
+            Assert.NotEqual(updatedRecipe.Name, recipeInDB.Name);
+            Assert.NotEqual(updatedRecipe.BaseLiquor, recipeInDB.BaseLiquor);    
+            Assert.NotEqual(updatedRecipeItemListString, recipeInDBItemListString);       
+        }
+
+        [Fact]
+        public void RemoveRecipeTestSuccess() {
+            //Arrange
+            Recipe recipeToRemove = fakeDBRecipes[1];
+            int expectedDBRecipeCount = fakeDBRecipes.Count() - 1;
+            int expectedReturnCode = 0;
+            string expectedUpdatedRecipeString = JsonConvert.SerializeObject(recipeToRemove);
+
+            //Act
+            int returnCode = inventory.RemoveRecipe(recipeToRemove);
+
+            //Assert
+            Recipe recipeInDB = fakeDBRecipes.FirstOrDefault(x => x.ID == recipeToRemove.ID);
+
+            Assert.Equal(expectedReturnCode, returnCode);
+            Assert.Equal(expectedDBRecipeCount, fakeDBRecipes.Count());
+            Assert.Null(recipeInDB);
+        }
+
+        //Testing that proper return code is sent in case of failure
+        [Fact]
+        public void RemoveRecipeTestFailure_DataBaseManagerFailure() {
+            //Arrange
+            Recipe recipeToRemove = fakeDBRecipes[1];
+            int expectedReturnCode = 1;
+            //force Failure on DataBase Manager's End
+            mockDBManager.Setup(x => x.deleteRecipe(It.IsAny<int>())).Returns(false);
+
+            //Act
+            int returnCode = inventory.RemoveRecipe(recipeToRemove);
+
+            //Assert
             Assert.Equal(expectedReturnCode, returnCode);
         }
     }
