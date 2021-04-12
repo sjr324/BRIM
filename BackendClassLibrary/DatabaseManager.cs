@@ -99,22 +99,22 @@ namespace BRIM.BackendClassLibrary
         public bool deleteDrink(Drink drink)
         {
             int drinkID = drink.ID;
-            string query = @"delete from brim.drinks where drinkID = '" + drink.ID + "'";
+            string query = @"delete from brim.drinktags where drinkID = '" + drinkID + "'";
             bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
             if (!result)
             {
-                Console.WriteLine("Error: Drink could not be deleted");
+                Console.WriteLine("Error: Associated DrinkTags for removed drink could not be deleted");
 
                 return false;
             }
 
-            query = @"delete from brim.drinktags where drinkID = '" + drinkID + "'";
+            query = @"delete from brim.drinks where drinkID = '" + drink.ID + "'";
             result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
             if (!result)
             {
-                Console.WriteLine("Error: Associated tags for removed drink could not be deleted");
+                Console.WriteLine("Error: Drink could not be deleted");
 
                 return false;
             }
@@ -322,8 +322,18 @@ namespace BRIM.BackendClassLibrary
         //Deletes a tag from the tags table by ID
         public bool deleteTag(int ID)
         {
-            string query = @"delete from brim.tags where ID = '" + ID + "';";
+            string query = @"delete from brim.drinktags where tagID = '" + ID + "'";
             bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Associated DrinkTags for removed Tag could not be deleted");
+
+                return false;
+            }
+
+            query = @"delete from brim.tags where ID = '" + ID + "';";
+            result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
             if (!result)
             {

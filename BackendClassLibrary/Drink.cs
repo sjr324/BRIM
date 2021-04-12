@@ -17,15 +17,18 @@ namespace BRIM.BackendClassLibrary
         public double IdealLevel { get; set; }
         public unit Measurement { get; set; }
         public status Status { get; set; }
+        public List<Tag> Tags { get; set; } 
 
         //drink properties
         public int BottleSize {get; set ;}
         public string Brand {get; set;}
         public int UnitsPerCase {get; set;}
         public int? Vintage{get;set;}
-        public List<Tag> Tags { get; set; }
+       
 
-        public Drink() { }
+        public Drink() { 
+            Tags = new List<Tag>();
+        }
 
         //Data Conversion Constructor
         //takes a DataRow object(assumed for a drink) and uses the data to create a Drink Object

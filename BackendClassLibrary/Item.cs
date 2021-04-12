@@ -18,6 +18,7 @@ namespace BRIM.BackendClassLibrary
         double IdealLevel { get; set; }
         unit Measurement { get; set; }
         status Status { get; set; }
+        List<Tag> Tags { get; set; }
 
         Boolean CalculateStatus();
     }

@@ -406,6 +406,17 @@ namespace BRIM.BackendClassLibrary
         public int AddRecipe(Recipe newRecipe)
         {
             int recipeID, itemListResult;
+            //Validate Recipe ItemList
+            if (!validateDrinkRecipeList(newRecipe.ItemList)) {
+                Console.WriteLine("Error: Recipe Item List Invalid. Not Entering Data Into Table");
+                string mes = newRecipe.Name + " could not be added." + 
+                "\n Error: New Recipe Item List has one or more Invalid Entries. "+
+                "Not Adding New Recipe Name, Base Liquor, Or Ingredients Into Database";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
             //add entry into Recipe Table
             recipeID = this.databaseManager.addRecipe(newRecipe.Name, newRecipe.BaseLiquor);
             if (recipeID == -1)
@@ -429,13 +440,13 @@ namespace BRIM.BackendClassLibrary
                     Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
                     + itemID + "' ItemID and '" + itemQuantity + "' failed. Stopping here");
 
-                    string mes = component.Item.Name + " could not be added to the recipie";
+                    string mes = component.Item.Name + " could not be added to the recipie." +
+                    "\n Recipe Ingredient Data Entry Stopped There.";
                     NotificationManager.AddNotification(mes);
 
                     return 1;
                 }
             }
-            
             
             // TODO: come up with and implement a better structure for return Codes
             // at the very Least, we should make them an Enum with Proper names for each Code;
@@ -451,6 +462,17 @@ namespace BRIM.BackendClassLibrary
         public int UpdateRecipe(Recipe updatedRecipe)
         {
             int recipeID, itemListResult;
+            //Validate Recipe ItemList
+            if (!validateDrinkRecipeList(updatedRecipe.ItemList)) {
+                Console.WriteLine("Error: Recipe Item List Invalid. Not Entering Data Into Table");
+                string mes = updatedRecipe.Name + " could not be added." + 
+                "\n Error: Updated Recipe Item List has one or more Invalid Entries. " +
+                "Not Updating Recipe Name, Base Liqour, or Ingredients In Database.";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
             //add entry into Recipe Table
             recipeID = updatedRecipe.ID;
             string updatedName = updatedRecipe.Name;
@@ -496,6 +518,22 @@ namespace BRIM.BackendClassLibrary
             
             return 0;
         }
+
+        //Check to make Sure An Added or Updated Recipe's DrinkRecipe is valid before adding it in 
+        private bool validateDrinkRecipeList(List<RecipeItem> itemList) {
+            this.GetItemList();    //ItemList must be populated and uptoDate First                    
+            foreach(RecipeItem component in itemList) {
+                int itemID = component.Item.ID;
+                double itemQuantity = component.Quantity;
+                int drinkFound = this.ItemList.FindIndex(x => x.ID == itemID);
+
+                if (drinkFound == -1 || itemQuantity < 0) {
+                    return false;
+                }
+            }  
+            
+            return true;
+        } 
 
         
         /// <summary>
