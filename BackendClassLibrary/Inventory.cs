@@ -14,6 +14,7 @@ namespace BRIM.BackendClassLibrary
     {
         public List<Item> ItemList = new List<Item>(); //holds all items registered to this BRIM instance
         public List<Recipe> RecipeList = new List<Recipe>(); //holds all of the recipes for this BRIM instance
+        public List<Tag> TagList = new List<Tag>(); //holds all of the tags for this BRIM instance
         public string Country;
         public IDatabaseManager databaseManager;
 
@@ -35,6 +36,9 @@ namespace BRIM.BackendClassLibrary
         public int UpdateItem(Item info)
         {
             Drink updateItem = info as Drink;
+            //make sure status is recalculated to reflect any changes in Quantity
+            updateItem.CalculateStatus(); 
+            
             bool result = this.databaseManager.updateDrink(updateItem);
 
             if (!result)
@@ -45,6 +49,35 @@ namespace BRIM.BackendClassLibrary
                 NotificationManager.AddNotification(mes);
 
                 return 1;
+            }
+
+            //Similar to Recipie updates, delete all Tag entries and readd them for simplicity
+            if (!this.databaseManager.deleteDrinkTagsByDrinkID(updateItem.ID))
+            {
+                Console.WriteLine("Error: Drink Tag Entry Deletion Failed. Stopping here");
+
+                string mes = updateItem.Name + " could not be updated";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
+            //After removing all of the tags for the drink, re-adds them
+            foreach (Tag T in updateItem.Tags)
+            {
+                int tagID = T.ID;
+                result = this.databaseManager.addDrinkTag(updateItem.ID, tagID);
+
+                if (!result)
+                {
+                    Console.WriteLine("Error: Drink Tag Entry Addition Failed For Tag '"
+                    + T.Name + "' on item '" + updateItem.Name + "'. Stopping here");
+
+                    string mes = updateItem.Name + " could not be updated";
+                    NotificationManager.AddNotification(mes);
+
+                    return 1;
+                }
             }
 
             return 0;
@@ -60,15 +93,30 @@ namespace BRIM.BackendClassLibrary
         {
             Drink newItem = i as Drink;
             bool result = this.databaseManager.addDrink(newItem);
+            string mes = "";
             
             if (!result)
             {
                 Console.WriteLine("Error: Item Addition Failed");
 
-                string mes = newItem.Name + " could not be added";
+                mes = newItem.Name + " could not be added";
                 NotificationManager.AddNotification(mes);
 
                 return 1;
+            }
+
+            //add in the tags associated with that drink if there are any
+            foreach (Tag T in newItem.Tags)
+            {
+                if (!this.databaseManager.addDrinkTag(newItem.ID, T.ID))
+                {
+                    Console.WriteLine("Error: Tag could not be added");
+
+                    mes = T.Name + " could not be added";
+                    NotificationManager.AddNotification(mes);
+                    
+                    return 1;
+                }
             }
 
             return 0;
@@ -95,6 +143,8 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
 
+            ItemList.Remove(removeItem);
+
             return 0;
         }
 
@@ -114,7 +164,7 @@ namespace BRIM.BackendClassLibrary
         public void parseAPIPOSUpdate(JObject message)
         {
             JToken msg = message;
-            double varianceMultiplier = 0.15;
+            //double varianceMultiplier = 0.15;
 
             foreach (JObject order in msg)
             {
@@ -133,8 +183,6 @@ namespace BRIM.BackendClassLibrary
                     int recipieFound = RecipeList.FindIndex(x => x.Name == name);
                     if (drinkFound != -1)
                     {
-                        Drink updatedDrink = ItemList[drinkFound] as Drink;
-
                         JArray modifications = (JArray)lineitem["modifications"];
 
                         //should only be one, but maybe there is something im not thinking of,
@@ -163,39 +211,7 @@ namespace BRIM.BackendClassLibrary
                                 updateAmt += pourAmt * quantitySold;
                             }
                         }
-
-                        //account for possible spillage/ over or under pouring
-                        double varianceAmount = varianceMultiplier * updateAmt;
-                        updatedDrink.LowerEstimate -= (updateAmt + varianceAmount);
-                        updatedDrink.UpperEstimate -= (updateAmt - varianceAmount);
-
-                        //TODO: should update the user if any of these is true
-                        if (updatedDrink.LowerEstimate < 0.0)
-                        {
-                            updatedDrink.LowerEstimate = 0.0;
-                        }
-
-                        if (updatedDrink.UpperEstimate < 0.0)
-                        {
-                            updatedDrink.UpperEstimate = 0.0;
-                        }
-
-                        if (updatedDrink.CalculateStatus())
-                        {
-                            if (updatedDrink.Status == status.belowIdeal)
-                            {
-                                string mes = updatedDrink.Name + " is below ideal level";
-                                NotificationManager.AddNotification(mes);
-                            } else if (updatedDrink.Status == status.belowPar)
-                            {
-                                string mes = updatedDrink.Name + " is below par level";
-                                NotificationManager.AddNotification(mes);
-                            } else if (updatedDrink.Status == status.empty)
-                            {
-                                string mes = updatedDrink.Name + " is empty";
-                                NotificationManager.AddNotification(mes);
-                            }
-                        }
+                        Drink updatedDrink = (Drink) orderItemUpdateProcedure(ItemList[drinkFound], updateAmt);
 
                         databaseManager.updateDrink(updatedDrink);
                         ItemList[drinkFound] = updatedDrink;
@@ -205,7 +221,7 @@ namespace BRIM.BackendClassLibrary
                         //same process as above, but for recipies
                         //recipies may or may not have modifications
                         Recipe orderedRecipe = RecipeList[recipieFound];
-                        List<(Item item, double quantity)> parts = orderedRecipe.ItemList;
+                        List<RecipeItem> parts = orderedRecipe.ItemList;
                         int amtOrdered = (int)lineitem["quantitySold"];
 
                         JArray modifications = (JArray)lineitem["modifications"];
@@ -220,10 +236,10 @@ namespace BRIM.BackendClassLibrary
 
                                 if (modIndex != -1)
                                 {
-                                    int baseIndex = parts.FindIndex(x => x.item.Name == orderedRecipe.BaseLiquor);
-                                    double q = parts[baseIndex].quantity;
+                                    int baseIndex = parts.FindIndex(x => x.Item.Name == orderedRecipe.BaseLiquor);
+                                    double q = parts[baseIndex].Quantity;
                                     parts.RemoveAt(baseIndex);
-                                    parts.Add((ItemList[modIndex], q));
+                                    parts.Add(new RecipeItem(ItemList[modIndex] as Drink, q));
                                 } else
                                 {
                                     //Flag for the user because modification is unknown
@@ -233,53 +249,12 @@ namespace BRIM.BackendClassLibrary
                             }
 
                             //update every drink that was a part of the recipe
-                            foreach ((Item item, double quantity) part in parts)
+                            foreach (RecipeItem part in parts)
                             {
-                                //calcualte and update every item
-                                Drink updatedDrink = part.item as Drink;
+                                //calculate and update every item
+                                updateAmt += part.Quantity * amtOrdered;
 
-                                updateAmt += part.quantity * amtOrdered;
-
-                                //account for possible spillage/ over or under pouring
-                                double varianceAmount = varianceMultiplier * updateAmt;
-                                updatedDrink.LowerEstimate -= (updateAmt + varianceAmount);
-                                updatedDrink.UpperEstimate -= (updateAmt - varianceAmount);
-
-                                //update the user if any of these is true
-                                if (updatedDrink.LowerEstimate < 0.0)
-                                {
-                                    updatedDrink.LowerEstimate = 0.0;
-
-                                    string mes = updatedDrink.Name + " may be empty";
-                                    NotificationManager.AddNotification(mes);
-                                }
-
-                                if (updatedDrink.UpperEstimate < 0.0)
-                                {
-                                    updatedDrink.UpperEstimate = 0.0;
-
-                                    string mes = updatedDrink.Name + " may be empty";
-                                    NotificationManager.AddNotification(mes);
-                                }
-
-                                if (updatedDrink.CalculateStatus())
-                                {
-                                    if (updatedDrink.Status == status.belowIdeal)
-                                    {
-                                        string mes = updatedDrink.Name + " is below ideal level";
-                                        NotificationManager.AddNotification(mes);
-                                    }
-                                    else if (updatedDrink.Status == status.belowPar)
-                                    {
-                                        string mes = updatedDrink.Name + " is below par level";
-                                        NotificationManager.AddNotification(mes);
-                                    }
-                                    else if (updatedDrink.Status == status.empty)
-                                    {
-                                        string mes = updatedDrink.Name + " is empty";
-                                        NotificationManager.AddNotification(mes);
-                                    }
-                                }
+                                Drink updatedDrink = (Drink) orderItemUpdateProcedure(part.Item, updateAmt);
 
                                 databaseManager.updateDrink(updatedDrink);
                                 ItemList[drinkFound] = updatedDrink;
@@ -295,6 +270,45 @@ namespace BRIM.BackendClassLibrary
                 }
             }
         }
+        
+        /// <summary>
+        /// For use by the "parseAPIPOSUpdate":
+        /// Takes an Item Object and a Double amount, subtracts the amount from the Item's estimate
+        /// recalculates the item's status, and creates a status change notification if neccesary
+        /// </summary>
+        /// <returns>The updated Item Object</returns>
+        private Item orderItemUpdateProcedure(Item updatedItem, double amount) {
+            //update Item amount
+            updatedItem.Estimate -= amount;
+
+            //update the user if any of these is true
+            if (updatedItem.Estimate < 0.0)
+            {
+                updatedItem.Estimate = 0.0;
+            }
+            
+            //Since an Interface can only be instantiated as one of its child classes, Then
+            //Theoretically, whatever child class updatedItem is should already have their own
+            //implementation of calculate Status 
+            if (updatedItem.CalculateStatus())
+            {
+                if (updatedItem.Status == status.belowIdeal)
+                {
+                    string mes = updatedItem.Name + " is below ideal level";
+                    NotificationManager.AddNotification(mes);
+                } else if (updatedItem.Status == status.belowPar)
+                {
+                    string mes = updatedItem.Name + " is below par level";
+                    NotificationManager.AddNotification(mes);
+                } else if (updatedItem.Status == status.empty)
+                {
+                    string mes = updatedItem.Name + " is empty";
+                    NotificationManager.AddNotification(mes);
+                }
+            }
+
+            return updatedItem;
+        }
 
         /// <summary>
         /// Makes a call to the drinks table of the brim database to get the list of all drinks 
@@ -309,6 +323,48 @@ namespace BRIM.BackendClassLibrary
             List<Item> drinksList = new List<Item>();
             drinksList = this.databaseManager.getDrinks();
             ItemList = drinksList;
+
+            return 0;
+        }
+
+        //Gets the list of all tags in the tags table
+        public int GetTagList()
+        {
+            List<Tag> tagList = new List<Tag>();
+            tagList = this.databaseManager.getTags();
+            TagList = tagList;
+
+            return 0;
+        }
+
+        //Adds a tag to the tag table
+        public int AddTag(string tagName)
+        {
+            int tagID = this.databaseManager.addTag(tagName);
+            Tag newTag = new Tag(tagID, tagName);
+            TagList.Add(newTag);
+
+            return 0;
+        }
+
+        //Removes a tag from the tag table
+        public int DeleteTag(int tagID)
+        {
+            int removeIndex = TagList.FindIndex(x => x.ID == tagID);
+            Tag removeTag = TagList[removeIndex];
+            bool result = this.databaseManager.deleteTag(tagID);
+
+            if (!result)
+            {
+                Console.WriteLine("Error: Tag removal failed");
+
+                string mes = removeTag.Name + " could not be removed";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
+            TagList.Remove(removeTag);
 
             return 0;
         }
@@ -350,6 +406,17 @@ namespace BRIM.BackendClassLibrary
         public int AddRecipe(Recipe newRecipe)
         {
             int recipeID, itemListResult;
+            //Validate Recipe ItemList
+            if (!validateDrinkRecipeList(newRecipe.ItemList)) {
+                Console.WriteLine("Error: Recipe Item List Invalid. Not Entering Data Into Table");
+                string mes = newRecipe.Name + " could not be added." + 
+                "\n Error: New Recipe Item List has one or more Invalid Entries. "+
+                "Not Adding New Recipe Name, Base Liquor, Or Ingredients Into Database";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
             //add entry into Recipe Table
             recipeID = this.databaseManager.addRecipe(newRecipe.Name, newRecipe.BaseLiquor);
             if (recipeID == -1)
@@ -364,22 +431,22 @@ namespace BRIM.BackendClassLibrary
 
             //NOTE: this relies on the recipe Object sent from the frontend is a DeepCopy and not a shallow one
             //i.e. that the Item Objects in item list are copied, and not just the references
-            foreach((Item item, double quantity) component in newRecipe.ItemList) {
-                int itemID = component.item.ID;
-                double itemQuantity = component.quantity;
+            foreach(RecipeItem component in newRecipe.ItemList) {
+                int itemID = component.Item.ID;
+                double itemQuantity = component.Quantity;
                 itemListResult = this.databaseManager.addDrinkRecipe(recipeID, itemID, itemQuantity);
 
                 if (itemListResult == -1) {
                     Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
                     + itemID + "' ItemID and '" + itemQuantity + "' failed. Stopping here");
 
-                    string mes = component.item.Name + " could not be added to the recipie";
+                    string mes = component.Item.Name + " could not be added to the recipie." +
+                    "\n Recipe Ingredient Data Entry Stopped There.";
                     NotificationManager.AddNotification(mes);
 
                     return 1;
                 }
             }
-            
             
             // TODO: come up with and implement a better structure for return Codes
             // at the very Least, we should make them an Enum with Proper names for each Code;
@@ -395,6 +462,17 @@ namespace BRIM.BackendClassLibrary
         public int UpdateRecipe(Recipe updatedRecipe)
         {
             int recipeID, itemListResult;
+            //Validate Recipe ItemList
+            if (!validateDrinkRecipeList(updatedRecipe.ItemList)) {
+                Console.WriteLine("Error: Recipe Item List Invalid. Not Entering Data Into Table");
+                string mes = updatedRecipe.Name + " could not be added." + 
+                "\n Error: Updated Recipe Item List has one or more Invalid Entries. " +
+                "Not Updating Recipe Name, Base Liqour, or Ingredients In Database.";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
             //add entry into Recipe Table
             recipeID = updatedRecipe.ID;
             string updatedName = updatedRecipe.Name;
@@ -422,16 +500,16 @@ namespace BRIM.BackendClassLibrary
 
             //NOTE: this relies on the recipe Object sent from the frontend is a DeepCopy and not a shallow one
             //i.e. that the Item Objects in item list are copied, and not just the references
-            foreach((Item item, double quantity) component in updatedRecipe.ItemList) {
-                int itemID = component.item.ID;
-                double itemQuantity = component.quantity;
+            foreach(RecipeItem component in updatedRecipe.ItemList) {
+                int itemID = component.Item.ID;
+                double itemQuantity = component.Quantity;
                 itemListResult = this.databaseManager.addDrinkRecipe(recipeID, itemID, itemQuantity);
 
                 if (itemListResult == -1) {
                     Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
                     + itemID + "' ItemID and '" + itemQuantity + "' failed. Stopping here");
 
-                    string mes = component.item.Name + " could not be updated";
+                    string mes = component.Item.Name + " could not be updated";
                     NotificationManager.AddNotification(mes);
 
                     return 1;
@@ -440,6 +518,22 @@ namespace BRIM.BackendClassLibrary
             
             return 0;
         }
+
+        //Check to make Sure An Added or Updated Recipe's DrinkRecipe is valid before adding it in 
+        private bool validateDrinkRecipeList(List<RecipeItem> itemList) {
+            this.GetItemList();    //ItemList must be populated and uptoDate First                    
+            foreach(RecipeItem component in itemList) {
+                int itemID = component.Item.ID;
+                double itemQuantity = component.Quantity;
+                int drinkFound = this.ItemList.FindIndex(x => x.ID == itemID);
+
+                if (drinkFound == -1 || itemQuantity < 0) {
+                    return false;
+                }
+            }  
+            
+            return true;
+        } 
 
         
         /// <summary>

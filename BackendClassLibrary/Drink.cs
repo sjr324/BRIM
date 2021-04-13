@@ -12,20 +12,23 @@ namespace BRIM.BackendClassLibrary
         public int ID { get; set; }
         public string Name { get; set; }
         public double Price { get; set; }
-        public double LowerEstimate { get; set; }
-        public double UpperEstimate { get; set; }
+        public double Estimate { get; set; }
         public double ParLevel { get; set; }
         public double IdealLevel { get; set; }
         public unit Measurement { get; set; }
         public status Status { get; set; }
+        public List<Tag> Tags { get; set; } 
 
         //drink properties
-        public int BottleSize;
-        public string Brand;
-        public int UnitsPerCase;
-        public Boolean Vintage;
+        public int BottleSize {get; set ;}
+        public string Brand {get; set;}
+        public int UnitsPerCase {get; set;}
+        public int? Vintage{get;set;}
+       
 
-        public Drink() { }
+        public Drink() { 
+            Tags = new List<Tag>();
+        }
 
         //Data Conversion Constructor
         //takes a DataRow object(assumed for a drink) and uses the data to create a Drink Object
@@ -35,16 +38,16 @@ namespace BRIM.BackendClassLibrary
             try {
                 ID = dr.Field<int>("drinkID");
                 Name = dr.Field<string>("name");
-                LowerEstimate = dr.Field<double>("lowerEstimate");
-                UpperEstimate = dr.Field<double>("upperEstimate");
+                Estimate = dr.Field<double>("estimate");
                 Measurement = (unit) Enum.Parse(typeof(unit), dr.Field<string>("measurementUnit"));
                 ParLevel = dr.Field<double>("parLevel");
                 IdealLevel = dr.Field<double>("idealLevel");
                 BottleSize = dr.Field<int>("bottleSize");
                 Brand = dr.Field<string>("brand");
                 UnitsPerCase = dr.Field<int>("bottlesPerCase");
-                Vintage = Convert.ToBoolean(dr.Field<SByte>("vintage"));
+                Vintage = dr.Field<int?>("vintage");
                 Price = dr.Field<double>("price");
+                Tags = new List<Tag>();
             } catch (IndexOutOfRangeException exp) {
                 Console.WriteLine("The Datarow given does not contain one or more of the columns in a Drink Object");
                 Console.WriteLine(exp.Message);
@@ -58,13 +61,12 @@ namespace BRIM.BackendClassLibrary
         public Boolean CalculateStatus()
         {
             //average value (should) provide a good balance between False Positive and False Negative Risk
-            double averageQuantity = (LowerEstimate + UpperEstimate) / 2;
             status oldStatus = this.Status;
-            if (averageQuantity > IdealLevel) {
+            if (this.Estimate > IdealLevel) {
                 this.Status = status.aboveIdeal;
-            } else if (averageQuantity <= IdealLevel && averageQuantity > ParLevel) {
+            } else if (this.Estimate <= IdealLevel && this.Estimate > ParLevel) {
                 this.Status = status.belowIdeal;
-            } else if (averageQuantity <= ParLevel && averageQuantity > 0) {
+            } else if (this.Estimate <= ParLevel && this.Estimate > 0) {
                 this.Status = status.belowPar;
             } else {
                 this.Status = status.empty;
