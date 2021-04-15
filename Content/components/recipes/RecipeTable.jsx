@@ -62,15 +62,15 @@ export default function RecipeTable(props){
         <div className={classes.root}>
             <Grid container justify="flex-start" alignItems="stretch" >
                 <Grid container item xs={10} direction="row"
-                    justify="space-around" >
+                    justify="space-around" aria-label="recipes">
                     {state.recipes.map((row) => (
                         <RecipeCard key={row.id} {...row}></RecipeCard>
                         ))}
                 </Grid>
 
                 <Grid container item xs={1} alignItems="flex-end">
-                    <Grid item xs={12}> 
-                        <RecipeCreationFab onRecipeSubmit={loadRecipesFromServer}/>
+                    <Grid item xs={12} aria-label="create recipe"> 
+                        <RecipeCreationFab  onRecipeSubmit={loadRecipesFromServer}/>
                     </Grid>
                 </Grid>
             </Grid>

@@ -64,9 +64,9 @@ test("clicking edit button lets you input things", () => {
     const editButton = getByText(/Edit/i)
     fireEvent.click(editButton)
 
-    userEvent.type(screen.getByLabelText(/Lower Estimate/i), '{selectall}{del}new value')
+    userEvent.type(screen.getByLabelText(/Estimate/i), '{selectall}{del}new value')
 
-    expect(screen.getByLabelText(/Lower Estimate/i)).toHaveValue('new value')
+    expect(screen.getByLabelText(/Estimate/i)).toHaveValue('new value')
 })
 
 test("clicking editing button, makes save possible", () => {
@@ -81,12 +81,12 @@ test("clicking editing button, makes save possible", () => {
 
     expect(getByText(/Save/i)).toBeTruthy()
 
-    userEvent.type(screen.getByLabelText(/Lower Estimate/i), '{selectall}{del}new value')
+    userEvent.type(screen.getByLabelText(/Estimate/i), '{selectall}{del}new value')
 
     const saveButton = getByText(/Save/i)
     fireEvent.click(saveButton)
 
-    expect(screen.getByLabelText(/Lower Estimate/i)).toHaveValue('new value')
+    expect(screen.getByLabelText(/Estimate/i)).toHaveValue('new value')
 
     const exitButton = getByText(/Close/i)
 
