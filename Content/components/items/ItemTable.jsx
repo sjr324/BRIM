@@ -120,7 +120,7 @@ export default function ItemTableBasic(props) {
       </Grid>
 
       <Grid container item xs={12} justify="flex-end">
-        <Grid item xs={1}>
+        <Grid item xs={1} aria-label="create item">
             <AddItemFab onNewItem={loadItemsFromServer}/>
         </Grid>
       </Grid>
