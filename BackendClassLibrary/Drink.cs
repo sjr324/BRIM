@@ -30,6 +30,16 @@ namespace BRIM.BackendClassLibrary
             Tags = new List<Tag>();
         }
 
+        //make a clone of the Current Drink Object
+        public Drink Clone() {
+            Drink other = (Drink) this.MemberwiseClone();
+            other.Tags = new List<Tag>();
+            foreach(Tag drinkTag in Tags) {
+                other.Tags.Add(drinkTag);
+            }
+            return other;
+        }
+
         //Data Conversion Constructor
         //takes a DataRow object(assumed for a drink) and uses the data to create a Drink Object
         //makes it less cluttered to convert results form database queries into objects

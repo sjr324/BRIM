@@ -51,7 +51,7 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
 
-            //Similar to Recipie updates, delete all Tag entries and readd them for simplicity
+            //Similar to Recipe updates, delete all Tag entries and readd them for simplicity
             if (!this.databaseManager.deleteDrinkTagsByDrinkID(updateItem.ID))
             {
                 Console.WriteLine("Error: Drink Tag Entry Deletion Failed. Stopping here");

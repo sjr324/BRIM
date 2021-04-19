@@ -18,7 +18,7 @@ namespace BRIM.BackendClassLibrary
         //had to explicitly make a default constructor to make a test recipe to mess with the Add and Updates
         public Recipe() {}
 
-        //make a clone of the Current Recipe Obeject
+        //make a clone of the Current Recipe Object
         public Recipe Clone() {
             Recipe other = (Recipe) this.MemberwiseClone();
             other.ItemList = new List<RecipeItem>();

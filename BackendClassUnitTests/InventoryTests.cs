@@ -199,7 +199,9 @@ namespace BackendClassUnitTests
                     latestItemID += 1;
                     drink.ID = latestItemID;
 
-                    fakeDBItems.Add(drink);
+                    Drink newDrink = drink.Clone();
+                    newDrink.Tags = new List<Tag>();
+                    fakeDBItems.Add(newDrink);
                     return true;
                 });
             
@@ -210,7 +212,7 @@ namespace BackendClassUnitTests
                         //preserve Item's tag's since updateDrink does not change entries within 
                         //DrinkTags table
                         List<Tag> tagListHolder = fakeDBItems[itemToUpdateIndex].Tags;
-                        fakeDBItems[itemToUpdateIndex] = drink;
+                        fakeDBItems[itemToUpdateIndex] = drink.Clone();
                         fakeDBItems[itemToUpdateIndex].Tags = tagListHolder;
                         return true;
                     } else {
@@ -353,20 +355,12 @@ namespace BackendClassUnitTests
         [Fact]
         public void UpdateItemTestSuccess() {
             //Arrange
-            Drink updatedItem1 = new Drink {
-                ID = 1,
-                Name = "Updated Drink 1",
-                Price = 9.99,
-                Estimate = 13500.00,
-                ParLevel = 7000.00,
-                IdealLevel = 10000.00,
-                Measurement = unit.milliliters,
-                Status = status.aboveIdeal,
-                BottleSize = 200,
-                Brand = "Fake Brand 4",
-                UnitsPerCase = 10,
-                Vintage = null
-            };
+            Drink updatedItem1 = ((Drink) fakeDBItems[0]).Clone();
+            updatedItem1.Name = "Updated Drink 1";
+            updatedItem1.Estimate = 13500.00;
+            updatedItem1.Brand = "Fake Brand 4";
+            updatedItem1.Tags.Add(fakeDBTags[1]);
+
             string expectedName = "Updated Drink 1";
             double expectedEstimate = 13500.00;
             string expectedBrand = "Fake Brand 4";
@@ -376,10 +370,16 @@ namespace BackendClassUnitTests
             int returnCode = inventory.UpdateItem(updatedItem1);
             
             //Assert
+            mockDBManager.Verify(mock => mock.updateDrink(It.IsAny<Drink>()), Times.Once());
+            mockDBManager.Verify(mock => mock.deleteDrinkTagsByDrinkID(It.IsAny<int>()), Times.Once());
+            mockDBManager.Verify(mock => 
+                mock.addDrinkTag(It.IsAny<int>(), It.IsAny<int>()), Times.Exactly(2));
+
+            Assert.Equal(expectedReturnCode, returnCode);
             Assert.Equal(expectedName, fakeDBItems[0].Name);
             Assert.Equal(expectedEstimate, fakeDBItems[0].Estimate);
             Assert.Equal(expectedBrand, ((Drink) fakeDBItems[0]).Brand);
-            Assert.Equal(expectedReturnCode, returnCode);
+            
         }
 
         [Fact]
@@ -405,6 +405,9 @@ namespace BackendClassUnitTests
             int returnCode = inventory.UpdateItem(fakeItem);
 
             //assert
+            mockDBManager.Verify(mock => mock.updateDrink(It.IsAny<Drink>()), Times.Once());
+            mockDBManager.Verify(mock => mock.deleteDrinkTagsByDrinkID(It.IsAny<int>()), Times.Never());
+            mockDBManager.Verify(mock => mock.addDrinkTag(It.IsAny<int>(), It.IsAny<int>()), Times.Never());
             Assert.Equal(expectedReturnCode, returnCode);
         }
 
@@ -423,7 +426,9 @@ namespace BackendClassUnitTests
                 Brand = "Fake Brand 4",
                 UnitsPerCase = 7,
                 Vintage = null,
-                Tags = new List<Tag> {}
+                Tags = new List<Tag> { 
+                    fakeDBTags[0] 
+                }
             };
             int expectedDBItemCount = fakeDBItems.Count() + 1;
             int expectedReturnCode = 0;
@@ -434,11 +439,48 @@ namespace BackendClassUnitTests
             int returnCode = inventory.AddItem(newItem);
 
             //Assert
+            mockDBManager.Verify(mock => mock.addDrink(It.IsAny<Drink>()), Times.Once());
+            mockDBManager.Verify(mock => mock.addDrinkTag(It.IsAny<int>(), It.IsAny<int>()), Times.Once());
+            Assert.Equal(expectedReturnCode, returnCode);
+
             Item addedItem = fakeDBItems.FirstOrDefault(x => x.ID == latestItemID);
             string addedItemString = addedItem != null ? JsonConvert.SerializeObject(addedItem) : "";
             Assert.Equal(expectedDBItemCount, fakeDBItems.Count());
-            Assert.Equal(expectedReturnCode, returnCode);
             Assert.Equal(expectedNewItemString, addedItemString); 
+        }
+
+        [Fact]
+        public void AddItemTestFailure_DataBaseManagerFailure() {
+            //Arrange
+            Drink newItem = new Drink {
+                Name = "New Item",
+                Price = 1.99,
+                Estimate = 27375.00,
+                ParLevel = 17000.00,
+                IdealLevel = 35000.00,
+                Measurement = unit.milliliters,
+                Status = status.aboveIdeal,
+                BottleSize = 450,
+                Brand = "Fake Brand 4",
+                UnitsPerCase = 7,
+                Vintage = null,
+                Tags = new List<Tag> { 
+                    fakeDBTags[0] 
+                }
+            };
+            int expectedDBItemCount = fakeDBItems.Count();
+            int expectedReturnCode = 1;
+            mockDBManager.Setup(x => x.addDrink(It.IsAny<Drink>())).Returns(false);
+
+            //Act
+            int returnCode = inventory.AddItem(newItem);
+
+            //Assert
+            mockDBManager.Verify(mock => mock.addDrink(It.IsAny<Drink>()), Times.Once());
+            mockDBManager.Verify(mock => mock.addDrinkTag(It.IsAny<int>(), It.IsAny<int>()), Times.Never());
+
+            Assert.Equal(expectedDBItemCount, fakeDBItems.Count());
+            Assert.Equal(expectedReturnCode, returnCode);
         }
 
         [Fact]
@@ -452,6 +494,7 @@ namespace BackendClassUnitTests
             int returnCode = inventory.RemoveItem(itemToRemove);
 
             //Assert
+            mockDBManager.Verify(mock => mock.deleteDrink(It.IsAny<Drink>()), Times.Once());
             Assert.Equal(expectedDBItemCount, fakeDBItems.Count());
             Assert.Null(fakeDBItems.FirstOrDefault(x => x.ID == itemToRemove.ID));
             Assert.Equal(expectedReturnCode, returnCode);
@@ -466,7 +509,9 @@ namespace BackendClassUnitTests
 
             //Act
             int returnCode = inventory.RemoveItem(itemToRemove);
+
             //Assert
+            mockDBManager.Verify(mock => mock.deleteDrink(It.IsAny<Drink>()), Times.Once());
             Assert.Equal(expectedDBItemCount, fakeDBItems.Count());
             Assert.NotNull(fakeDBItems.FirstOrDefault(x => x.ID == itemToRemove.ID));
             Assert.Equal(expectedReturnCode, returnCode);
@@ -512,6 +557,11 @@ namespace BackendClassUnitTests
             int returnCode = inventory.AddRecipe(newRecipe);
 
             //Assert
+            mockDBManager.Verify(mock => 
+                mock.addRecipe(It.IsAny<string>(), It.IsAny<string>()), Times.Once());
+            mockDBManager.Verify(mock => 
+                mock.addDrinkRecipe(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<double>()), Times.Exactly(2));
+
             Recipe addedRecipe = fakeDBRecipes.FirstOrDefault(x => x.ID == newRecipeID);
             string addedRecipeString = addedRecipe != null ? JsonConvert.SerializeObject(addedRecipe) : "";
             Assert.Equal(expectedReturnCode, returnCode);
@@ -582,6 +632,13 @@ namespace BackendClassUnitTests
             int returnCode = inventory.UpdateRecipe(updatedRecipe);
 
             //Assert
+            mockDBManager.Verify(mock => 
+                mock.updateRecipe(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once());
+            mockDBManager.Verify(mock => 
+                mock.deleteDrinkRecipesByRecipeID(It.IsAny<int>()), Times.Once());
+            mockDBManager.Verify(mock => 
+                mock.addDrinkRecipe(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<double>()), Times.Exactly(3));
+
             Recipe recipeInDB = fakeDBRecipes.FirstOrDefault(x => x.ID == updatedRecipe.ID);
             string recipeInDBString = recipeInDB != null ? JsonConvert.SerializeObject(recipeInDB) : "";
             Assert.Equal(expectedReturnCode, returnCode);
@@ -600,7 +657,13 @@ namespace BackendClassUnitTests
             //Act
             int returnCode = inventory.UpdateRecipe(updatedRecipe);
 
-            //Assert            
+            //Assert    
+            mockDBManager.Verify(mock => 
+                mock.updateRecipe(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once());
+            mockDBManager.Verify(mock => 
+                mock.deleteDrinkRecipesByRecipeID(It.IsAny<int>()), Times.Never());
+            mockDBManager.Verify(mock => 
+                mock.addDrinkRecipe(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<double>()), Times.Never());        
             Assert.Equal(expectedReturnCode, returnCode);
         }
 
@@ -634,6 +697,12 @@ namespace BackendClassUnitTests
             int returnCode = inventory.UpdateRecipe(updatedRecipe);
 
             //Assert
+            mockDBManager.Verify(mock => 
+                mock.updateRecipe(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never());
+            mockDBManager.Verify(mock => 
+                mock.deleteDrinkRecipesByRecipeID(It.IsAny<int>()), Times.Never());
+            mockDBManager.Verify(mock => 
+                mock.addDrinkRecipe(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<double>()), Times.Never());
             Recipe recipeInDB = fakeDBRecipes.FirstOrDefault(x => x.ID == updatedRecipe.ID);
             string recipeInDBItemListString = JsonConvert.SerializeObject(recipeInDB.ItemList);
 
@@ -655,6 +724,11 @@ namespace BackendClassUnitTests
             int returnCode = inventory.RemoveRecipe(recipeToRemove);
 
             //Assert
+            mockDBManager.Verify(mock => 
+                mock.deleteRecipe(It.IsAny<int>()), Times.Once());
+            mockDBManager.Verify(mock => 
+                mock.deleteDrinkRecipesByRecipeID(It.IsAny<int>()), Times.Once());
+        
             Recipe recipeInDB = fakeDBRecipes.FirstOrDefault(x => x.ID == recipeToRemove.ID);
 
             Assert.Equal(expectedReturnCode, returnCode);
@@ -675,6 +749,10 @@ namespace BackendClassUnitTests
             int returnCode = inventory.RemoveRecipe(recipeToRemove);
 
             //Assert
+            mockDBManager.Verify(mock => 
+                mock.deleteRecipe(It.IsAny<int>()), Times.Once());
+            mockDBManager.Verify(mock => 
+                mock.deleteDrinkRecipesByRecipeID(It.IsAny<int>()), Times.Once());
             Assert.Equal(expectedReturnCode, returnCode);
         }
 
@@ -702,10 +780,13 @@ namespace BackendClassUnitTests
             int returnCode = inventory.AddTag(newTagName);
 
             //Assert
+            mockDBManager.Verify(mock => 
+                mock.addTag(It.IsAny<string>()), Times.Once());
             Assert.Equal(expectedReturnCode, returnCode);
             Assert.Equal(expectedDBTagCount, fakeDBTags.Count());
         }
 
+        //Testing that proper return code is sent in case of failure
         [Fact]
         public void AddTagFailure_DataBaseManagerFailure() {
             //Arrange
@@ -718,6 +799,8 @@ namespace BackendClassUnitTests
             int returnCode = inventory.AddTag(newTagName);
 
             //Assert
+            mockDBManager.Verify(mock => 
+                mock.addTag(It.IsAny<string>()), Times.Once());
             Assert.Equal(expectedReturnCode, returnCode);
             Assert.Equal(expectedDBTagCount, fakeDBTags.Count());
         }
@@ -728,6 +811,24 @@ namespace BackendClassUnitTests
             int tagToDelete = 1;
             int expectedDBTagCount = fakeDBTags.Count() - 1;
             int expectedReturnCode = 0;
+
+            //Act
+            int returnCode = inventory.RemoveTag(tagToDelete);
+
+            //Assert
+            mockDBManager.Verify(mock => mock.deleteTag(It.IsAny<int>()), Times.Once());
+            Assert.Equal(expectedReturnCode, returnCode);
+            Assert.Equal(expectedDBTagCount, fakeDBTags.Count());
+        }
+
+        //Testing that proper return code is sent in case of failure
+        [Fact]
+        public void RemoveTagFailure_DataBaseManagerFailure () {
+            //Arrange
+            int tagToDelete = 1;
+            int expectedDBTagCount = fakeDBTags.Count();
+            int expectedReturnCode = 1;
+            mockDBManager.Setup(x => x.deleteTag(It.IsAny<int>())).Returns(false);
 
             //Act
             int returnCode = inventory.RemoveTag(tagToDelete);
