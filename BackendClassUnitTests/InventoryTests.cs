@@ -646,7 +646,7 @@ namespace BackendClassUnitTests
         [Fact]
         public void RemoveRecipeTestSuccess() {
             //Arrange
-            Recipe recipeToRemove = fakeDBRecipes[1];
+            Recipe recipeToRemove = fakeDBRecipes[1].Clone();
             int expectedDBRecipeCount = fakeDBRecipes.Count() - 1;
             int expectedReturnCode = 0;
             string expectedUpdatedRecipeString = JsonConvert.SerializeObject(recipeToRemove);
@@ -676,6 +676,66 @@ namespace BackendClassUnitTests
 
             //Assert
             Assert.Equal(expectedReturnCode, returnCode);
+        }
+
+        [Fact]
+        public void GetTagListTestSuccess() {
+            //Arrange
+            string fakeDBTagsString = JsonConvert.SerializeObject(fakeDBTags);
+
+            //Act
+            inventory.GetTagList();
+
+            //Assert
+            string resultOfGetString = JsonConvert.SerializeObject(inventory.TagList);
+            Assert.Equal(fakeDBTagsString, resultOfGetString);
+        }
+
+        [Fact]
+        public void AddTagSuccess() {
+            //Arrange
+            string newTagName = "newTag";
+            int expectedDBTagCount = fakeDBTags.Count() + 1;
+            int expectedReturnCode = 0;
+
+            //Act 
+            int returnCode = inventory.AddTag(newTagName);
+
+            //Assert
+            Assert.Equal(expectedReturnCode, returnCode);
+            Assert.Equal(expectedDBTagCount, fakeDBTags.Count());
+        }
+
+        [Fact]
+        public void AddTagFailure_DataBaseManagerFailure() {
+            //Arrange
+            string newTagName = "newTag";
+            int expectedDBTagCount = fakeDBTags.Count();
+            int expectedReturnCode = 1;
+            mockDBManager.Setup(x => x.addTag(It.IsAny<string>())).Returns(-1);
+
+            //Act 
+            int returnCode = inventory.AddTag(newTagName);
+
+            //Assert
+            Assert.Equal(expectedReturnCode, returnCode);
+            Assert.Equal(expectedDBTagCount, fakeDBTags.Count());
+        }
+
+        [Fact]
+        public void RemoveTagSuccess() {
+            //Arrange
+            int tagToDelete = 1;
+            int expectedDBTagCount = fakeDBTags.Count() - 1;
+            int expectedReturnCode = 0;
+
+            //Act
+            int returnCode = inventory.RemoveTag(tagToDelete);
+
+            //Assert
+            mockDBManager.Verify(mock => mock.deleteTag(It.IsAny<int>()), Times.Once());
+            Assert.Equal(expectedReturnCode, returnCode);
+            Assert.Equal(expectedDBTagCount, fakeDBTags.Count());
         }
     }
 }
