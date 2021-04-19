@@ -22,6 +22,7 @@
     <PackageReference Include="MySql.Data" Version="8.0.22" />
     <PackageReference Include="React.AspNet" Version="5.2.11" />
     <PackageReference Include="React.Router" Version="5.2.11" />
+    <PackageReference Include="RestSharp" Version="106.11.7" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
     <PackageReference Include="xunit" Version="2.4.1" />
   </ItemGroup>
