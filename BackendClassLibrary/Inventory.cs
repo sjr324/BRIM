@@ -51,7 +51,7 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
 
-            //Similar to Recipie updates, delete all Tag entries and readd them for simplicity
+            //Similar to Recipe updates, delete all Tag entries and readd them for simplicity
             if (!this.databaseManager.deleteDrinkTagsByDrinkID(updateItem.ID))
             {
                 Console.WriteLine("Error: Drink Tag Entry Deletion Failed. Stopping here");
@@ -142,8 +142,6 @@ namespace BRIM.BackendClassLibrary
 
                 return 1;
             }
-
-            ItemList.Remove(removeItem);
 
             return 0;
         }
@@ -341,6 +339,16 @@ namespace BRIM.BackendClassLibrary
         public int AddTag(string tagName)
         {
             int tagID = this.databaseManager.addTag(tagName);
+            if (tagID == -1)
+            {
+                Console.WriteLine("Error: Tag Addition Failed");
+
+                string mes = tagName + " could not be added";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
             Tag newTag = new Tag(tagID, tagName);
             TagList.Add(newTag);
 
@@ -348,23 +356,19 @@ namespace BRIM.BackendClassLibrary
         }
 
         //Removes a tag from the tag table
-        public int DeleteTag(int tagID)
+        public int RemoveTag(int tagID)
         {
-            int removeIndex = TagList.FindIndex(x => x.ID == tagID);
-            Tag removeTag = TagList[removeIndex];
             bool result = this.databaseManager.deleteTag(tagID);
 
             if (!result)
             {
                 Console.WriteLine("Error: Tag removal failed");
 
-                string mes = removeTag.Name + " could not be removed";
+                string mes = "Tag with " + tagID + " could not be removed";
                 NotificationManager.AddNotification(mes);
 
                 return 1;
             }
-
-            TagList.Remove(removeTag);
 
             return 0;
         }
