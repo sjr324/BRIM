@@ -63,6 +63,14 @@ namespace BRIM.BackendClassLibrary
         // Querys the database for all entries in the drinkrecipes, and the pertinent information  
         // of their respectively referenced Recipe and Drink entries
         List<Recipe> getRecipes();
+
+        //Takes in the id, date, and amount for a drink and either updates an existing entry by that amount
+        //or inserts a new entry into the drinkstats table
+        void incrementDrinkStat(int id, string date, double amt);
+
+        //Takes in the id, date, and amount for a recipe and either updates an existing entry by that amount
+        //or inserts a new entry into the recipestats table
+        void incrementRecipeStat(int id, string date, double amt);
     }
     
 }

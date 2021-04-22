@@ -396,5 +396,84 @@ namespace BRIM.BackendClassLibrary
 
             return newRecipeList;
         }
+
+        public void incrementDrinkStat(int id, string date, double amt) 
+        {
+            //Select to see if entry already exists
+            //if it does, update it, if not insert it
+            string query = @"SELECT * FROM brim.drinkstats WHERE DrinkID = '" + id + "' AND Date = '" + date + "';";
+
+            DataTable stats = this.runSelectQuery(query);
+
+            if (stats.Rows.Count > 0)
+            {
+                //update
+                query = @"UPDATE brim.drinkstats SET Quantity = Quantity + " + amt + " WHERE DrinkID = '" + id + "' AND Date = '" + date + "';";
+                
+                if (!this.runSqlInsertUpdateOrDeleteCommand(query))
+                {
+                    Console.WriteLine("Error: DrinkStats could not be updated for drink ID " + id);
+                }
+            } else
+            {
+                //insert
+                query = @"INSERT INTO brim.drinkstats (DrinkID, Date, Quantity) VALUES ('" + id + "', '" + date + "', '" + amt + "');";
+
+                if (!this.runSqlInsertUpdateOrDeleteCommand(query))
+                {
+                    Console.WriteLine("Error: DrinkStats could not insert drink ID " + id);
+                }
+            }
+        }
+
+        public void incrementRecipeStat(int id, string date, double amt)
+        {
+            //Select to see if entry already exists
+            //if it does, update it, if not insert it
+            string query = @"SELECT * FROM brim.recipestats WHERE RecipeID = '" + id + "' AND Date = '" + date + "';";
+
+            DataTable stats = this.runSelectQuery(query);
+
+            if (stats.Rows.Count > 0)
+            {
+                //update
+                query = @"UPDATE brim.recipestats SET Quantity = Quantity + " + amt + " WHERE RecipeID = '" + id + "' AND Date = '" + date + "';";
+
+                if (!this.runSqlInsertUpdateOrDeleteCommand(query))
+                {
+                    Console.WriteLine("Error: RecipeStats could not be updated for recipe ID " + id + " on date " + date);
+                }
+            }
+            else
+            {
+                //insert
+                query = @"INSERT INTO brim.recipestats (RecipeID, Date, Quantity) VALUES ('" + id + "', '" + date + "', '" + amt + "');";
+
+                if (!this.runSqlInsertUpdateOrDeleteCommand(query))
+                {
+                    Console.WriteLine("Error: RecipeStats could not insert recipe ID " + id + " on date " + date);
+                }
+            }
+        }
+
+        public List<DrinkStat> getDrinkStatsByDateRange(int DrinkID, string StartDate, string EndDate)
+        {
+
+        }
+
+        public List<RecipeStat> getRecipeStatsByDateRange(int RecipeID, string StartDate, string EndDate)
+        {
+
+        }
+
+        public List<DrinkStat> getAllDrinkStatsByDateRange(string StartDate, string EndDate)
+        {
+
+        }
+
+        public List<RecipeStat> getAllRecipeStatsByDateRange(string StartDate, string EndDate)
+        {
+
+        }
     }
 }
