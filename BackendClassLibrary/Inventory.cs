@@ -211,6 +211,9 @@ namespace BRIM.BackendClassLibrary
                                 updateAmt += pourAmt * quantitySold;
                             }
                         }
+                        //update DB for amount of drink ordered for that day
+                        databaseManager.incrementDrinkStat(ItemList[drinkFound].ID, DateTime.Now.ToString("yyyy-MM-dd"), updateAmt);
+
                         Drink updatedDrink = (Drink) orderItemUpdateProcedure(ItemList[drinkFound], updateAmt);
 
                         databaseManager.updateDrink(updatedDrink);
@@ -223,6 +226,9 @@ namespace BRIM.BackendClassLibrary
                         Recipe orderedRecipe = RecipeList[recipieFound];
                         List<RecipeItem> parts = orderedRecipe.ItemList;
                         int amtOrdered = (int)lineitem["quantitySold"];
+
+                        //increment the amount of the recipie ordered
+                        databaseManager.incrementRecipeStat(orderedRecipe.ID, DateTime.Now.ToString("yyyy-MM-dd"), amtOrdered);
 
                         JArray modifications = (JArray)lineitem["modifications"];
                         if (modifications.Count > 0)
@@ -253,6 +259,9 @@ namespace BRIM.BackendClassLibrary
                             {
                                 //calculate and update every item
                                 updateAmt += part.Quantity * amtOrdered;
+
+                                //update Db for amount of drink ordered that day
+                                databaseManager.incrementDrinkStat(part.Item.ID, DateTime.Now.ToString("yyyy-MM-dd"), updateAmt);
 
                                 Drink updatedDrink = (Drink) orderItemUpdateProcedure(part.Item, updateAmt);
 
@@ -568,6 +577,20 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
             return 0;
+        }
+
+        //This function returns the stats for the drink that is requested
+        //For now it returns an int, but in the future will return a list to the frontend
+        public int GetDrinkStats(Drink drink)
+        {
+
+        }
+
+        //This function returns the stats for the recipie that is requested
+        //For now it returns an int, but in the future will return a list to the frontend
+        public int GetRecipeStats(Recipe recipe)
+        {
+
         }
     }
 }
