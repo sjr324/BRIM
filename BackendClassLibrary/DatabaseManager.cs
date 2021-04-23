@@ -397,6 +397,8 @@ namespace BRIM.BackendClassLibrary
             return newRecipeList;
         }
 
+        //Takes in the id, date, and amount for a drink and either updates an existing entry by that amount
+        //or inserts a new entry into the drinkstats table
         public void incrementDrinkStat(int id, string date, double amt) 
         {
             //Select to see if entry already exists
@@ -426,6 +428,8 @@ namespace BRIM.BackendClassLibrary
             }
         }
 
+        //Takes in the id, date, and amount for a recipe and either updates an existing entry by that amount
+        //or inserts a new entry into the recipestats table
         public void incrementRecipeStat(int id, string date, double amt)
         {
             //Select to see if entry already exists
@@ -456,24 +460,102 @@ namespace BRIM.BackendClassLibrary
             }
         }
 
+        //Takes in an ID, a start date, and an end date. It returns a list of drink stats for that drink that are between those dates
         public List<DrinkStat> getDrinkStatsByDateRange(int DrinkID, string StartDate, string EndDate)
         {
+            string query = @"SELECT * FROM brim.drinkstats WHERE DrinkID = '" + DrinkID + "' AND Date >= '" + StartDate + "' AND Date <= '" + EndDate + "';";
+            List<DrinkStat> drinkStats = new List<DrinkStat>();
+            
+            DataTable stats = this.runSelectQuery(query);
 
+            foreach (DataRow dr in stats.Rows)
+            {
+                drinkStats.Add(new DrinkStat(dr));
+            }
+
+            return drinkStats;
         }
 
+        //Takes in an ID, a start date, and an end date. It returns a list of recipe stats for that recipe that are between those dates for that recipe
         public List<RecipeStat> getRecipeStatsByDateRange(int RecipeID, string StartDate, string EndDate)
         {
+            string query = @"SELECT * FROM brim.recipestats WHERE RecipeID = '" + RecipeID + "' AND Date >= '" + StartDate + "' AND Date <= '" + EndDate + "';";
+            List<RecipeStat> recipeStats = new List<RecipeStat>();
 
+            DataTable stats = this.runSelectQuery(query);
+
+            foreach (DataRow dr in stats.Rows)
+            {
+                recipeStats.Add(new RecipeStat(dr));
+            }
+
+            return recipeStats;
         }
 
+        //Takes in a start date, and an end date. It returns a list of drink stats from the drinkstats table that are between those dates
         public List<DrinkStat> getAllDrinkStatsByDateRange(string StartDate, string EndDate)
         {
+            string query = @"SELECT * FROM brim.drinkstats WHERE Date >= '" + StartDate + "' AND Date <= '" + EndDate + "';";
+            List<DrinkStat> drinkStats = new List<DrinkStat>();
 
+            DataTable stats = this.runSelectQuery(query);
+
+            foreach (DataRow dr in stats.Rows)
+            {
+                drinkStats.Add(new DrinkStat(dr));
+            }
+
+            return drinkStats;
         }
 
+        //Takes in a start date, and an end date. It returns a list of recipe stats from the recipestats table that are between those dates
         public List<RecipeStat> getAllRecipeStatsByDateRange(string StartDate, string EndDate)
         {
+            string query = @"SELECT * FROM brim.recipestats WHERE Date >= '" + StartDate + "' AND Date <= '" + EndDate + "';";
+            List<RecipeStat> recipeStats = new List<RecipeStat>();
 
+            DataTable stats = this.runSelectQuery(query);
+
+            foreach (DataRow dr in stats.Rows)
+            {
+                recipeStats.Add(new RecipeStat(dr));
+            }
+
+            return recipeStats;
+        }
+
+        //Takes in a drink id and gets a list of all entries from the DrinkStats table with that DrinkID
+        //Returns that list of stats
+        public List<DrinkStat> getDrinkStats(int DrinkID)
+        {
+            string query = @"SELECT * FROM brim.drinkstats WHERE DrinkID = '" + DrinkID + "';";
+            List<DrinkStat> drinkStats = new List<DrinkStat>();
+
+            DataTable stats = this.runSelectQuery(query);
+
+            foreach (DataRow dr in stats.Rows)
+            {
+                drinkStats.Add(new DrinkStat(dr));
+            }
+
+            return drinkStats;
+        }
+
+        //Takes in a recipe id and gets a list of all entries from the RecipeStats table with that recipeID
+        //returns that list of stats
+        public List<RecipeStat> getRecipeStats(int RecipeID)
+        {
+            string query = @"SELECT * FROM brim.recipestats WHERE RecipeID = '" + RecipeID + "';";
+            List<RecipeStat> recipeStats = new List<RecipeStat>();
+
+            DataTable stats = this.runSelectQuery(query);
+
+            foreach (DataRow dr in stats.Rows)
+            {
+                recipeStats.Add(new RecipeStat(dr));
+            }
+
+            return recipeStats;
         }
     }
 }
