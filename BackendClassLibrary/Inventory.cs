@@ -579,18 +579,40 @@ namespace BRIM.BackendClassLibrary
             return 0;
         }
 
-        //This function returns the stats for the drink that is requested
-        //For now it returns an int, but in the future will return a list to the frontend
-        public int GetDrinkStats(Drink drink)
+        //This returns the all of the stats for the drink that is requested
+        public List<DrinkStat> GetDrinkStats(Drink drink)
         {
-
+            return databaseManager.getDrinkStats(drink.ID);
         }
 
-        //This function returns the stats for the recipie that is requested
-        //For now it returns an int, but in the future will return a list to the frontend
-        public int GetRecipeStats(Recipe recipe)
+        //This returns all of the stats for the recipie that is requested
+        public List<RecipeStat> GetRecipeStats(Recipe recipe)
         {
+            return databaseManager.getRecipeStats(recipe.ID);
+        }
 
+        //This returns the stats for the requested drink between the dates specified
+        public List<DrinkStat> GetDrinkStatsByDate(Drink drink, DateTime startDate, DateTime endDate)
+        {
+            return databaseManager.getDrinkStatsByDateRange(drink.ID, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+        }
+
+        //This returns the stats for the requested recipe between the dates specified
+        public List<RecipeStat> GetRecipeStatsByDate(Recipe recipe, DateTime startDate, DateTime endDate)
+        {
+            return databaseManager.getRecipeStatsByDateRange(recipe.ID, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+        }
+
+        //This returns the stats for all drinks between the specified times
+        public List<DrinkStat> GetAllDrinkStats(DateTime startDate, DateTime endDate)
+        {
+            return databaseManager.getAllDrinkStatsByDateRange(startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+        }
+
+        //This returns the stats for all recipes between the specified times
+        public List<RecipeStat> GetAllRecipeStats(DateTime startDate, DateTime endDate)
+        {
+            return databaseManager.getAllRecipeStatsByDateRange(startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
     }
 }
