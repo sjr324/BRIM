@@ -63,6 +63,34 @@ namespace BRIM.BackendClassLibrary
         // Querys the database for all entries in the drinkrecipes, and the pertinent information  
         // of their respectively referenced Recipe and Drink entries
         List<Recipe> getRecipes();
+
+        //Takes in the id, date, and amount for a drink and either updates an existing entry by that amount
+        //or inserts a new entry into the drinkstats table
+        void incrementDrinkStat(int id, string date, double amt);
+
+        //Takes in the id, date, and amount for a recipe and either updates an existing entry by that amount
+        //or inserts a new entry into the recipestats table
+        void incrementRecipeStat(int id, string date, double amt);
+
+        //Takes in an ID, a start date, and an end date. It returns a list of drink stats for that drink that are between those dates
+        List<DrinkStat> getDrinkStatsByDateRange(int DrinkID, string StartDate, string EndDate);
+
+        //Takes in an ID, a start date, and an end date. It returns a list of recipe stats for that recipe that are between those dates for that recipe
+        List<RecipeStat> getRecipeStatsByDateRange(int RecipeID, string StartDate, string EndDate);
+
+        //Takes in a start date, and an end date. It returns a list of drink stats from the drinkstats table that are between those dates
+        List<DrinkStat> getAllDrinkStatsByDateRange(string StartDate, string EndDate);
+
+        //Takes in a start date, and an end date. It returns a list of recipe stats from the recipestats table that are between those dates
+        List<RecipeStat> getAllRecipeStatsByDateRange(string StartDate, string EndDate);
+
+        //Takes in a drink id and gets a list of all entries from the DrinkStats table with that DrinkID
+        //Returns that list of stats
+        List<DrinkStat> getDrinkStats(int DrinkID);
+
+        //Takes in a recipe id and gets a list of all entries from the RecipeStats table with that recipeID
+        //returns that list of stats
+        List<RecipeStat> getRecipeStats(int RecipeID);
     }
     
 }
