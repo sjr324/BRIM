@@ -11,7 +11,7 @@ namespace BRIM.BackendClassLibrary
     public class DatabaseManager : IDatabaseManager
     {
         //Should probably move this somewhere more secure eventually
-        private static string connString = @"SERVER=68.84.78.85;PORT=3306;DATABASE=brim;UID=dev;PASSWORD=devpassword;";
+        private static string connString = @"SERVER=68.84.78.85; PORT=3306; DATABASE=brim; UID=dev; PASSWORD=devpassword; convert zero datetime=True";
         private MySqlConnection conn = new MySqlConnection(connString);
 
         //runs any given Select Query on the Database and returns the results in a DataTable
