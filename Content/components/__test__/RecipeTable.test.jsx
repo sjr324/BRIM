@@ -6,8 +6,13 @@ import '@testing-library/jest-dom'
 import RecipeTable from '../recipes/RecipeTable.jsx'
 
 const setup = (itemId, Label, defaultName, disabled) => {
+    let data = {
+        name: "testName",
+        lowerEstimate: "360"
+    }
+
     const { getByText, getByLabelText } =
-        render(<RecipeTable />)
+        render(<RecipeTable item={ data }/>)
 
     return {
         getByText, getByLabelText,
