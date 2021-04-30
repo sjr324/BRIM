@@ -399,7 +399,7 @@ namespace BRIM.BackendClassLibrary
 
         //Takes in the id, date, and amount for a drink and either updates an existing entry by that amount
         //or inserts a new entry into the drinkstats table
-        public void incrementDrinkStat(int id, string date, double amt) 
+        public bool incrementDrinkStat(int id, string date, double amt) 
         {
             //Select to see if entry already exists
             //if it does, update it, if not insert it
@@ -407,43 +407,46 @@ namespace BRIM.BackendClassLibrary
 
             DataTable stats = this.runSelectQuery(query);
 
+            bool result;
             if (stats.Rows.Count > 0)
             {
                 //update
                 query = @"UPDATE brim.drinkstats SET Quantity = Quantity + " + amt + " WHERE DrinkID = '" + id + "' AND Date = '" + date + "';";
-                
-                if (!this.runSqlInsertUpdateOrDeleteCommand(query))
+                result = this.runSqlInsertUpdateOrDeleteCommand(query);
+                if (!result)
                 {
                     Console.WriteLine("Error: DrinkStats could not be updated for drink ID " + id);
                 }
+
             } else
             {
                 //insert
                 query = @"INSERT INTO brim.drinkstats (DrinkID, Date, Quantity) VALUES ('" + id + "', '" + date + "', '" + amt + "');";
-
-                if (!this.runSqlInsertUpdateOrDeleteCommand(query))
+                result = this.runSqlInsertUpdateOrDeleteCommand(query);
+                if (!result)
                 {
                     Console.WriteLine("Error: DrinkStats could not insert drink ID " + id);
                 }
             }
+            return result;
         }
 
         //Takes in the id, date, and amount for a recipe and either updates an existing entry by that amount
         //or inserts a new entry into the recipestats table
-        public void incrementRecipeStat(int id, string date, double amt)
+        public bool incrementRecipeStat(int id, string date, double amt)
         {
             //Select to see if entry already exists
             //if it does, update it, if not insert it
             string query = @"SELECT * FROM brim.recipestats WHERE RecipeID = '" + id + "' AND Date = '" + date + "';";
 
             DataTable stats = this.runSelectQuery(query);
-
+            bool result;
             if (stats.Rows.Count > 0)
             {
                 //update
                 query = @"UPDATE brim.recipestats SET Quantity = Quantity + " + amt + " WHERE RecipeID = '" + id + "' AND Date = '" + date + "';";
-
-                if (!this.runSqlInsertUpdateOrDeleteCommand(query))
+                result = this.runSqlInsertUpdateOrDeleteCommand(query);
+                if (!result)
                 {
                     Console.WriteLine("Error: RecipeStats could not be updated for recipe ID " + id + " on date " + date);
                 }
@@ -452,12 +455,14 @@ namespace BRIM.BackendClassLibrary
             {
                 //insert
                 query = @"INSERT INTO brim.recipestats (RecipeID, Date, Quantity) VALUES ('" + id + "', '" + date + "', '" + amt + "');";
-
-                if (!this.runSqlInsertUpdateOrDeleteCommand(query))
+                result = this.runSqlInsertUpdateOrDeleteCommand(query);
+                if (!result)
                 {
                     Console.WriteLine("Error: RecipeStats could not insert recipe ID " + id + " on date " + date);
                 }
             }
+            
+            return result;
         }
 
         //Takes in an ID, a start date, and an end date. It returns a list of drink stats for that drink that are between those dates

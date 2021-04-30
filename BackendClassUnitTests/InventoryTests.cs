@@ -14,6 +14,8 @@ namespace BackendClassUnitTests
         private List<Item> fakeDBItems;
         private List<Recipe> fakeDBRecipes;
         private List<Tag> fakeDBTags;
+        private List<DrinkStat> fakeDBDrinkStats;
+        private List<RecipeStat> fakeDBRecipeStats;
         private int latestItemID;
         private int latestRecipeID;
         private int latestTagID;
@@ -336,6 +338,32 @@ namespace BackendClassUnitTests
                 });
 
             mockDBManager.Setup(x => x.getRecipes()).Returns(fakeDBRecipes);
+            
+            //don't need full functionality for inventory tests, just the ability to verify
+            //that they were called
+            mockDBManager.Setup(x => x.getDrinkStats(It.IsAny<int>()))
+                .Returns(new List<DrinkStat>());
+            
+            mockDBManager.Setup(x => x.getDrinkStatsByDateRange(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new List<DrinkStat>());
+
+            mockDBManager.Setup(x => x.getAllDrinkStatsByDateRange(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new List<DrinkStat>());
+            
+            mockDBManager.Setup(x => x.incrementDrinkStat(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<double>()))
+                .Returns(true);
+
+            mockDBManager.Setup(x => x.getRecipeStats(It.IsAny<int>()))
+                .Returns(new List<RecipeStat>());
+            
+            mockDBManager.Setup(x => x.getRecipeStatsByDateRange(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new List<RecipeStat>());
+
+            mockDBManager.Setup(x => x.getAllRecipeStatsByDateRange(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new List<RecipeStat>());
+            
+            mockDBManager.Setup(x => x.incrementRecipeStat(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()))
+                .Returns(true);
 
             inventory = new Inventory(mockDBManager.Object);
         }
@@ -823,7 +851,7 @@ namespace BackendClassUnitTests
 
         //Testing that proper return code is sent in case of failure
         [Fact]
-        public void RemoveTagFailure_DataBaseManagerFailure () {
+        public void RemoveTagFailure_DataBaseManagerFailure() {
             //Arrange
             int tagToDelete = 1;
             int expectedDBTagCount = fakeDBTags.Count();
@@ -837,6 +865,96 @@ namespace BackendClassUnitTests
             mockDBManager.Verify(mock => mock.deleteTag(It.IsAny<int>()), Times.Once());
             Assert.Equal(expectedReturnCode, returnCode);
             Assert.Equal(expectedDBTagCount, fakeDBTags.Count());
+        }
+
+        [Fact]
+        public void GetDrinkStatsSuccess() {
+            //Arrange
+            Drink fakeDrink = (Drink) fakeDBItems[0];
+
+            //Act
+            inventory.GetDrinkStats(fakeDrink);
+
+            //Assert
+            mockDBManager.Verify(mock => mock.getDrinkStats(fakeDrink.ID), Times.Once());
+        }
+
+        [Fact]
+        public void GetRecipeStatsSuccess() {
+            //Arrange
+            Recipe fakeRecipe = fakeDBRecipes[0];
+
+            //Act
+            inventory.GetRecipeStats(fakeRecipe);
+
+            //Assert
+            mockDBManager.Verify(mock => mock.getRecipeStats(fakeRecipe.ID), Times.Once());
+        }
+
+        [Fact]
+        public void GetDrinkStatsByDateSuccess() {
+            //Arrange
+            Drink fakeDrink = (Drink) fakeDBItems[0];
+            DateTime startDate = new DateTime(2021, 1, 1);
+            DateTime endDate = new DateTime(2021, 1, 10);
+            string expectedSDString = "2021-01-01";
+            string expectedEDString = "2021-01-10";
+
+            //Act
+            inventory.GetDrinkStatsByDate(fakeDrink, startDate, endDate);
+
+            //Assert
+            mockDBManager.Verify(mock => mock.getDrinkStatsByDateRange
+                (fakeDrink.ID, expectedSDString, expectedEDString), Times.Once());
+        }
+
+        [Fact]
+        public void GetRecipeStatsByDateSuccess() {
+            //Arrange
+            Recipe fakeRecipe = fakeDBRecipes[0];
+            DateTime startDate = new DateTime(2021, 1, 1);
+            DateTime endDate = new DateTime(2021, 1, 10);
+            string expectedSDString = "2021-01-01";
+            string expectedEDString = "2021-01-10";
+
+            //Act
+            inventory.GetRecipeStatsByDate(fakeRecipe, startDate, endDate);
+
+            //Assert
+            mockDBManager.Verify(mock => mock.getRecipeStatsByDateRange
+                (fakeRecipe.ID, expectedSDString, expectedEDString), Times.Once());
+        }
+
+        [Fact]
+        public void GetAllDrinkStatsSuccess() {
+            //Arrange
+            DateTime startDate = new DateTime(2021, 1, 1);
+            DateTime endDate = new DateTime(2021, 1, 10);
+            string expectedSDString = "2021-01-01";
+            string expectedEDString = "2021-01-10";
+
+            //Act
+            inventory.GetAllDrinkStats(startDate, endDate);
+
+            //Assert
+            mockDBManager.Verify(mock => mock.getAllDrinkStatsByDateRange
+                (expectedSDString, expectedEDString), Times.Once());
+        }
+
+        [Fact]
+        public void GetAllRecipeStatsSuccess() {
+            //Arrange
+            DateTime startDate = new DateTime(2021, 1, 1);
+            DateTime endDate = new DateTime(2021, 1, 10);
+            string expectedSDString = "2021-01-01";
+            string expectedEDString = "2021-01-10";
+
+            //Act
+            inventory.GetAllRecipeStats(startDate, endDate);
+
+            //Assert
+            mockDBManager.Verify(mock => mock.getAllRecipeStatsByDateRange
+                (expectedSDString, expectedEDString), Times.Once());
         }
     }
 }
