@@ -51,7 +51,7 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
 
-            //Similar to Recipie updates, delete all Tag entries and readd them for simplicity
+            //Similar to Recipe updates, delete all Tag entries and readd them for simplicity
             if (!this.databaseManager.deleteDrinkTagsByDrinkID(updateItem.ID))
             {
                 Console.WriteLine("Error: Drink Tag Entry Deletion Failed. Stopping here");
@@ -143,8 +143,6 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
 
-            ItemList.Remove(removeItem);
-
             return 0;
         }
 
@@ -211,6 +209,9 @@ namespace BRIM.BackendClassLibrary
                                 updateAmt += pourAmt * quantitySold;
                             }
                         }
+                        //update DB for amount of drink ordered for that day
+                        databaseManager.incrementDrinkStat(ItemList[drinkFound].ID, DateTime.Now.ToString("yyyy-MM-dd"), updateAmt);
+
                         Drink updatedDrink = (Drink) orderItemUpdateProcedure(ItemList[drinkFound], updateAmt);
 
                         databaseManager.updateDrink(updatedDrink);
@@ -223,6 +224,9 @@ namespace BRIM.BackendClassLibrary
                         Recipe orderedRecipe = RecipeList[recipieFound];
                         List<RecipeItem> parts = orderedRecipe.ItemList;
                         int amtOrdered = (int)lineitem["quantitySold"];
+
+                        //increment the amount of the recipie ordered
+                        databaseManager.incrementRecipeStat(orderedRecipe.ID, DateTime.Now.ToString("yyyy-MM-dd"), amtOrdered);
 
                         JArray modifications = (JArray)lineitem["modifications"];
                         if (modifications.Count > 0)
@@ -253,6 +257,9 @@ namespace BRIM.BackendClassLibrary
                             {
                                 //calculate and update every item
                                 updateAmt += part.Quantity * amtOrdered;
+
+                                //update Db for amount of drink ordered that day
+                                databaseManager.incrementDrinkStat(part.Item.ID, DateTime.Now.ToString("yyyy-MM-dd"), updateAmt);
 
                                 Drink updatedDrink = (Drink) orderItemUpdateProcedure(part.Item, updateAmt);
 
@@ -341,6 +348,16 @@ namespace BRIM.BackendClassLibrary
         public int AddTag(string tagName)
         {
             int tagID = this.databaseManager.addTag(tagName);
+            if (tagID == -1)
+            {
+                Console.WriteLine("Error: Tag Addition Failed");
+
+                string mes = tagName + " could not be added";
+                NotificationManager.AddNotification(mes);
+
+                return 1;
+            }
+
             Tag newTag = new Tag(tagID, tagName);
             TagList.Add(newTag);
 
@@ -348,23 +365,19 @@ namespace BRIM.BackendClassLibrary
         }
 
         //Removes a tag from the tag table
-        public int DeleteTag(int tagID)
+        public int RemoveTag(int tagID)
         {
-            int removeIndex = TagList.FindIndex(x => x.ID == tagID);
-            Tag removeTag = TagList[removeIndex];
             bool result = this.databaseManager.deleteTag(tagID);
 
             if (!result)
             {
                 Console.WriteLine("Error: Tag removal failed");
 
-                string mes = removeTag.Name + " could not be removed";
+                string mes = "Tag with " + tagID + " could not be removed";
                 NotificationManager.AddNotification(mes);
 
                 return 1;
             }
-
-            TagList.Remove(removeTag);
 
             return 0;
         }
@@ -568,6 +581,42 @@ namespace BRIM.BackendClassLibrary
                 return 1;
             }
             return 0;
+        }
+
+        //This returns the all of the stats for the drink that is requested
+        public List<DrinkStat> GetDrinkStats(Drink drink)
+        {
+            return databaseManager.getDrinkStats(drink.ID);
+        }
+
+        //This returns all of the stats for the recipie that is requested
+        public List<RecipeStat> GetRecipeStats(Recipe recipe)
+        {
+            return databaseManager.getRecipeStats(recipe.ID);
+        }
+
+        //This returns the stats for the requested drink between the dates specified
+        public List<DrinkStat> GetDrinkStatsByDate(Drink drink, DateTime startDate, DateTime endDate)
+        {
+            return databaseManager.getDrinkStatsByDateRange(drink.ID, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+        }
+
+        //This returns the stats for the requested recipe between the dates specified
+        public List<RecipeStat> GetRecipeStatsByDate(Recipe recipe, DateTime startDate, DateTime endDate)
+        {
+            return databaseManager.getRecipeStatsByDateRange(recipe.ID, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+        }
+
+        //This returns the stats for all drinks between the specified times
+        public List<DrinkStat> GetAllDrinkStats(DateTime startDate, DateTime endDate)
+        {
+            return databaseManager.getAllDrinkStatsByDateRange(startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
+        }
+
+        //This returns the stats for all recipes between the specified times
+        public List<RecipeStat> GetAllRecipeStats(DateTime startDate, DateTime endDate)
+        {
+            return databaseManager.getAllRecipeStatsByDateRange(startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
     }
 }
