@@ -13,12 +13,6 @@ namespace BRIM
 	{
 		public static void Main(string[] args)
 		{
-			//test stuff here
-			POSManager testmanager = new POSManager();
-			var response = testmanager.GetAllOrders(DateTime.Now);
-			Console.WriteLine(response.ToString());
-			//end test stuff
-
 			BuildWebHost(args).Run();
 		}
 
