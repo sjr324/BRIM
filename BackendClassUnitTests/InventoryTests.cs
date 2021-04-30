@@ -14,8 +14,6 @@ namespace BackendClassUnitTests
         private List<Item> fakeDBItems;
         private List<Recipe> fakeDBRecipes;
         private List<Tag> fakeDBTags;
-        private List<DrinkStat> fakeDBDrinkStats;
-        private List<RecipeStat> fakeDBRecipeStats;
         private int latestItemID;
         private int latestRecipeID;
         private int latestTagID;
