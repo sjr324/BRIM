@@ -12,9 +12,6 @@ namespace BRIM.BackendClassLibrary
     {
         public JObject GetAllOrders(DateTime time)
         {
-            /*var client = new RestClient("https://sandbox.dev.clover.com/v3/merchants/RCTST0000008099/orders?filter=createdTime>="
-                                            + ((DateTimeOffset)time).ToUnixTimeSeconds() 
-                                            + "&access_token=8fe4215a-a338-4fbe-4f74-193919caa02c");*/
             var client = new RestClient("https://sandbox.dev.clover.com/v3/merchants/RYBHTZ2AMPQY1/orders?filter=createdTime>="
                                             + ((DateTimeOffset)time).ToUnixTimeSeconds()
                                             + "&access_token=8fe4215a-a338-4fbe-4f74-193919caa02c");
@@ -27,7 +24,7 @@ namespace BRIM.BackendClassLibrary
 
         public void SendOrder() 
         {
-            var client = new RestClient("https://sandbox.dev.clover.com/v3/merchants/RYBHTZ2AMPQY1/atomic_order/orders?access_token=8fe4215a-a338-4fbe-4f74-193919caa02c%22");
+            var client = new RestClient("https://sandbox.dev.clover.com/v3/merchants/RYBHTZ2AMPQY1/atomic_order/orders?access_token=8fe4215a-a338-4fbe-4f74-193919caa02c");
             var request = new RestRequest(Method.POST);
             request.AddHeader("Accept", "application/json");
             request.AddHeader("Content-Type", "application/json");
