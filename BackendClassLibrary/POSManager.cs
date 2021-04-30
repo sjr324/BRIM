@@ -12,7 +12,7 @@ namespace BRIM.BackendClassLibrary
     {
         public JObject GetAllOrders(DateTime time)
         {
-            var client = new RestClient("https://sandbox.dev.clover.com/v3/merchants/RYBHTZ2AMPQY1/atomic_order/orders?filter=createdTime>=" 
+            var client = new RestClient("https://sandbox.dev.clover.com/v3/merchants/RYBHTZ2AMPQY1/orders?filter=createdTime>=" 
                                             + ((DateTimeOffset)time).ToUnixTimeSeconds() 
                                             + "&access_token=8fe4215a-a338-4fbe-4f74-193919caa02c%22");
             var request = new RestRequest(Method.GET);
