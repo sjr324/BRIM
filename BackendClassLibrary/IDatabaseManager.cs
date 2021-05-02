@@ -66,11 +66,11 @@ namespace BRIM.BackendClassLibrary
 
         //Takes in the id, date, and amount for a drink and either updates an existing entry by that amount
         //or inserts a new entry into the drinkstats table
-        void incrementDrinkStat(int id, string date, double amt);
+        bool incrementDrinkStat(int id, string date, double amt);
 
         //Takes in the id, date, and amount for a recipe and either updates an existing entry by that amount
         //or inserts a new entry into the recipestats table
-        void incrementRecipeStat(int id, string date, double amt);
+        bool incrementRecipeStat(int id, string date, double amt);
 
         //Takes in an ID, a start date, and an end date. It returns a list of drink stats for that drink that are between those dates
         List<DrinkStat> getDrinkStatsByDateRange(int DrinkID, string StartDate, string EndDate);
