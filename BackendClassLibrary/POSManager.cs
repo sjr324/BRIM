@@ -47,7 +47,7 @@ namespace BRIM.BackendClassLibrary
         //Used to add the inventory items to the database so they can be ordered. Used for testing purposes
         public void CreateItem()
         {
-            var client = new RestClient("https://sandbox.dev.clover.com/v3/merchants/mId/bulk_items");
+            var client = new RestClient("https://sandbox.dev.clover.com/v3/merchants/RYBHTZ2AMPQY1/bulk_items?access_token=8fe4215a-a338-4fbe-4f74-193919caa02c");
             var request = new RestRequest(Method.POST);
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json", 
