@@ -28,8 +28,15 @@ namespace BRIM.BackendClassLibrary
             var request = new RestRequest(Method.POST);
             request.AddHeader("Accept", "application/json");
             request.AddHeader("Content-Type", "application/json");
-            request.AddParameter("application/json", 
-                                    "{\"orderCart\":{\"orderType\":{\"taxable\":\"false\",\"isDefault\":\"false\",\"filterCategories\":\"false\",\"isHidden\":\"false\",\"isDeleted\":\"false\"},\"groupLineItems\":\"false\"}}", 
+            request.AddParameter("application/json",
+                                    "{\"orderCart\":{\"lineItems\":[{\"item\":{\"id\":\"722\"},\"printed\":\"false\",\"exchangedLineItem\":{},\"exchanged\":\"false\"," + 
+                                    "\"modifications\":[{\"modifier\":{\"price\":\"0\",\"modifierGroup\":{}},\"id\":\"7\",\"name\":\"Test (1.5 oz)\"}],\"refunded\":\"false\"" + 
+                                    ",\"refund\":{\"orderRef\":{},\"device\":{},\"payment\":{},\"employee\":{},\"overrideMerchantTender\":{},\"serviceChargeAmount\":{}," + 
+                                    "\"germanInfo\":{},\"appTracking\":{},\"cardTransaction\":{\"extra\":{},\"vaultedCard\":{\"first6\":\"777777\",\"last4\":\"7777\"}},\"" + 
+                                    "transactionInfo\":{\"identityDocument\":{\"payment\":{}},\"isTokenBasedTx\":\"false\",\"emergencyFlag\":\"false\",\"promotionalMessage\":{},\"" + 
+                                    "sepaElvTransactionInfo\":{}},\"merchant\":{}},\"isRevenue\":\"false\",\"printGroup\":{},\"id\":\"01\",\"name\":\"TestDrink1\",\"quantitySold\":2}],\"" + 
+                                    "orderType\":{\"taxable\":\"false\",\"isDefault\":\"false\",\"filterCategories\":\"false\",\"isHidden\":\"false\",\"isDeleted\":\"false\"},\"" + 
+                                    "groupLineItems\":\"false\",\"id\":\"01\",\"currency\":\"USD\",\"title\":\"test1\"}}", 
                                     ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
         }
