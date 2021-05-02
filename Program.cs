@@ -15,6 +15,9 @@ namespace BRIM
 		{
 			//testing code here
 			POSManager testManager = new POSManager();
+
+			testManager.SendOrder();
+
 			var response = testManager.GetAllOrders(DateTime.Now.AddDays(-1));
 			Console.WriteLine(response.ToString());
 			//testing code end

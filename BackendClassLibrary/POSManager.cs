@@ -29,7 +29,7 @@ namespace BRIM.BackendClassLibrary
             request.AddHeader("Accept", "application/json");
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json",
-                                    "{\"orderCart\":{\"lineItems\":[{\"item\":{\"id\":\"722\"},\"printed\":\"false\",\"exchangedLineItem\":{},\"exchanged\":\"false\"," + 
+                                    "{\"orderCart\":{\"lineItems\":[{\"item\":{\"id\":\"01\"},\"printed\":\"false\",\"exchangedLineItem\":{},\"exchanged\":\"false\"," + 
                                     "\"modifications\":[{\"modifier\":{\"price\":\"0\",\"modifierGroup\":{}},\"id\":\"7\",\"name\":\"Test (1.5 oz)\"}],\"refunded\":\"false\"" + 
                                     ",\"refund\":{\"orderRef\":{},\"device\":{},\"payment\":{},\"employee\":{},\"overrideMerchantTender\":{},\"serviceChargeAmount\":{}," + 
                                     "\"germanInfo\":{},\"appTracking\":{},\"cardTransaction\":{\"extra\":{},\"vaultedCard\":{\"first6\":\"777777\",\"last4\":\"7777\"}},\"" + 
@@ -39,6 +39,8 @@ namespace BRIM.BackendClassLibrary
                                     "groupLineItems\":\"false\",\"id\":\"01\",\"currency\":\"USD\",\"title\":\"test1\"}}", 
                                     ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
+
+            JObject result = JsonConvert.DeserializeObject<JObject>(response.Content);
         }
     }
 }
