@@ -16,9 +16,5 @@ namespace BRIM.BackendClassLibrary
         //This will take in information on an order in the future
         //Most likely will be used to create orders in clover to be used for testing purposes
         public void SendOrder();
-
-        //This will take in information on the items in the future
-        //Used to add the inventory items to the database so they can be ordered. Used for testing purposes
-        public void CreateItem();
     }
 }
