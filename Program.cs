@@ -16,6 +16,9 @@ namespace BRIM
 			//testing code here
 			POSManager testManager = new POSManager();
 
+			//Change test items created EVERY RUN. Do NOT recreate items. im not sure how the system will respond
+			testManager.CreateItem();
+
 			testManager.SendOrder();
 
 			var response = testManager.GetAllOrders(DateTime.Now.AddDays(-1));

@@ -42,5 +42,23 @@ namespace BRIM.BackendClassLibrary
 
             JObject result = JsonConvert.DeserializeObject<JObject>(response.Content);
         }
+
+        //This will take in information on the items in the future
+        //Used to add the inventory items to the database so they can be ordered. Used for testing purposes
+        public void CreateItem()
+        {
+            var client = new RestClient("https://sandbox.dev.clover.com/v3/merchants/mId/bulk_items");
+            var request = new RestRequest(Method.POST);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddParameter("application/json", 
+                                    "{\"items\":[{\"hidden\":\"false\",\"itemGroup\":{},\"defaultTaxRates\":\"true\",\"isRevenue\":\"false\",\"canonical\":{},\"itemStock\":{" + 
+                                    "\"item\":{\"id\":\"01\"},\"quantity\":1000},\"id\":\"01\",\"name\":\"TestDrink1\",\"price\":0},{\"hidden\":\"false\",\"itemGroup\":{}," + 
+                                    "\"defaultTaxRates\":\"true\",\"isRevenue\":\"false\",\"canonical\":{},\"itemStock\":{\"item\":{\"id\":\"02\"},\"quantity\":1000},\"id\":\"02\"," + 
+                                    "\"name\":\"TestDrink2\",\"price\":0}]}", 
+                                    ParameterType.RequestBody);
+            IRestResponse response = client.Execute(request);
+
+            JObject result = JsonConvert.DeserializeObject<JObject>(response.Content);
+        }
     }
 }
