@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Microsoft.AspNetCore.Mvc;
-using BRIM.BackendClassLibrary;
+using bcl=BRIM.BackendClassLibrary;
 using Microsoft.Extensions.Logging;
 
 namespace BRIM 
@@ -11,7 +11,6 @@ namespace BRIM
 	{
 		private readonly ILogger<InventoryController> _logger;
 
-		private Inventory inventory;
 		
 
 
@@ -20,15 +19,13 @@ namespace BRIM
 			_logger = logger;
 			_logger.LogInformation("In inventory");
 			//initialize the inventory
-			inventory = new Inventory();
-			inventory.GetItemList();
-			inventory.GetRecipeList();	
-
+			bcl.Inventory.GetRecipeList();	
+			
 		}
 		
 		public ActionResult Recipes(){
 			_logger.LogInformation("Recipe call");
-			List<RecipeModel> reclist = this.inventory.RecipeList.Select(p=>new RecipeModel()
+			List<RecipeModel> reclist = bcl.Inventory.RecipeList.Select(p=>new RecipeModel()
 			{
 				id = p.ID,
 				name = p.Name,
@@ -36,7 +33,7 @@ namespace BRIM
 				{
 					id = q.Item.ID,
 					name= q.Item.Name,
-					brand=((Drink)q.Item).Brand,
+					brand=((bcl.Drink)q.Item).Brand,
 					baseliquor = false,
 					quantity= Convert.ToString(q.Quantity)
 				}).ToList()
@@ -49,25 +46,25 @@ namespace BRIM
 		}
 		
 		public ActionResult SubmitRecipe([FromBody]RecipeModel recipe){
-			int maxid = this.inventory.RecipeList.Select(p=>p.ID).Max();
-			Recipe r = new Recipe();
+			int maxid = bcl.Inventory.RecipeList.Select(p=>p.ID).Max();
+			bcl.Recipe r = new bcl.Recipe();
 			r.ID = maxid;
 			r.Name = recipe.name;
 			r.ItemList =
-				(from item in inventory.ItemList
+				(from item in bcl.Inventory.ItemList
 				join comp in recipe.components
 				on item.ID equals comp.id
-				select ( new RecipeItem((Drink)item,Convert.ToDouble(comp.quantity))
+				select ( new bcl.RecipeItem((bcl.Drink)item,Convert.ToDouble(comp.quantity))
 				)).ToList();
-			inventory.AddRecipe(r);
+			bcl.Inventory.AddRecipe(r);
 			return Content("Success");
 		}
 		public ActionResult ItemNames(){
-			List<RecipeComponentModel> names = this.inventory.ItemList.Select(p=>new RecipeComponentModel
+			List<RecipeComponentModel> names = bcl.Inventory.ItemList.Select(p=>new RecipeComponentModel
 			{
 				id = p.ID,
 				name = p.Name,
-				brand = ((Drink)p).Brand,
+				brand = ((bcl.Drink)p).Brand,
 				baseliquor = false,
 				quantity = "0" 
 			}).ToList();
@@ -95,7 +92,7 @@ namespace BRIM
 		
 		public class RecipeComponent
 		{
-			public Item component{get;set;}
+			public bcl.Item component{get;set;}
 			public double amount{get;set;}
 		}
 

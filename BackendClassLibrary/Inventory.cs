@@ -10,36 +10,27 @@ using System.Threading.Tasks;
 namespace BRIM.BackendClassLibrary
 {
     //The main class of the program. 
-    public class Inventory
+    public static class Inventory
     {
-        public List<Item> ItemList = new List<Item>(); //holds all items registered to this BRIM instance
-        public List<Recipe> RecipeList = new List<Recipe>(); //holds all of the recipes for this BRIM instance
-        public List<Tag> TagList = new List<Tag>(); //holds all of the tags for this BRIM instance
-        public string Country;
-        public IDatabaseManager databaseManager;
+        public static List<Item> ItemList = new List<Item>(); //holds all items registered to this BRIM instance
+        public static List<Recipe> RecipeList = new List<Recipe>(); //holds all of the recipes for this BRIM instance
+        public static List<Tag> TagList = new List<Tag>(); //holds all of the tags for this BRIM instance
+        public static string Country;
+        public static IDatabaseManager databaseManager = new DatabaseManager();
 
-        // Default Constructor, makes its own DatabaseManager
-        public Inventory() {
-            this.databaseManager = new DatabaseManager();
-        }
-
-        //  Overloaded Constructor, takes IDatabaseManager instance (For Mocking when Unit Testing)
-        public Inventory(IDatabaseManager dbManager) {
-            this.databaseManager = dbManager;
-        }
 
         /// <summary>
         /// Runs an update command on the item based off the item that is sent in from the frontend
         /// </summary>
         /// <param name="info">An item that is created from the frontend</param>
         /// <returns>an integer return based on the exit status of the function</returns>
-        public int UpdateItem(Item info)
+        public static int UpdateItem(Item info)
         {
             Drink updateItem = info as Drink;
             //make sure status is recalculated to reflect any changes in Quantity
             updateItem.CalculateStatus(); 
             
-            bool result = this.databaseManager.updateDrink(updateItem);
+            bool result = databaseManager.updateDrink(updateItem);
 
             if (!result)
             {
@@ -52,7 +43,7 @@ namespace BRIM.BackendClassLibrary
             }
 
             //Similar to Recipe updates, delete all Tag entries and readd them for simplicity
-            if (!this.databaseManager.deleteDrinkTagsByDrinkID(updateItem.ID))
+            if (!databaseManager.deleteDrinkTagsByDrinkID(updateItem.ID))
             {
                 Console.WriteLine("Error: Drink Tag Entry Deletion Failed. Stopping here");
 
@@ -66,7 +57,7 @@ namespace BRIM.BackendClassLibrary
             foreach (Tag T in updateItem.Tags)
             {
                 int tagID = T.ID;
-                result = this.databaseManager.addDrinkTag(updateItem.ID, tagID);
+                result = databaseManager.addDrinkTag(updateItem.ID, tagID);
 
                 if (!result)
                 {
@@ -89,10 +80,10 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="i">Item that the frontend sends to the backend</param>
         /// <returns>An integer is returned that corresponds to the exit status of the method</returns>
-        public int AddItem(Item i)
+        public static int AddItem(Item i)
         {
             Drink newItem = i as Drink;
-            bool result = this.databaseManager.addDrink(newItem);
+            bool result = databaseManager.addDrink(newItem);
             string mes = "";
             
             if (!result)
@@ -108,7 +99,7 @@ namespace BRIM.BackendClassLibrary
             //add in the tags associated with that drink if there are any
             foreach (Tag T in newItem.Tags)
             {
-                if (!this.databaseManager.addDrinkTag(newItem.ID, T.ID))
+                if (!databaseManager.addDrinkTag(newItem.ID, T.ID))
                 {
                     Console.WriteLine("Error: Tag could not be added");
 
@@ -128,10 +119,10 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="i">The item to be deleted</param>
         /// <returns>an integer value representing the exit status of the method</returns>
-        public int RemoveItem(Item i)
+        public static int RemoveItem(Item i)
         {
             Drink removeItem = i as Drink;
-            bool result = this.databaseManager.deleteDrink(removeItem);
+            bool result = databaseManager.deleteDrink(removeItem);
 
             if (!result)
             {
@@ -146,7 +137,7 @@ namespace BRIM.BackendClassLibrary
             return 0;
         }
 
-        public int PurchseItem(Recipe r)
+        public static int PurchseItem(Recipe r)
         {
             return 0;
         }
@@ -159,7 +150,7 @@ namespace BRIM.BackendClassLibrary
         /// that. 
         /// </summary>
         /// <param name="message"></param>
-        public void parseAPIPOSUpdate(JObject message)
+        public static void parseAPIPOSUpdate(JObject message)
         {
             JToken msg = message;
             //double varianceMultiplier = 0.15;
@@ -284,7 +275,7 @@ namespace BRIM.BackendClassLibrary
         /// recalculates the item's status, and creates a status change notification if neccesary
         /// </summary>
         /// <returns>The updated Item Object</returns>
-        private Item orderItemUpdateProcedure(Item updatedItem, double amount) {
+        private static Item orderItemUpdateProcedure(Item updatedItem, double amount) {
             //update Item amount
             updatedItem.Estimate -= amount;
 
@@ -325,29 +316,29 @@ namespace BRIM.BackendClassLibrary
         /// such as food.
         /// </summary>
         /// <returns>an integer value that represents the exit status of the method</returns>
-        public int GetItemList()
+        public static int GetItemList()
         {
             List<Item> drinksList = new List<Item>();
-            drinksList = this.databaseManager.getDrinks();
+            drinksList = databaseManager.getDrinks();
             ItemList = drinksList;
 
             return 0;
         }
 
         //Gets the list of all tags in the tags table
-        public int GetTagList()
+        public static int GetTagList()
         {
             List<Tag> tagList = new List<Tag>();
-            tagList = this.databaseManager.getTags();
+            tagList = databaseManager.getTags();
             TagList = tagList;
 
             return 0;
         }
 
         //Adds a tag to the tag table
-        public int AddTag(string tagName)
+        public static int AddTag(string tagName)
         {
-            int tagID = this.databaseManager.addTag(tagName);
+            int tagID = databaseManager.addTag(tagName);
             if (tagID == -1)
             {
                 Console.WriteLine("Error: Tag Addition Failed");
@@ -365,9 +356,9 @@ namespace BRIM.BackendClassLibrary
         }
 
         //Removes a tag from the tag table
-        public int RemoveTag(int tagID)
+        public static int RemoveTag(int tagID)
         {
-            bool result = this.databaseManager.deleteTag(tagID);
+            bool result = databaseManager.deleteTag(tagID);
 
             if (!result)
             {
@@ -383,12 +374,12 @@ namespace BRIM.BackendClassLibrary
         }
 
         //what are these for again? Are the even still neccesary with the current plan, or are the vestigial?
-        public void EmitEvent()
+        public static void EmitEvent()
         {
 
         }
 
-        public void ListenEvent()
+        public static void ListenEvent()
         {
 
         }
@@ -401,10 +392,10 @@ namespace BRIM.BackendClassLibrary
         /// tuple list for each recipe entry
         /// </summary>
         /// <returns>It returns an int representing the status of the request</returns>
-        public int GetRecipeList()
+        public static int GetRecipeList()
         {
             List<Recipe> recipeList = new List<Recipe>();
-            recipeList = this.databaseManager.getRecipes();
+            recipeList = databaseManager.getRecipes();
             RecipeList = recipeList;
 
             return 0;
@@ -416,7 +407,7 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="newRecipe">Recipe that the frontend sends to the backend</param>
         /// <returns>An integer is returned that corresponds to the exit status of the method</returns>
-        public int AddRecipe(Recipe newRecipe)
+        public static int AddRecipe(Recipe newRecipe)
         {
             int recipeID, itemListResult;
             //Validate Recipe ItemList
@@ -431,7 +422,7 @@ namespace BRIM.BackendClassLibrary
             }
 
             //add entry into Recipe Table
-            recipeID = this.databaseManager.addRecipe(newRecipe.Name, newRecipe.BaseLiquor);
+            recipeID = databaseManager.addRecipe(newRecipe.Name, newRecipe.BaseLiquor);
             if (recipeID == -1)
             {
                 Console.WriteLine("Error: Recipe Entry Addition Failed. Stopping here");
@@ -447,7 +438,7 @@ namespace BRIM.BackendClassLibrary
             foreach(RecipeItem component in newRecipe.ItemList) {
                 int itemID = component.Item.ID;
                 double itemQuantity = component.Quantity;
-                itemListResult = this.databaseManager.addDrinkRecipe(recipeID, itemID, itemQuantity);
+                itemListResult = databaseManager.addDrinkRecipe(recipeID, itemID, itemQuantity);
 
                 if (itemListResult == -1) {
                     Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
@@ -472,7 +463,7 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="updatedRecipe">Recipe that the frontend sends to the backend</param>
         /// <returns>An integer is returned that corresponds to the exit status of the method</returns>
-        public int UpdateRecipe(Recipe updatedRecipe)
+        public static int UpdateRecipe(Recipe updatedRecipe)
         {
             int recipeID, itemListResult;
             //Validate Recipe ItemList
@@ -491,7 +482,7 @@ namespace BRIM.BackendClassLibrary
             string updatedName = updatedRecipe.Name;
             string updatedBase = updatedRecipe.BaseLiquor;
             
-            if (!this.databaseManager.updateRecipe(recipeID, updatedName, updatedBase))
+            if (!databaseManager.updateRecipe(recipeID, updatedName, updatedBase))
             {
                 Console.WriteLine("Error: Recipe Entry Update Failed. Stopping here");
 
@@ -502,7 +493,7 @@ namespace BRIM.BackendClassLibrary
             }
             
             //deleting old DrinkRecipe table entries for this Recipe
-            if (!this.databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
+            if (!databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
 
                 string mes = updatedName + " could not be updated";
@@ -516,7 +507,7 @@ namespace BRIM.BackendClassLibrary
             foreach(RecipeItem component in updatedRecipe.ItemList) {
                 int itemID = component.Item.ID;
                 double itemQuantity = component.Quantity;
-                itemListResult = this.databaseManager.addDrinkRecipe(recipeID, itemID, itemQuantity);
+                itemListResult = databaseManager.addDrinkRecipe(recipeID, itemID, itemQuantity);
 
                 if (itemListResult == -1) {
                     Console.WriteLine("Error: DrinkRecipe Entry Addition Failed For Entry with '"
@@ -533,12 +524,12 @@ namespace BRIM.BackendClassLibrary
         }
 
         //Check to make Sure An Added or Updated Recipe's DrinkRecipe is valid before adding it in 
-        private bool validateDrinkRecipeList(List<RecipeItem> itemList) {
-            this.GetItemList();    //ItemList must be populated and uptoDate First                    
+        private static bool validateDrinkRecipeList(List<RecipeItem> itemList) {
+            GetItemList();    //ItemList must be populated and uptoDate First                    
             foreach(RecipeItem component in itemList) {
                 int itemID = component.Item.ID;
                 double itemQuantity = component.Quantity;
-                int drinkFound = this.ItemList.FindIndex(x => x.ID == itemID);
+                int drinkFound = ItemList.FindIndex(x => x.ID == itemID);
 
                 if (drinkFound == -1 || itemQuantity < 0) {
                     return false;
@@ -556,13 +547,13 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="unwantedRecipe">The item to be deleted</param>
         /// <returns>an integer value representing the exit status of the method</returns>
-        public int RemoveRecipe(Recipe unwantedRecipe)
+        public static int RemoveRecipe(Recipe unwantedRecipe)
         {
             int recipeID = unwantedRecipe.ID;
 
             //deleting old DrinkRecipes table entries for this Recipe
             //Should be done first since drinkrecipe Table is the one with the constraints
-            if (!this.databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
+            if (!databaseManager.deleteDrinkRecipesByRecipeID(recipeID)) {
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
 
                 string mes = unwantedRecipe.Name + " could not be deleted";
@@ -572,7 +563,7 @@ namespace BRIM.BackendClassLibrary
             }
 
             // delete recip entry from recipes table 
-            if (!this.databaseManager.deleteRecipe(recipeID)) {
+            if (!databaseManager.deleteRecipe(recipeID)) {
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
 
                 string mes = unwantedRecipe.Name + " could not be deleted";
@@ -584,37 +575,37 @@ namespace BRIM.BackendClassLibrary
         }
 
         //This returns the all of the stats for the drink that is requested
-        public List<DrinkStat> GetDrinkStats(Drink drink)
+        public static List<DrinkStat> GetDrinkStats(Drink drink)
         {
             return databaseManager.getDrinkStats(drink.ID);
         }
 
         //This returns all of the stats for the recipie that is requested
-        public List<RecipeStat> GetRecipeStats(Recipe recipe)
+        public static List<RecipeStat> GetRecipeStats(Recipe recipe)
         {
             return databaseManager.getRecipeStats(recipe.ID);
         }
 
         //This returns the stats for the requested drink between the dates specified
-        public List<DrinkStat> GetDrinkStatsByDate(Drink drink, DateTime startDate, DateTime endDate)
+        public static List<DrinkStat> GetDrinkStatsByDate(Drink drink, DateTime startDate, DateTime endDate)
         {
             return databaseManager.getDrinkStatsByDateRange(drink.ID, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
 
         //This returns the stats for the requested recipe between the dates specified
-        public List<RecipeStat> GetRecipeStatsByDate(Recipe recipe, DateTime startDate, DateTime endDate)
+        public static List<RecipeStat> GetRecipeStatsByDate(Recipe recipe, DateTime startDate, DateTime endDate)
         {
             return databaseManager.getRecipeStatsByDateRange(recipe.ID, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
 
         //This returns the stats for all drinks between the specified times
-        public List<DrinkStat> GetAllDrinkStats(DateTime startDate, DateTime endDate)
+        public static List<DrinkStat> GetAllDrinkStats(DateTime startDate, DateTime endDate)
         {
             return databaseManager.getAllDrinkStatsByDateRange(startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
 
         //This returns the stats for all recipes between the specified times
-        public List<RecipeStat> GetAllRecipeStats(DateTime startDate, DateTime endDate)
+        public static List<RecipeStat> GetAllRecipeStats(DateTime startDate, DateTime endDate)
         {
             return databaseManager.getAllRecipeStatsByDateRange(startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
