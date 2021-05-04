@@ -32,6 +32,11 @@ const NavDrawer = props => {
       icon: <InboxIcon />,
       onClick: () => history.push("/recipes")
     },
+    {
+      text: "Tags",
+      icon: <InboxIcon />,
+      onClick:()=>history.push("/tags")
+    },
   ];
   return (
     <MUIDrawer variant="permanent" className={classes.drawer}>
