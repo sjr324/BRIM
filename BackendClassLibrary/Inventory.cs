@@ -18,6 +18,14 @@ namespace BRIM.BackendClassLibrary
         public static string Country;
         public static IDatabaseManager databaseManager = new DatabaseManager();
 
+        /// <summary>
+        /// Replaces the existing database manager with a new one, replaces the old overloaded contructor
+        /// </summary>
+        /// <param name="databasemanager"></param>
+        public static void ReplaceDBManager(IDatabaseManager databasemanager)
+        {
+            databaseManager=databasemanager;
+        }
 
         /// <summary>
         /// Runs an update command on the item based off the item that is sent in from the frontend

@@ -13,8 +13,7 @@ namespace BRIM
 
 		public ActionResult GetTags()
 		{
-			return View(new TagListModel 
-			{
+			return new JsonResult(new{
 				tags=bcl.Inventory.TagList.AsReadOnly()
 			});
 		}

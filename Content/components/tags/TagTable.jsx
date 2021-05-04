@@ -8,6 +8,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { Button, Container } from '@material-ui/core';
+import TagAddField from './TagAddField.jsx';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Grid from '@material-ui/core/Grid';
@@ -21,7 +22,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function ItemTableBasic(props) {
+export default function TagTable(props) {
   const classes = useStyles();
 	let [state, updateState]= React.useState({
 		tags:[],
@@ -40,18 +41,19 @@ export default function ItemTableBasic(props) {
   
 
   const loadTagsFromServer=()=>{
-    console.log("Loading items:")
+    console.log("Loading tags:")
     let itemurl='/inventory/tags'
     let xhr = new XMLHttpRequest();
     xhr.open('GET',itemurl,true);
     xhr.setRequestHeader('Content-Type','application/json');
     xhr.onload = ()=>{
 
-      console.log("Updated items");
+      console.log("Updated tags");
+      console.log(xhr.responseText);
 
       let data = JSON.parse(xhr.responseText);
       updateState({
-        items: data.tags
+        tags: data.tags
       });
       console.log(data.tags);
       
@@ -67,6 +69,7 @@ export default function ItemTableBasic(props) {
       <Grid item xs={12}>
         <Grid container justify="center" spacing={2} direction="row" alignItems = "flex-start">
           <Grid item xs={12}>
+            <TagAddField/>
             <TableContainer component={Paper}>
               <Table className={classes.table} aria-label="simple table">
                 <TableHead>
@@ -76,7 +79,7 @@ export default function ItemTableBasic(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {state.items.map((row) => (
+                  {state.tags.map((row) => (
                     <TableRow key={row.id}>
                       <TableCell component="th" scope="row" align="center">
                         {row.name}
