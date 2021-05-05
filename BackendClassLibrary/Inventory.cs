@@ -181,6 +181,7 @@ namespace BRIM.BackendClassLibrary
                     int recipieFound = RecipeList.FindIndex(x => x.Name == name);
                     if (drinkFound != -1)
                     {
+                        //TODO: do this if mods exist, else send notifiction
                         JArray modifications = (JArray)lineitem["modifications"];
 
                         //should only be one, but maybe there is something im not thinking of,
@@ -198,6 +199,7 @@ namespace BRIM.BackendClassLibrary
 
                                 double pourAmt = Convert.ToDouble(pour[0]);
                                 string pourMeasurement = pour[1];
+                                //TODO: check if this field is present, else send notification
                                 int quantitySold = (int)lineitem["quantitySold"];
 
                                 if (pourMeasurement == "oz")
@@ -228,6 +230,7 @@ namespace BRIM.BackendClassLibrary
                         //increment the amount of the recipie ordered
                         databaseManager.incrementRecipeStat(orderedRecipe.ID, DateTime.Now.ToString("yyyy-MM-dd"), amtOrdered);
 
+                        //TODI: Check if this exists, else send notification or possibly count instances of recipe
                         JArray modifications = (JArray)lineitem["modifications"];
                         if (modifications.Count > 0)
                         {
