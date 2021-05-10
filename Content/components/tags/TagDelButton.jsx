@@ -3,7 +3,7 @@ import React from 'react';
 import { Button  } from '@material-ui/core';
 export default  function DelTagButton(props){
 
-	const DetTag=()=>{
+	const DelTag=()=>{
 		let data = new FormData;
 		let submitUrl = "/inventory/deltag"
 		data.append('name',props.tag.name);
@@ -14,11 +14,11 @@ export default  function DelTagButton(props){
 
 		xhr.open('POST',submitUrl,true);
 		xhr.onload=()=>{
-			props.onTagSubmit();
+
+			props.onClick();
 			console.log("Tag Deleted");
 		}
 		xhr.send(data);
-		props.onClick();
 	}
 	return (
 		<Button variant="contained" color="secondary" onClick={DelTag}>
