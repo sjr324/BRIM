@@ -176,81 +176,145 @@ namespace BRIM.BackendClassLibrary
                     //Modifications always come in for ordering a specific drink item, 
                     //but in the case of cocktails(recipies) there is a possibility of there 
                     //being no modification
-                    //TODO: If not in recipies or drinks flag it for manual update
                     int drinkFound = ItemList.FindIndex(x => x.Name == name);
                     int recipieFound = RecipeList.FindIndex(x => x.Name == name);
                     if (drinkFound != -1)
                     {
-                        JArray modifications = (JArray)lineitem["modifications"];
-
-                        //should only be one, but maybe there is something im not thinking of,
-                        //can change from a loop later
-                        foreach (JObject mod in modifications)
+                        //TODO: do this if mods exist, else send notifiction
+                        if (lineitem.ContainsKey("modifications"))
                         {
-                            string modName = mod["name"].ToString();
+                            JArray modifications = (JArray)lineitem["modifications"];
 
-                            //if it has parenthasis then assume it is the modification that tells us the portion size
-                            if (modName.Contains("("))
+                            //should only be one, but maybe there is something im not thinking of,
+                            //can change from a loop later
+                            foreach (JObject mod in modifications)
                             {
-                                string[] temppour = modName.Split('(');
-                                temppour = temppour[1].Split(')');
-                                string[] pour = temppour[0].Split(' ');
+                                string modName = mod["name"].ToString();
 
-                                double pourAmt = Convert.ToDouble(pour[0]);
-                                string pourMeasurement = pour[1];
-                                int quantitySold = (int)lineitem["quantitySold"];
-
-                                if (pourMeasurement == "oz")
+                                //if it has parenthasis then assume it is the modification that tells us the portion size
+                                if (modName.Contains("("))
                                 {
-                                    pourAmt = pourAmt * 29.5735; //conversion for fluid oz to ml
+                                    string[] temppour = modName.Split('(');
+                                    temppour = temppour[1].Split(')');
+                                    string[] pour = temppour[0].Split(' ');
+
+                                    double pourAmt = Convert.ToDouble(pour[0]);
+                                    string pourMeasurement = pour[1];
+                                    //TODO: check if this field is present, else send notification
+
+                                    int quantitySold;
+
+                                    if (lineitem.ContainsKey("quantitySold"))
+                                    {
+                                        quantitySold = (int)lineitem["quantitySold"];
+                                    } else
+                                    {
+                                        quantitySold = 1;
+
+                                        string mes = "Order " + order["id"] + " may not have updated accurately. No quantity sold provided.";
+                                        NotificationManager.AddNotification(mes);
+                                    }
+
+                                    if (pourMeasurement == "oz")
+                                    {
+                                        pourAmt = pourAmt * 29.5735; //conversion for fluid oz to ml
+                                    }
+
+                                    //setup the total amount that should have been poured
+                                    updateAmt += pourAmt * quantitySold;
                                 }
-
-                                //setup the total amount that should have been poured
-                                updateAmt += pourAmt * quantitySold;
                             }
+                            //update DB for amount of drink ordered for that day
+                            databaseManager.incrementDrinkStat(ItemList[drinkFound].ID, DateTime.Now.ToString("yyyy-MM-dd"), updateAmt);
+
+                            Drink updatedDrink = (Drink)orderItemUpdateProcedure(ItemList[drinkFound], updateAmt);
+
+                            databaseManager.updateDrink(updatedDrink);
+                            ItemList[drinkFound] = updatedDrink;
+                            updateAmt = 0.0;
+                        } else
+                        {
+                            string mes = "Order " + order["id"] + " must be manually updated. No modifications given.";
+                            NotificationManager.AddNotification(mes);
                         }
-                        //update DB for amount of drink ordered for that day
-                        databaseManager.incrementDrinkStat(ItemList[drinkFound].ID, DateTime.Now.ToString("yyyy-MM-dd"), updateAmt);
-
-                        Drink updatedDrink = (Drink) orderItemUpdateProcedure(ItemList[drinkFound], updateAmt);
-
-                        databaseManager.updateDrink(updatedDrink);
-                        ItemList[drinkFound] = updatedDrink;
-                        updateAmt = 0.0;
                     } else if (recipieFound != -1)
                     {
                         //same process as above, but for recipies
                         //recipies may or may not have modifications
                         Recipe orderedRecipe = RecipeList[recipieFound];
                         List<RecipeItem> parts = orderedRecipe.ItemList;
-                        int amtOrdered = (int)lineitem["quantitySold"];
 
-                        //increment the amount of the recipie ordered
-                        databaseManager.incrementRecipeStat(orderedRecipe.ID, DateTime.Now.ToString("yyyy-MM-dd"), amtOrdered);
-
-                        JArray modifications = (JArray)lineitem["modifications"];
-                        if (modifications.Count > 0)
+                        if (order.ContainsKey("modifications"))
                         {
-                            string modName = modifications[0]["name"].ToString();
+                            int amtOrdered;
 
-                            if (modName != orderedRecipe.BaseLiquor)
+                            if (order.ContainsKey("quantitySold"))
                             {
-                                //process the modification
-                                int modIndex = RecipeList.FindIndex(x => x.Name == modName);
+                                amtOrdered = (int)lineitem["quantitySold"];
+                            } else
+                            {
+                                amtOrdered = 1;
 
-                                if (modIndex != -1)
+                                string mes = "Order " + order["id"] + " may not have updated properly, no quantity sold specified";
+                                NotificationManager.AddNotification(mes);
+                            }
+
+                            //increment the amount of the recipie ordered
+                            databaseManager.incrementRecipeStat(orderedRecipe.ID, DateTime.Now.ToString("yyyy-MM-dd"), amtOrdered);
+
+                            //TODI: Check if this exists, else send notification or possibly count instances of recipe
+                            JArray modifications = (JArray)lineitem["modifications"];
+                            if (modifications.Count > 0)
+                            {
+                                string modName = modifications[0]["name"].ToString();
+
+                                if (modName != orderedRecipe.BaseLiquor)
                                 {
-                                    int baseIndex = parts.FindIndex(x => x.Item.Name == orderedRecipe.BaseLiquor);
-                                    double q = parts[baseIndex].Quantity;
-                                    parts.RemoveAt(baseIndex);
-                                    parts.Add(new RecipeItem(ItemList[modIndex] as Drink, q));
-                                } else
-                                {
-                                    //Flag for the user because modification is unknown
-                                    string mes = modName + " is unknown. Must be updated manually.";
-                                    NotificationManager.AddNotification(mes);
+                                    //process the modification
+                                    int modIndex = RecipeList.FindIndex(x => x.Name == modName);
+
+                                    if (modIndex != -1)
+                                    {
+                                        int baseIndex = parts.FindIndex(x => x.Item.Name == orderedRecipe.BaseLiquor);
+                                        double q = parts[baseIndex].Quantity;
+                                        parts.RemoveAt(baseIndex);
+                                        parts.Add(new RecipeItem(ItemList[modIndex] as Drink, q));
+                                    }
+                                    else
+                                    {
+                                        //Flag for the user because modification is unknown
+                                        string mes = modName + " is unknown. Must be updated manually.";
+                                        NotificationManager.AddNotification(mes);
+                                    }
                                 }
                             }
+                            
+                            //update every drink that was a part of the recipe
+                            foreach (RecipeItem part in parts)
+                            {
+                                //calculate and update every item
+                                updateAmt += part.Quantity * amtOrdered;
+
+                                //update Db for amount of drink ordered that day
+                                databaseManager.incrementDrinkStat(part.Item.ID, DateTime.Now.ToString("yyyy-MM-dd"), updateAmt);
+
+                                Drink updatedDrink = (Drink)orderItemUpdateProcedure(part.Item, updateAmt);
+
+                                databaseManager.updateDrink(updatedDrink);
+                                ItemList[drinkFound] = updatedDrink;
+                                updateAmt = 0.0;
+                            }
+                        }
+                        else
+                        {
+                            string mes = "Order " + order["id"] + " may not have updated properly, no quantity sold specified";
+                            NotificationManager.AddNotification(mes);
+
+                            //update by assuming only one was ordered
+                            int amtOrdered = 1;
+
+                            //increment the amount of the recipie ordered
+                            databaseManager.incrementRecipeStat(orderedRecipe.ID, DateTime.Now.ToString("yyyy-MM-dd"), amtOrdered);
 
                             //update every drink that was a part of the recipe
                             foreach (RecipeItem part in parts)
@@ -261,7 +325,7 @@ namespace BRIM.BackendClassLibrary
                                 //update Db for amount of drink ordered that day
                                 databaseManager.incrementDrinkStat(part.Item.ID, DateTime.Now.ToString("yyyy-MM-dd"), updateAmt);
 
-                                Drink updatedDrink = (Drink) orderItemUpdateProcedure(part.Item, updateAmt);
+                                Drink updatedDrink = (Drink)orderItemUpdateProcedure(part.Item, updateAmt);
 
                                 databaseManager.updateDrink(updatedDrink);
                                 ItemList[drinkFound] = updatedDrink;
