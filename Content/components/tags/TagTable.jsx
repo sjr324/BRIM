@@ -9,6 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { Button, Container } from '@material-ui/core';
 import TagAddField from './TagAddField.jsx';
+import TagDelButton from './TagDelButton.jsx'
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import Grid from '@material-ui/core/Grid';
@@ -61,6 +62,9 @@ export default function TagTable(props) {
     xhr.send();
     
   }
+  const onTagSubmit=()=>{
+    loadTagsFromServer();
+  }
   return (
 
     <Grid container className={classes.root} spacing={5} direction="column"
@@ -69,7 +73,7 @@ export default function TagTable(props) {
       <Grid item xs={12}>
         <Grid container justify="center" spacing={2} direction="row" alignItems = "flex-start">
           <Grid item xs={12}>
-            <TagAddField/>
+            <TagAddField onTagSubmit={onTagSubmit}/>
             <TableContainer component={Paper}>
               <Table className={classes.table} aria-label="simple table">
                 <TableHead>
@@ -85,10 +89,8 @@ export default function TagTable(props) {
                         {row.name}
                       </TableCell>
                       <TableCell align="center">
-							<Button variant="contained" color="secondary">
-  								Secondary
-							</Button>
-						</TableCell>
+                        <TagDelButton tag={row} onClick={loadTagsFromServer}/>
+						          </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

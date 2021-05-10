@@ -4,8 +4,28 @@ import AddCircle from '@material-ui/icons/AddCircle';
 import TextField from '@material-ui/core/TextField';
 
 export default function TagAddField(props){
-	const AddButton = () =>(
-		<IconButton>
+	const [text,setText]=React.useState("");
+	const handleChange = (event) =>{
+		setText(event.target.value)
+	}
+	const submitTag = () =>{
+		let data = new FormData;
+		let submitUrl = "/inventory/addtag"
+		data.append('name',text);
+		data.append('id',1);
+		 console.log(data);
+
+		let xhr= new XMLHttpRequest();
+
+		xhr.open('POST',submitUrl,true);
+		xhr.onload=()=>{
+			props.onTagSubmit();
+			console.log("Tag Submitted");
+		}
+		xhr.send(data);
+	}
+	const AddButton = (props) =>(
+		<IconButton onClick={props.onClick}>
 			<AddCircle />
 		</IconButton>
 	)
@@ -13,10 +33,12 @@ export default function TagAddField(props){
 		<TextField
 			margin="dense"
 			id="tagadd"
-			defaultValue="Add Tag"
+			placeholder="Add Tag"
 			variant="filled"
 			fullWidth
-			InputProps={{endAdornment: <AddButton/>}}
+			style={{margin: 8}}
+			InputProps={{endAdornment: <AddButton onClick={submitTag}/>}}
+			onChange={handleChange}
 		/>
 	);
 }
