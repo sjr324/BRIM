@@ -29,19 +29,28 @@ export default function App(props) {
   const app = (
     <ThemeProvider theme={theme}>
       <CssBaseline/>
-    <div className={classes.container}>
-      <Helmet>
-        <title>
-          BRIM
-        </title>
-      </Helmet>
-      <NavDrawer />
-      <Switch>
-        <Route exact from="/" render={props => <ItemTableBasic initialItems={state.items}  />} />
-      </Switch>
-      <Switch>
-        <Route exact from="/recipes" render={props => <RecipeTable  />} />
-      </Switch>
+        <div className={classes.container}>
+
+          <Helmet>
+            <title>
+              BRIM
+            </title>
+          </Helmet>
+
+          <NavDrawer/>
+
+          <Switch>
+                <Route exact from="/" render={props => <ItemTableBasic initialItems={state.items} />} />
+          </Switch>
+
+          <Switch>
+                <Route exact from="/recipes" render={props => <RecipeTable  />} />
+          </Switch>
+
+          <Switch>
+                <Route exact from="/stat" render={props => <RecipeTable />} />
+          </Switch>
+
     </div>
   </ThemeProvider>
   );

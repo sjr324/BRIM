@@ -8,6 +8,9 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
+import InsertChartIcon from '@material-ui/icons/InsertChart';
+import LocalBarIcon from '@material-ui/icons/LocalBar';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import MailIcon from "@material-ui/icons/Mail";
 import { withRouter } from "react-router-dom";
 
@@ -23,14 +26,19 @@ const NavDrawer = props => {
   const classes = useStyles();
   const itemsList = [
     {
-      text: "Items",
-      icon: <InboxIcon />,
+      text: "Inventory Items",
+      icon: <LocalBarIcon />,
       onClick: () => history.push("/")
     },
     {
-      text: "Recipes",
-      icon: <InboxIcon />,
+      text: "Recipe Book",
+      icon: <LibraryBooksIcon />,
       onClick: () => history.push("/recipes")
+    },
+    {
+      text: "Statistics",
+      icon: <InsertChartIcon />,
+      onClick: () => history.push("/stat")
     },
   ];
   return (
