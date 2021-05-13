@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route,StaticRouter, Switch } from "react-router-dom";
 import ItemTableBasic from './items/ItemTable.jsx'
 import RecipeTable from './recipes/RecipeTable.jsx'
-import StatisticsPage from './stats/StatisticsPage'
+import StatisticsPage from './stats/StatisticsPage.jsx'
 import NavDrawer from "./NavDrawer.jsx";
 import { makeStyles } from "@material-ui/core/styles";
 import { Helmet} from 'react-helmet';

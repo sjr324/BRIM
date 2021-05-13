@@ -4,14 +4,13 @@ import {
   ListItem,
   List,
   ListItemIcon,
-  ListItemText
+    ListItemText,
+    Divider
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import InboxIcon from "@material-ui/icons/MoveToInbox";
 import InsertChartIcon from '@material-ui/icons/InsertChart';
 import LocalBarIcon from '@material-ui/icons/LocalBar';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
-import MailIcon from "@material-ui/icons/Mail";
 import { withRouter } from "react-router-dom";
 
 //https://codesandbox.io/s/winter-brook-fnepe?file=/src/Drawer.jsx:0-1323
@@ -47,11 +46,15 @@ const NavDrawer = props => {
       <List>
         {itemsList.map((item, index) => {
           const { text, icon, onClick } = item;
-          return (
-            <ListItem button key={text} onClick={onClick}>
-              {icon && <ListItemIcon>{icon}</ListItemIcon>}
-              <ListItemText primary={text} />
-            </ListItem>
+            return (
+              <div>
+                <ListItem button key={text} onClick={onClick}>
+                  {icon && <ListItemIcon>{icon}</ListItemIcon>}
+                  <ListItemText primary={text} />
+                </ListItem>
+               
+                <Divider />
+               </div>
           );
         })}
       </List>

@@ -9,9 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import ItemDialog from './ItemDialog.jsx'
 import AddItemFab from './AddItemFab.jsx'
-import { Button, Container } from '@material-ui/core';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
+
 import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles({
