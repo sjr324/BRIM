@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using Microsoft.AspNetCore.Mvc;
-using bcl = BRIM.BackendClassLibrary;
+using BRIM.BackendClassLibrary;
 using Microsoft.Extensions.Logging;
 
 namespace BRIM 
@@ -10,21 +10,22 @@ namespace BRIM
 	public class InventoryController: Controller
 	{
 		private readonly ILogger<InventoryController> _logger;
-
+		private IInventoryManager _inventory;
 		
 
 
-		public InventoryController(ILogger<InventoryController> logger)
+		public InventoryController(ILogger<InventoryController> logger,IInventoryManager inventory)
 		{
 			_logger = logger;
 			_logger.LogInformation("In inventory");
+			_inventory = inventory;
 			//initialize the inventory
-			bcl.Inventory.GetItemList();
+			_inventory.GetItemList();
 
 		}
 		public ActionResult Index(){
 			return View(new ItemViewModel{
-				Items = bcl.Inventory.ItemList.ToList()
+				Items = _inventory.ItemList.ToList()
 			});
 		}
 		
@@ -32,31 +33,31 @@ namespace BRIM
 			_logger.LogInformation("Content type"+ ControllerContext.HttpContext.Request.ContentType, DateTimeOffset.Now);
 			if (ControllerContext.HttpContext.Request.ContentType == "application/json")
 			{
-				List<bcl.Drink> items = bcl.Inventory.ItemList.Select(p=>(bcl.Drink)p).ToList();
+				List<Drink> items = _inventory.ItemList.Select(p=>(Drink)p).ToList();
 				return new JsonResult(new
 				{
 					Items= items.AsReadOnly()
 				});
 			}
 			return View("~/Views/Home/Index.cshtml",new ItemViewModel{
-				Items = bcl.Inventory.ItemList.Select(p=>(bcl.Drink)p).ToList().AsReadOnly()
+				Items = _inventory.ItemList.Select(p=>(Drink)p).ToList().AsReadOnly()
 			});	
 		}
 		
 		public ActionResult SubmitItem(DrinkSubmissionModel item){
-			bcl.Drink dr;
+			Drink dr;
 			if(item.Id==-1){
 
-				dr = new bcl.Drink();
+				dr = new Drink();
 				//set the id to the next highest one
-				dr.ID =  bcl.Inventory.ItemList.Select(p=> p.ID).Max()+1;
+				dr.ID =  _inventory.ItemList.Select(p=> p.ID).Max()+1;
 			}else{
-				dr=(bcl.Drink)bcl.Inventory.ItemList.Where(p=>p.ID == item.Id).ToList().First();
+				dr=(Drink)_inventory.ItemList.Where(p=>p.ID == item.Id).ToList().First();
 			}
 			dr.Name = item.Name;
 			dr.Brand = item.Brand;
 			dr.Estimate = Convert.ToDouble(item.Est);
-			dr.Measurement= (bcl.unit) Enum.Parse(typeof(bcl.unit), item.Units);
+			dr.Measurement= (unit) Enum.Parse(typeof(unit), item.Units);
 			dr.Price = Convert.ToDouble(item.Price);
 			dr.IdealLevel = Convert.ToDouble(item.Ideal);
 			dr.ParLevel = Convert.ToDouble(item.Par);
@@ -69,9 +70,9 @@ namespace BRIM
 			}
 			dr.CalculateStatus();
 			if(item.Id == -1){
-				bcl.Inventory.AddItem(dr);
+				_inventory.AddItem(dr);
 			}else{
-				bcl.Inventory.UpdateItem(dr);
+				_inventory.UpdateItem(dr);
 			}
 			return Content("Success");
 		}
@@ -79,7 +80,7 @@ namespace BRIM
 		
 		public class ItemViewModel
 		{
-			public IReadOnlyList<bcl.Item> Items { get; set; }
+			public IReadOnlyList<Item> Items { get; set; }
 
 		}
 

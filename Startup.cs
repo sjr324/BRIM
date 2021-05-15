@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using React.AspNet;
+using BRIM.BackendClassLibrary;
 
 //namespace React.Sample.Webpack.CoreMvc
 namespace BRIM
@@ -29,6 +30,7 @@ namespace BRIM
 
 			services.AddReact();
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddSingleton<IInventoryManager,Inventory>();
 
 			// Build the intermediate service provider then return it
 			services.BuildServiceProvider();

@@ -10,19 +10,28 @@ using System.Threading.Tasks;
 namespace BRIM.BackendClassLibrary
 {
     //The main class of the program. 
-    public static class Inventory
+    public class Inventory:IInventoryManager
     {
-        public static List<Item> ItemList = new List<Item>(); //holds all items registered to this BRIM instance
-        public static List<Recipe> RecipeList = new List<Recipe>(); //holds all of the recipes for this BRIM instance
-        public static List<Tag> TagList = new List<Tag>(); //holds all of the tags for this BRIM instance
-        public static string Country;
-        public static IDatabaseManager databaseManager = new DatabaseManager();
+        public List<Item> ItemList{get;set;} //holds all items registered to this BRIM instance
+        public List<Recipe> RecipeList {get;set;} //holds all of the recipes for this BRIM instance
+        public List<Tag> TagList {get;set;} //holds all of the tags for this BRIM instance
+        public string Country;
+        public IDatabaseManager databaseManager = new DatabaseManager();
+        public NotificationManager notificationManager;
+        public Inventory()
+        {
+            notificationManager= new NotificationManager();
+            ItemList=new List<Item>();
+            RecipeList = new List<Recipe>();
+            TagList=new List<Tag>();
+        }
+
 
         /// <summary>
         /// Replaces the existing database manager with a new one, replaces the old overloaded contructor
         /// </summary>
         /// <param name="databasemanager"></param>
-        public static void ReplaceDBManager(IDatabaseManager databasemanager)
+        public void ReplaceDBManager(IDatabaseManager databasemanager)
         {
             databaseManager=databasemanager;
         }
@@ -32,7 +41,7 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="info">An item that is created from the frontend</param>
         /// <returns>an integer return based on the exit status of the function</returns>
-        public static int UpdateItem(Item info)
+        public int UpdateItem(Item info)
         {
             Drink updateItem = info as Drink;
             //make sure status is recalculated to reflect any changes in Quantity
@@ -45,7 +54,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: Item Update Failed");
 
                 string mes = updateItem.Name + " could not be updated";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -56,7 +65,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: Drink Tag Entry Deletion Failed. Stopping here");
 
                 string mes = updateItem.Name + " could not be updated";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -73,7 +82,7 @@ namespace BRIM.BackendClassLibrary
                     + T.Name + "' on item '" + updateItem.Name + "'. Stopping here");
 
                     string mes = updateItem.Name + " could not be updated";
-                    NotificationManager.AddNotification(mes);
+                    notificationManager.AddNotification(mes);
 
                     return 1;
                 }
@@ -88,7 +97,7 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="i">Item that the frontend sends to the backend</param>
         /// <returns>An integer is returned that corresponds to the exit status of the method</returns>
-        public static int AddItem(Item i)
+        public int AddItem(Item i)
         {
             Drink newItem = i as Drink;
             bool result = databaseManager.addDrink(newItem);
@@ -99,7 +108,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: Item Addition Failed");
 
                 mes = newItem.Name + " could not be added";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -112,7 +121,7 @@ namespace BRIM.BackendClassLibrary
                     Console.WriteLine("Error: Tag could not be added");
 
                     mes = T.Name + " could not be added";
-                    NotificationManager.AddNotification(mes);
+                    notificationManager.AddNotification(mes);
                     
                     return 1;
                 }
@@ -127,7 +136,7 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="i">The item to be deleted</param>
         /// <returns>an integer value representing the exit status of the method</returns>
-        public static int RemoveItem(Item i)
+        public int RemoveItem(Item i)
         {
             Drink removeItem = i as Drink;
             bool result = databaseManager.deleteDrink(removeItem);
@@ -137,7 +146,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: Item removal failed");
 
                 string mes = removeItem.Name + " could not be removed";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -145,7 +154,7 @@ namespace BRIM.BackendClassLibrary
             return 0;
         }
 
-        public static int PurchseItem(Recipe r)
+        public int PurchaseItem(Recipe r)
         {
             return 0;
         }
@@ -158,7 +167,7 @@ namespace BRIM.BackendClassLibrary
         /// that. 
         /// </summary>
         /// <param name="message"></param>
-        public static void parseAPIPOSUpdate(JObject message)
+        public void parseAPIPOSUpdate(JObject message)
         {
             JToken msg = message;
             //double varianceMultiplier = 0.15;
@@ -247,7 +256,7 @@ namespace BRIM.BackendClassLibrary
                                 {
                                     //Flag for the user because modification is unknown
                                     string mes = modName + " is unknown. Must be updated manually.";
-                                    NotificationManager.AddNotification(mes);
+                                    notificationManager.AddNotification(mes);
                                 }
                             }
 
@@ -271,7 +280,7 @@ namespace BRIM.BackendClassLibrary
                     {
                         //flag user for unknown items the user has to update
                         string mes = name + " is unknown. Please update manually.";
-                        NotificationManager.AddNotification(mes);
+                        notificationManager.AddNotification(mes);
                     }
                 }
             }
@@ -283,7 +292,7 @@ namespace BRIM.BackendClassLibrary
         /// recalculates the item's status, and creates a status change notification if neccesary
         /// </summary>
         /// <returns>The updated Item Object</returns>
-        private static Item orderItemUpdateProcedure(Item updatedItem, double amount) {
+        private Item orderItemUpdateProcedure(Item updatedItem, double amount) {
             //update Item amount
             updatedItem.Estimate -= amount;
 
@@ -301,15 +310,15 @@ namespace BRIM.BackendClassLibrary
                 if (updatedItem.Status == status.belowIdeal)
                 {
                     string mes = updatedItem.Name + " is below ideal level";
-                    NotificationManager.AddNotification(mes);
+                    notificationManager.AddNotification(mes);
                 } else if (updatedItem.Status == status.belowPar)
                 {
                     string mes = updatedItem.Name + " is below par level";
-                    NotificationManager.AddNotification(mes);
+                    notificationManager.AddNotification(mes);
                 } else if (updatedItem.Status == status.empty)
                 {
                     string mes = updatedItem.Name + " is empty";
-                    NotificationManager.AddNotification(mes);
+                    notificationManager.AddNotification(mes);
                 }
             }
 
@@ -324,7 +333,7 @@ namespace BRIM.BackendClassLibrary
         /// such as food.
         /// </summary>
         /// <returns>an integer value that represents the exit status of the method</returns>
-        public static int GetItemList()
+        public int GetItemList()
         {
             List<Item> drinksList = new List<Item>();
             drinksList = databaseManager.getDrinks();
@@ -334,7 +343,7 @@ namespace BRIM.BackendClassLibrary
         }
 
         //Gets the list of all tags in the tags table
-        public static int GetTagList()
+        public int GetTagList()
         {
             List<Tag> tagList = new List<Tag>();
             tagList = databaseManager.getTags();
@@ -344,7 +353,7 @@ namespace BRIM.BackendClassLibrary
         }
 
         //Adds a tag to the tag table
-        public static int AddTag(string tagName)
+        public int AddTag(string tagName)
         {
             int tagID = databaseManager.addTag(tagName);
             if (tagID == -1)
@@ -352,7 +361,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: Tag Addition Failed");
 
                 string mes = tagName + " could not be added";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -364,7 +373,7 @@ namespace BRIM.BackendClassLibrary
         }
 
         //Removes a tag from the tag table
-        public static int RemoveTag(int tagID)
+        public int RemoveTag(int tagID)
         {
             bool result = databaseManager.deleteTag(tagID);
 
@@ -373,7 +382,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: Tag removal failed");
 
                 string mes = "Tag with " + tagID + " could not be removed";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -382,12 +391,12 @@ namespace BRIM.BackendClassLibrary
         }
 
         //what are these for again? Are the even still neccesary with the current plan, or are the vestigial?
-        public static void EmitEvent()
+        public void EmitEvent()
         {
 
         }
 
-        public static void ListenEvent()
+        public void ListenEvent()
         {
 
         }
@@ -400,7 +409,7 @@ namespace BRIM.BackendClassLibrary
         /// tuple list for each recipe entry
         /// </summary>
         /// <returns>It returns an int representing the status of the request</returns>
-        public static int GetRecipeList()
+        public int GetRecipeList()
         {
             List<Recipe> recipeList = new List<Recipe>();
             recipeList = databaseManager.getRecipes();
@@ -415,7 +424,7 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="newRecipe">Recipe that the frontend sends to the backend</param>
         /// <returns>An integer is returned that corresponds to the exit status of the method</returns>
-        public static int AddRecipe(Recipe newRecipe)
+        public int AddRecipe(Recipe newRecipe)
         {
             int recipeID, itemListResult;
             //Validate Recipe ItemList
@@ -424,7 +433,7 @@ namespace BRIM.BackendClassLibrary
                 string mes = newRecipe.Name + " could not be added." + 
                 "\n Error: New Recipe Item List has one or more Invalid Entries. "+
                 "Not Adding New Recipe Name, Base Liquor, Or Ingredients Into Database";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -436,7 +445,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: Recipe Entry Addition Failed. Stopping here");
 
                 string mes = newRecipe.Name + " could not be added";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -454,7 +463,7 @@ namespace BRIM.BackendClassLibrary
 
                     string mes = component.Item.Name + " could not be added to the recipie." +
                     "\n Recipe Ingredient Data Entry Stopped There.";
-                    NotificationManager.AddNotification(mes);
+                    notificationManager.AddNotification(mes);
 
                     return 1;
                 }
@@ -471,7 +480,7 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="updatedRecipe">Recipe that the frontend sends to the backend</param>
         /// <returns>An integer is returned that corresponds to the exit status of the method</returns>
-        public static int UpdateRecipe(Recipe updatedRecipe)
+        public int UpdateRecipe(Recipe updatedRecipe)
         {
             int recipeID, itemListResult;
             //Validate Recipe ItemList
@@ -480,7 +489,7 @@ namespace BRIM.BackendClassLibrary
                 string mes = updatedRecipe.Name + " could not be added." + 
                 "\n Error: Updated Recipe Item List has one or more Invalid Entries. " +
                 "Not Updating Recipe Name, Base Liqour, or Ingredients In Database.";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -495,7 +504,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: Recipe Entry Update Failed. Stopping here");
 
                 string mes = updatedName + " could not be updated";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -505,7 +514,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
 
                 string mes = updatedName + " could not be updated";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -522,7 +531,7 @@ namespace BRIM.BackendClassLibrary
                     + itemID + "' ItemID and '" + itemQuantity + "' failed. Stopping here");
 
                     string mes = component.Item.Name + " could not be updated";
-                    NotificationManager.AddNotification(mes);
+                    notificationManager.AddNotification(mes);
 
                     return 1;
                 }
@@ -532,7 +541,7 @@ namespace BRIM.BackendClassLibrary
         }
 
         //Check to make Sure An Added or Updated Recipe's DrinkRecipe is valid before adding it in 
-        private static bool validateDrinkRecipeList(List<RecipeItem> itemList) {
+        private bool validateDrinkRecipeList(List<RecipeItem> itemList) {
             GetItemList();    //ItemList must be populated and uptoDate First                    
             foreach(RecipeItem component in itemList) {
                 int itemID = component.Item.ID;
@@ -555,7 +564,7 @@ namespace BRIM.BackendClassLibrary
         /// </summary>
         /// <param name="unwantedRecipe">The item to be deleted</param>
         /// <returns>an integer value representing the exit status of the method</returns>
-        public static int RemoveRecipe(Recipe unwantedRecipe)
+        public int RemoveRecipe(Recipe unwantedRecipe)
         {
             int recipeID = unwantedRecipe.ID;
 
@@ -565,7 +574,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
 
                 string mes = unwantedRecipe.Name + " could not be deleted";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -575,7 +584,7 @@ namespace BRIM.BackendClassLibrary
                 Console.WriteLine("Error: DrinkRecipe Entry Deletion Failed. Stopping here");
 
                 string mes = unwantedRecipe.Name + " could not be deleted";
-                NotificationManager.AddNotification(mes);
+                notificationManager.AddNotification(mes);
 
                 return 1;
             }
@@ -583,37 +592,37 @@ namespace BRIM.BackendClassLibrary
         }
 
         //This returns the all of the stats for the drink that is requested
-        public static List<DrinkStat> GetDrinkStats(Drink drink)
+        public List<DrinkStat> GetDrinkStats(Drink drink)
         {
             return databaseManager.getDrinkStats(drink.ID);
         }
 
         //This returns all of the stats for the recipie that is requested
-        public static List<RecipeStat> GetRecipeStats(Recipe recipe)
+        public List<RecipeStat> GetRecipeStats(Recipe recipe)
         {
             return databaseManager.getRecipeStats(recipe.ID);
         }
 
         //This returns the stats for the requested drink between the dates specified
-        public static List<DrinkStat> GetDrinkStatsByDate(Drink drink, DateTime startDate, DateTime endDate)
+        public List<DrinkStat> GetDrinkStatsByDate(Drink drink, DateTime startDate, DateTime endDate)
         {
             return databaseManager.getDrinkStatsByDateRange(drink.ID, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
 
         //This returns the stats for the requested recipe between the dates specified
-        public static List<RecipeStat> GetRecipeStatsByDate(Recipe recipe, DateTime startDate, DateTime endDate)
+        public List<RecipeStat> GetRecipeStatsByDate(Recipe recipe, DateTime startDate, DateTime endDate)
         {
             return databaseManager.getRecipeStatsByDateRange(recipe.ID, startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
 
         //This returns the stats for all drinks between the specified times
-        public static List<DrinkStat> GetAllDrinkStats(DateTime startDate, DateTime endDate)
+        public List<DrinkStat> GetAllDrinkStats(DateTime startDate, DateTime endDate)
         {
             return databaseManager.getAllDrinkStatsByDateRange(startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
 
         //This returns the stats for all recipes between the specified times
-        public static List<RecipeStat> GetAllRecipeStats(DateTime startDate, DateTime endDate)
+        public List<RecipeStat> GetAllRecipeStats(DateTime startDate, DateTime endDate)
         {
             return databaseManager.getAllRecipeStatsByDateRange(startDate.ToString("yyyy-MM-dd"), endDate.ToString("yyyy-MM-dd"));
         }
