@@ -4,19 +4,19 @@ import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 
-export default function SimpleSnackbar() {
+export default function NtfcnSnackbar() {
 	const [open, setOpen] = React.useState(false);
 
-	const handleClick = () => {
-		setOpen(true);
-	};
 
 	useEffect(() => {
-		const sse = new EventSource('[YOUR_SSE_ENDPOINT_URL]',
-			{ withCredentials: true }); function getRealtimeData(data) {
+		const sse = new EventSource('/notification/get',{ withCredentials: true }); 
+		function getRealtimeData(data) {
+				console.log(data);
+				setOpen(true);
 				// process the data here,
 				// then pass it to state to be rendered
-			} sse.onmessage = e => getRealtimeData(JSON.parse(e.data)); sse.onerror = () => {
+			} sse.onmessage = e => getRealtimeData(JSON.parse(e.data)); 
+			sse.onerror = () => {
 				// error log here 
 
 				sse.close();
@@ -24,7 +24,7 @@ export default function SimpleSnackbar() {
 		return () => {
 			sse.close();
 		};
-	}, [YOUR_DEPENDENCIES_HERE]);
+	}, []);
 	const handleClose = (event, reason) => {
 		if (reason === 'clickaway') {
 			return;
@@ -35,7 +35,6 @@ export default function SimpleSnackbar() {
 
 	return (
 		<div>
-			<Button onClick={handleClick}>Open simple snackbar</Button>
 			<Snackbar
 				anchorOrigin={{
 					vertical: 'bottom',

@@ -111,6 +111,11 @@ namespace BRIM
 					pattern: "inventory/deltag",
 					defaults: new {controller = "Tag", action = "DelTags"}
 				);
+				//Notifications
+				endpoints.MapControllerRoute(
+					name:"notification",
+					pattern:"{controller=Notification}/{action=Index}"
+				);
 				//default
 				endpoints.MapControllerRoute(
 					name: "default",
