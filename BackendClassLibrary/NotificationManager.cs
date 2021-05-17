@@ -25,6 +25,9 @@ namespace BRIM.BackendClassLibrary
             notifications.Add(notification);
             latest = notification;
             currentID++;
+            foreach (var o in observers){
+                o.OnNext(notification);
+            }
 
         }
 

@@ -9,7 +9,7 @@ namespace BRIM.BackendClassLibrary
 		}
 		public virtual void OnCompleted()
 		{
-
+			this.Unsubscribe();
 		}
 		public virtual void OnError(Exception e)
 		{

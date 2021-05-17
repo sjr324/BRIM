@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Drawer as MUIDrawer,
   ListItem,
@@ -52,7 +52,6 @@ const NavDrawer = props => {
             </ListItem>
           );
         })}
-      <NtfcnSnackbar/>
       </List>
     </MUIDrawer>
   );

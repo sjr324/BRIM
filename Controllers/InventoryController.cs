@@ -44,32 +44,40 @@ namespace BRIM
 			});	
 		}
 		
-		public ActionResult SubmitItem(DrinkSubmissionModel item){
+		public ActionResult SubmitItem([FromBody]DrinkSubmissionModel item){
 			Drink dr;
-			if(item.Id==-1){
+			if(item.id==-1){
 
 				dr = new Drink();
 				//set the id to the next highest one
 				dr.ID =  _inventory.ItemList.Select(p=> p.ID).Max()+1;
 			}else{
-				dr=(Drink)_inventory.ItemList.Where(p=>p.ID == item.Id).ToList().First();
+				dr=(Drink)_inventory.ItemList.Where(p=>p.ID == item.id).ToList().First();
 			}
-			dr.Name = item.Name;
-			dr.Brand = item.Brand;
-			dr.Estimate = Convert.ToDouble(item.Est);
-			dr.Measurement= (unit) Enum.Parse(typeof(unit), item.Units);
-			dr.Price = Convert.ToDouble(item.Price);
-			dr.IdealLevel = Convert.ToDouble(item.Ideal);
-			dr.ParLevel = Convert.ToDouble(item.Par);
-			dr.BottleSize = Convert.ToInt32(item.Size);
-			dr.UnitsPerCase = Convert.ToInt32(item.Upc);
-			if (item.Vintage != ""){
-				dr.Vintage = Convert.ToInt32(item.Vintage);
+			dr.Name = item.name;
+			dr.Brand = item.brand;
+			dr.Estimate = Convert.ToDouble(item.estimate);
+			dr.Measurement= (unit) Enum.Parse(typeof(unit), item.units);
+			dr.Price = Convert.ToDouble(item.price);
+			dr.IdealLevel = Convert.ToDouble(item.ideal);
+			dr.ParLevel = Convert.ToDouble(item.par);
+			dr.BottleSize = Convert.ToInt32(item.size);
+			dr.UnitsPerCase = Convert.ToInt32(item.upc);
+			/*
+			dr.Tags = 
+			(from i in _inventory.TagList
+			join t in item.tags
+			on i.ID equals t.ID
+			select i).ToList();	
+			*/
+			
+			if (item.vintage != ""){
+				dr.Vintage = Convert.ToInt32(item.vintage);
 			}else{
 				dr.Vintage = null;
 			}
 			dr.CalculateStatus();
-			if(item.Id == -1){
+			if(item.id == -1){
 				_inventory.AddItem(dr);
 			}else{
 				_inventory.UpdateItem(dr);
