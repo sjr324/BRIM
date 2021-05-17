@@ -42,7 +42,7 @@ export default function ItemDialog(props) {
     let data = new FormData();
     let submitUrl = "/inventory/newitem" 
     data.append('name', values.newItemName);
-    data.append('est', values.newItemLoEst);
+    data.append('estimate', values.newItemLoEst);
     data.append('ideal', values.newItemIdeal);
     data.append('par', values.newItemPar);
     data.append('brand', values.newItemBrand);
