@@ -85,45 +85,47 @@ export default function ItemTableBasic(props) {
       //console.log(state.items);
   return (
 
-    <Grid container className={classes.root} spacing={5} direction="column"
+      <Grid container className={classes.root} spacing={3}
+          direction="column"
           justify="flex-start"
           alignItems="stretch">
-      <Grid item xs={12}>
-        <Grid container justify="center" spacing={2} direction="row" alignItems = "flex-start">
-          <Grid item xs={12}>
-            <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center">Drink</TableCell>
-                    <TableCell align="center">Quantity</TableCell>
-                    <TableCell align="center">Status</TableCell>
-                    <TableCell align="center">Details</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {state.items.map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell component="th" scope="row" align="center">
-                        {row.name}
-                      </TableCell>
-                      <TableCell align="center">{row.estimate}</TableCell>
-                      <TableCell align="center">{setStatus(row.status)}</TableCell>
-                      <TableCell align="center"><ItemDialog item={row} onItemSubmit={loadItemsFromServer}/></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-        </Grid>
-      </Grid>
 
-      <Grid container item xs={12} justify="flex-end">
-        <Grid item xs={1}>
-            <AddItemFab onNewItem={loadItemsFromServer}/>
-        </Grid>
-      </Grid>
+          <Grid item xs={12}>
+            <Grid container justify="center" spacing={2} direction="row" alignItems = "flex-start">
+              <Grid item xs={12}>
+                <TableContainer component={Paper}>
+                  <Table className={classes.table} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell align="center">Drink</TableCell>
+                        <TableCell align="center">Quantity</TableCell>
+                        <TableCell align="center">Status</TableCell>
+                        <TableCell align="center">Details</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {state.items.map((row) => (
+                        <TableRow key={row.id}>
+                          <TableCell component="th" scope="row" align="center">
+                            {row.name}
+                          </TableCell>
+                          <TableCell align="center">{row.estimate}</TableCell>
+                          <TableCell align="center">{setStatus(row.status)}</TableCell>
+                          <TableCell align="center"><ItemDialog item={row} onItemSubmit={loadItemsFromServer}/></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Grid container item xs={10} justify="flex-end">
+            <Grid item xs={1}>
+                <AddItemFab onNewItem={loadItemsFromServer}/>
+            </Grid>
+          </Grid>
           
     </Grid>
   );

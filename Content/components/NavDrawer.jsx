@@ -16,7 +16,8 @@ import { withRouter } from "react-router-dom";
 //https://codesandbox.io/s/winter-brook-fnepe?file=/src/Drawer.jsx:0-1323
 const useStyles = makeStyles({
   drawer: {
-    width: "150px"
+    width: "150px",
+    marginLeft: "50px"
   }
 });
 
