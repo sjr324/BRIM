@@ -66,6 +66,7 @@ namespace BRIM
 				);
 				*/
 				
+				//Item Actions
 				endpoints.MapControllerRoute(
 					name: "items",
 					pattern: "inventory/items",
@@ -76,6 +77,7 @@ namespace BRIM
 					pattern: "inventory/newitem",
 					defaults: new { controller = "Inventory", action = "SubmitItem" }
 				);
+				//Recipe Actions
 				endpoints.MapControllerRoute(
 					name:"recipes",
 					pattern:"inventory/recipes",
@@ -91,6 +93,23 @@ namespace BRIM
 					pattern: "inventory/itemnames",
 					defaults: new {controller = "Recipes", action = "ItemNames"}
 				);
+				//Tag Actions
+				endpoints.MapControllerRoute(
+					name:"tags",
+					pattern: "inventory/tags",
+					defaults: new {controller = "Tag", action = "GetTags"}
+				);
+				endpoints.MapControllerRoute(
+					name:"addtag",
+					pattern: "inventory/addtag",
+					defaults: new {controller = "Tag", action = "AddTag"}
+				);
+				endpoints.MapControllerRoute(
+					name:"deltags",
+					pattern: "inventory/deltag",
+					defaults: new {controller = "Tag", action = "DelTags"}
+				);
+				//default
 				endpoints.MapControllerRoute(
 					name: "default",
 					pattern: "{path?}",

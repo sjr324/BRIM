@@ -8,6 +8,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import InboxIcon from "@material-ui/icons/MoveToInbox";
+import NtfcnDialog from './notifications/NtfcnDialog.jsx';
 import MailIcon from "@material-ui/icons/Mail";
 import { withRouter } from "react-router-dom";
 
@@ -32,6 +33,11 @@ const NavDrawer = props => {
       icon: <InboxIcon />,
       onClick: () => history.push("/recipes")
     },
+    {
+      text: "Tags",
+      icon: <InboxIcon />,
+      onClick:()=>history.push("/tags")
+    },
   ];
   return (
     <MUIDrawer variant="permanent" className={classes.drawer}>
@@ -45,6 +51,7 @@ const NavDrawer = props => {
             </ListItem>
           );
         })}
+        <NtfcnDialog></NtfcnDialog>
       </List>
     </MUIDrawer>
   );
