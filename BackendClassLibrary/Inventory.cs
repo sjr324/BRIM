@@ -220,7 +220,7 @@ namespace BRIM.BackendClassLibrary
                                         quantitySold = 1;
 
                                         string mes = "Order " + order["id"] + " may not have updated accurately. No quantity sold provided.";
-                                        NotificationManager.AddNotification(mes);
+                                        notificationManager.AddNotification(mes);
                                     }
 
                                     if (pourMeasurement == "oz")
@@ -243,7 +243,7 @@ namespace BRIM.BackendClassLibrary
                         } else
                         {
                             string mes = "Order " + order["id"] + " must be manually updated. No modifications given.";
-                            NotificationManager.AddNotification(mes);
+                            notificationManager.AddNotification(mes);
                         }
                     } else if (recipieFound != -1)
                     {
@@ -264,7 +264,7 @@ namespace BRIM.BackendClassLibrary
                                 amtOrdered = 1;
 
                                 string mes = "Order " + order["id"] + " may not have updated properly, no quantity sold specified";
-                                NotificationManager.AddNotification(mes);
+                                notificationManager.AddNotification(mes);
                             }
 
                             //increment the amount of the recipie ordered
@@ -292,7 +292,7 @@ namespace BRIM.BackendClassLibrary
                                     {
                                         //Flag for the user because modification is unknown
                                         string mes = modName + " is unknown. Must be updated manually.";
-                                        NotificationManager.AddNotification(mes);
+                                        notificationManager.AddNotification(mes);
                                     }
                                 }
                             }
@@ -316,7 +316,7 @@ namespace BRIM.BackendClassLibrary
                         else
                         {
                             string mes = "Order " + order["id"] + " may not have updated properly, no quantity sold specified";
-                            NotificationManager.AddNotification(mes);
+                            notificationManager.AddNotification(mes);
 
                             //update by assuming only one was ordered
                             int amtOrdered = 1;
