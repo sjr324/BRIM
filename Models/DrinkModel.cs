@@ -7,17 +7,17 @@ namespace BRIM{
 
 public class DrinkSubmissionModel{
 	public string name{get;set;}
-	public string estimate{get;set;}
-	public string ideal{get;set;}
-	public string par{get;set;}
+	public double estimate{get;set;}
+	public double ideal{get;set;}
+	public double par{get;set;}
 	public string brand{get;set;}
-	public string price{get;set;}
-	public string size{get;set;}
-	public string upc{get;set;}
-	public string vintage{get;set;}
-	public string units{get;set;}
+	public double price{get;set;}
+	public double size{get;set;}
+	public double upc{get;set;}
+	public double vintage{get;set;}
+	public int units{get;set;}
 	public int id{get;set;} 
-	//public List<Tag> tags{get;set;}
+	public List<Tag> tags{get;set;}
 
 }
 

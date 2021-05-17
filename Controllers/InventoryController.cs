@@ -57,21 +57,19 @@ namespace BRIM
 			dr.Name = item.name;
 			dr.Brand = item.brand;
 			dr.Estimate = Convert.ToDouble(item.estimate);
-			dr.Measurement= (unit) Enum.Parse(typeof(unit), item.units);
+			dr.Measurement= (unit) item.units;
 			dr.Price = Convert.ToDouble(item.price);
 			dr.IdealLevel = Convert.ToDouble(item.ideal);
 			dr.ParLevel = Convert.ToDouble(item.par);
 			dr.BottleSize = Convert.ToInt32(item.size);
 			dr.UnitsPerCase = Convert.ToInt32(item.upc);
-			/*
 			dr.Tags = 
 			(from i in _inventory.TagList
 			join t in item.tags
 			on i.ID equals t.ID
 			select i).ToList();	
-			*/
 			
-			if (item.vintage != ""){
+			if (item.vintage !=0) {
 				dr.Vintage = Convert.ToInt32(item.vintage);
 			}else{
 				dr.Vintage = null;

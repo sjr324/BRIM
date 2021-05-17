@@ -60,7 +60,7 @@ export default function ItemDialog(props) {
     let submitUrl = "/inventory/newitem" 
     console.log(values);
     data.append('name', values.name);
-    data.append('est', values.lowerEstimate);
+    data.append('estimate', values.lowerEstimate);
     data.append('ideal', values.idealLevel);
     data.append('par', values.parLevel);
     data.append('brand', values.brand);
@@ -82,6 +82,10 @@ export default function ItemDialog(props) {
   };
   const handleSave=()=>{
     let submitUrl="/inventory/newitem"
+    if (values.vintage == null){
+      values.vintage=0;
+      setValues({...values});
+    }
     let combined={
       name:values.name,
       est:values.estimate,
@@ -94,7 +98,7 @@ export default function ItemDialog(props) {
       vintage:values.vintage,
       units:values.measurement,
       id:values.id,
-      //tags:selectedTags.list,
+      tags:selectedTags.list,
     }
     console.log("combined");
     console.log(combined);
@@ -106,7 +110,8 @@ export default function ItemDialog(props) {
       props.onItemSubmit();
       console.log("done");
     }
-    xhr.send(JSON.stringify(combined))
+    console.log(JSON.stringify(combined));
+    xhr.send(JSON.stringify(combined));
     setOpen(false);
   }
   const handleChangeTags = (event,newValue)=>{
