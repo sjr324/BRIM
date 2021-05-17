@@ -125,9 +125,18 @@ namespace BRIM.BackendClassLibrary
         //Creates then runs an insert query
         public bool addDrink(Drink drink)
         {
-            string query = @"insert into brim.drinks (name, estimate, measurementUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
-                + drink.Name + "', '" + drink.Estimate + "', '" + drink.Measurement + "', '" + drink.ParLevel + "', '" + drink.IdealLevel
-                + "', '" + drink.BottleSize + "', '" + drink.Brand + "', '" + drink.UnitsPerCase + "', '" + drink.Vintage + "')";
+            string query = "";
+            if (drink.Vintage != null)
+            {
+                query = @"insert into brim.drinks (name, estimate, measurementUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
+                    + drink.Name + "', '" + drink.Estimate + "', '" + drink.Measurement + "', '" + drink.ParLevel + "', '" + drink.IdealLevel
+                    + "', '" + drink.BottleSize + "', '" + drink.Brand + "', '" + drink.UnitsPerCase + "', '" + drink.Vintage + "')";
+            } else
+            {
+                query = @"insert into brim.drinks (name, estimate, measurementUnit, parLevel, idealLevel, bottleSize, brand, bottlesPerCase, vintage) values ('"
+                    + drink.Name + "', '" + drink.Estimate + "', '" + drink.Measurement + "', '" + drink.ParLevel + "', '" + drink.IdealLevel
+                    + "', '" + drink.BottleSize + "', '" + drink.Brand + "', '" + drink.UnitsPerCase + "', '" + DBNull.Value + "')";
+            }
             int newDrinkID = this.runSqlInsertCommandReturnID(query); //TODO: Update drink to have this ID
 
             if (newDrinkID == -1)
@@ -155,11 +164,22 @@ namespace BRIM.BackendClassLibrary
         //Creates then runs an update query
         public bool updateDrink(Drink drink)
         {
-            //TODO: Re-add vintage
-            string query = @"update brim.drinks set name = '" + drink.Name + "', estimate = '" + drink.Estimate + "', measurementUnit = '" 
-                + drink.Measurement + "', parLevel = '" + drink.ParLevel + "', idealLevel = '" + drink.IdealLevel + "', bottleSize = '"
-                + drink.BottleSize + "', brand = '" + drink.Brand + "', bottlesPerCase = '" + drink.UnitsPerCase + "', vintage = '" + drink.Vintage 
-                + "' where drinkID = '" + drink.ID + "'";
+            string query = "";
+            if (drink.Vintage != null)
+            {
+                query = @"update brim.drinks set name = '" + drink.Name + "', estimate = '" + drink.Estimate + "', measurementUnit = '"
+                    + drink.Measurement + "', parLevel = '" + drink.ParLevel + "', idealLevel = '" + drink.IdealLevel + "', bottleSize = '"
+                    + drink.BottleSize + "', brand = '" + drink.Brand + "', bottlesPerCase = '" + drink.UnitsPerCase + "', vintage = '" + drink.Vintage
+                    + "' where drinkID = '" + drink.ID + "'";
+            }
+            else
+            {
+                query = @"update brim.drinks set name = '" + drink.Name + "', estimate = '" + drink.Estimate + "', measurementUnit = '"
+                    + drink.Measurement + "', parLevel = '" + drink.ParLevel + "', idealLevel = '" + drink.IdealLevel + "', bottleSize = '"
+                    + drink.BottleSize + "', brand = '" + drink.Brand + "', bottlesPerCase = '" + drink.UnitsPerCase + "', vintage = '" + DBNull.Value
+                    + "' where drinkID = '" + drink.ID + "'";
+            }
+
             bool result = this.runSqlInsertUpdateOrDeleteCommand(query);
 
             if (!result)
